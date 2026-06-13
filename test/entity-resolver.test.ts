@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveEntityMetas } from "../src/entity-resolver";
+import { resolveEntityMetas, resolveEntityMetasWithDiagnostics } from "../src/entity-resolver";
 import type { HomeAssistant } from "../src/types";
 
 function makeHass(): HomeAssistant {
@@ -61,6 +61,18 @@ function makeHass(): HomeAssistant {
 }
 
 describe("resolveEntityMetas", () => {
+  it("does not auto-discover entities when auto_discover is false", async () => {
+    const rows = await resolveEntityMetas({ type: "custom:activity-history-card", auto_discover: false }, makeHass());
+
+    expect(rows).toEqual([]);
+  });
+
+  it("does not generate mock entities when mock_data is false", async () => {
+    const rows = await resolveEntityMetas({ type: "custom:activity-history-card", mock_data: false }, undefined);
+
+    expect(rows).toEqual([]);
+  });
+
   it("discovers area-assigned supported entities and skips default sensor noise", async () => {
     const rows = await resolveEntityMetas({ type: "custom:activity-history-card", auto_discover: true }, makeHass());
     expect(rows.map((row) => row.entity_id)).toEqual(["light.kitchen", "switch.safe"]);
@@ -91,5 +103,35 @@ describe("resolveEntityMetas", () => {
     );
 
     expect(rows.map((row) => row.entity_id)).toEqual(["light.kitchen"]);
+  });
+
+  it("reports registry fallback when Home Assistant registries are unavailable", async () => {
+    const hass: HomeAssistant = {
+      states: {
+        "light.attribute_area": {
+          entity_id: "light.attribute_area",
+          state: "on",
+          attributes: { friendly_name: "תאורה", area: "מטבח" },
+          last_changed: "2026-01-01T00:00:00.000Z",
+          last_updated: "2026-01-01T00:00:00.000Z",
+        },
+      },
+      callWS: async () => {
+        throw new Error("Registry unavailable");
+      },
+      connection: {
+        subscribeMessage: async () => () => undefined,
+      },
+    };
+
+    const { entities, diagnostics } = await resolveEntityMetasWithDiagnostics(
+      { type: "custom:activity-history-card", auto_discover: true },
+      hass,
+    );
+
+    expect(entities.map((row) => row.entity_id)).toEqual(["light.attribute_area"]);
+    expect(diagnostics.fallbackUsed).toBe(true);
+    expect(diagnostics.unavailableReasons).toContain("area_registry_unavailable");
+    expect(diagnostics.unavailableReasons).toContain("entity_registry_unavailable");
   });
 });

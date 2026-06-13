@@ -1,6 +1,7 @@
 type: custom:activity-history-card
 title: היסטוריית פעילות חכמה
 auto_discover: true
+debug: false
 hours_to_show: 24
 live: true
 rtl: auto

@@ -63,6 +63,7 @@ export interface ActivityHistoryCardConfig {
   type: string;
   title?: string;
   auto_discover?: boolean;
+  debug?: boolean;
   hours_to_show?: number;
   start_time?: string;
   end_time?: string;
@@ -175,4 +176,35 @@ export interface ActivitySummary {
   mostActiveEntity?: TimelineRow;
   mostActiveArea?: TimelineGroup;
   peakBucketLabel?: string;
+}
+
+export interface DiscoveryDiagnostics {
+  registryAvailable: boolean;
+  areaRegistryAvailable: boolean;
+  entityRegistryAvailable: boolean;
+  deviceRegistryAvailable: boolean;
+  labelRegistryAvailable: boolean;
+  registryEntityCount: number;
+  areaCount: number;
+  labelCount: number;
+  fallbackUsed: boolean;
+  unavailableReasons: string[];
+}
+
+export interface ActivityDiagnostics {
+  resolvedEntityCount: number;
+  historyRecordCount: number;
+  timelineSegmentCount: number;
+  activeTimelineSegmentCount: number;
+  filteredRowCount: number;
+  renderedGroupCount: number;
+  activeFilters: FilterState;
+  historyRange?: TimeRange;
+  attributesRequested: {
+    withAttributes: number;
+    withoutAttributes: number;
+  };
+  cacheHit: boolean;
+  mockData: boolean;
+  discovery?: DiscoveryDiagnostics;
 }

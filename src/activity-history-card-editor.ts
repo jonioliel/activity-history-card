@@ -158,6 +158,10 @@ export class ActivityHistoryCardEditor extends LitElement {
             </label>
           </div>
           <label class="check">
+            <input type="checkbox" .checked=${config.debug === true} @change=${(event: Event) => this._setChecked("debug", event)} />
+            הצג דיאגנוסטיקה
+          </label>
+          <label class="check">
             <input type="checkbox" .checked=${config.auto_discover !== false} @change=${(event: Event) => this._setChecked("auto_discover", event)} />
             משוך אוטומטית רכיבים שמשויכים לאזורים
           </label>
@@ -248,7 +252,7 @@ export class ActivityHistoryCardEditor extends LitElement {
     }
   }
 
-  private _setChecked(key: "auto_discover" | "mock_data", event: Event): void {
+  private _setChecked(key: "auto_discover" | "mock_data" | "debug", event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
     this._emitConfig({ ...this._config, [key]: checked });
   }

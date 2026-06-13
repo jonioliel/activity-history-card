@@ -1,8 +1,8 @@
 import { LitElement, html, nothing, type TemplateResult } from "lit";
 import { DEFAULT_CONFIG, DOMAIN_LABELS_HE } from "./defaults";
-import { resolveEntityMetas } from "./entity-resolver";
+import { resolveEntityMetasWithDiagnostics } from "./entity-resolver";
 import { filterRows, groupRows } from "./filters";
-import { fetchHistory } from "./history-client";
+import { fetchHistory, getHistoryRequestPlan } from "./history-client";
 import { formatDuration, formatTime, isRtl, resolveTimeRange } from "./format";
 import { intervalizeHistory } from "./intervalize";
 import { getMockEntities, getMockHistory } from "./mock-data";
@@ -15,6 +15,7 @@ import { summarizeActivity } from "./summary";
 import "./activity-history-card-editor";
 import type {
   ActivityHistoryCardConfig,
+  ActivityDiagnostics,
   ActivitySummary,
   FilterState,
   HistoryStateRecord,
@@ -27,6 +28,12 @@ import type {
 } from "./types";
 
 const CARD_VERSION = "0.1.0";
+type EmptyStateReason =
+  | "no_entities_selected"
+  | "no_resolved_entities"
+  | "no_history_returned"
+  | "history_unusable"
+  | "all_entities_filtered";
 
 export class ActivityHistoryCard extends LitElement {
   static override styles = activityHistoryCardStyles;
@@ -53,6 +60,8 @@ export class ActivityHistoryCard extends LitElement {
   private _summary?: ActivitySummary;
   private _loading = false;
   private _error?: string;
+  private _emptyReason?: EmptyStateReason;
+  private _diagnostics?: ActivityDiagnostics;
   private _fullscreen = false;
   private _filterSheetOpen = false;
   private _usingMockData = false;
@@ -154,6 +163,7 @@ export class ActivityHistoryCard extends LitElement {
     return html`
       <ha-card class=${classes} dir=${rtl ? "rtl" : "ltr"} tabindex=${this._fullscreen ? "0" : "-1"}>
         ${this._renderHeader()} ${this._renderFilters()} ${this._renderSummary()}
+        ${this._config.debug ? this._renderDiagnostics() : nothing}
         <div class=${this._config.show_insights === false ? "ahc__body ahc__body--no-insights" : "ahc__body"}>
           <main class="ahc__main">${this._renderMainContent()}</main>
           ${this._config.show_insights === false ? nothing : this._renderInsights()}
@@ -308,15 +318,8 @@ export class ActivityHistoryCard extends LitElement {
     if (this._error) {
       return html`<div class="ahc-state-card"><div><h3 class="ahc-state-card__title">שגיאה בטעינת ההיסטוריה</h3><p>${this._error}</p></div></div>`;
     }
-    if (!this._groups.length) {
-      return html`
-        <div class="ahc-state-card">
-          <div>
-            <h3 class="ahc-state-card__title">אין נתונים להצגה</h3>
-            <p>לא נמצאו ישויות פעילות באזורים שנבחרו. בדוק שהרכיבים משויכים לאזורים, או שנה דומיינים/לייבלים בעורך הכרטיס.</p>
-          </div>
-        </div>
-      `;
+    if (this._emptyReason || !this._groups.length) {
+      return this._renderEmptyState(this._emptyReason ?? "no_resolved_entities");
     }
 
     const range = this._resolveRange();
@@ -336,6 +339,84 @@ export class ActivityHistoryCard extends LitElement {
           summary: this._summary ?? summarizeActivity(this._groups),
         });
     }
+  }
+
+  private _renderEmptyState(reason: EmptyStateReason): TemplateResult {
+    const states: Record<EmptyStateReason, { title: string; body: string; yaml: string }> = {
+      no_entities_selected: {
+        title: "לא נבחרו רכיבים",
+        body: "הפעל גילוי אוטומטי או הוסף רשימת entities ידנית. בלי אחד מהם הכרטיס לא יודע אילו רכיבים לטעון.",
+        yaml: "type: custom:activity-history-card\nauto_discover: true\nmock_data: false",
+      },
+      no_resolved_entities: {
+        title: "לא נמצאו רכיבים באזורים",
+        body: "בדוק שהרכיבים משויכים לאזורים ב-Home Assistant, שהדומיינים שבחרת מתאימים, ושלא סיננת אותם באמצעות labels.",
+        yaml: "type: custom:activity-history-card\nauto_discover: true\nmock_data: false\nexclude_labels:\n  - לא להצגה",
+      },
+      no_history_returned: {
+        title: "Recorder לא החזיר היסטוריה",
+        body: "נמצאו רכיבים, אבל Home Assistant לא החזיר עבורם רשומות בטווח הזמן. נסה להגדיל את הטווח או לבדוק שה-Recorder שומר את הישויות האלה.",
+        yaml: "type: custom:activity-history-card\nauto_discover: true\nhours_to_show: 168",
+      },
+      history_unusable: {
+        title: "היסטוריה לא תקינה להצגה",
+        body: "התקבלו רשומות היסטוריה, אבל הן היו חסרות זמן/מצב או לא יצרו מקטעים תקינים. הפעל debug כדי לראות את מספר הרשומות והמקטעים.",
+        yaml: "type: custom:activity-history-card\ndebug: true",
+      },
+      all_entities_filtered: {
+        title: "כל הרכיבים סוננו",
+        body: "יש נתונים, אבל המסננים הנוכחיים מסתירים הכל. נקה חיפוש, אזור, סוג ישות או מצב פעיל בלבד.",
+        yaml: "type: custom:activity-history-card\nauto_discover: true\nfilters:\n  active_only: false",
+      },
+    };
+    const state = states[reason];
+    const discoveryWarnings =
+      reason === "no_resolved_entities" && this._diagnostics?.discovery?.unavailableReasons.length
+        ? this._diagnostics.discovery.unavailableReasons.join(", ")
+        : "";
+    return html`
+      <div class="ahc-state-card">
+        <div>
+          <h3 class="ahc-state-card__title">${state.title}</h3>
+          <p>${state.body}</p>
+          ${discoveryWarnings ? html`<p>אזהרת discovery: ${discoveryWarnings}. אם האזורים לא זמינים, נסה להגדיר entities ידנית או להפעיל debug.</p>` : nothing}
+          <pre class="ahc-state-card__yaml" dir="ltr"><code>${state.yaml}</code></pre>
+        </div>
+      </div>
+    `;
+  }
+
+  private _renderDiagnostics(): TemplateResult {
+    const diagnostics = this._diagnostics;
+    if (!diagnostics) {
+      return html`<section class="ahc-debug" aria-label="אבחון"><strong>Debug</strong><span>ממתין לטעינת נתונים...</span></section>`;
+    }
+
+    return html`
+      <section class="ahc-debug" aria-label="אבחון">
+        <div class="ahc-debug__header">
+          <strong>Debug</strong>
+          <span>${diagnostics.cacheHit ? "cache hit" : "loaded"}</span>
+        </div>
+        <dl class="ahc-debug__grid">
+          <div><dt>רכיבים</dt><dd>${diagnostics.resolvedEntityCount}</dd></div>
+          <div><dt>רשומות</dt><dd>${diagnostics.historyRecordCount}</dd></div>
+          <div><dt>מקטעים</dt><dd>${diagnostics.timelineSegmentCount}</dd></div>
+          <div><dt>פעילים</dt><dd>${diagnostics.activeTimelineSegmentCount}</dd></div>
+          <div><dt>אחרי סינון</dt><dd>${diagnostics.filteredRowCount}</dd></div>
+          <div><dt>קבוצות</dt><dd>${diagnostics.renderedGroupCount}</dd></div>
+          <div><dt>attributes</dt><dd>${diagnostics.attributesRequested.withAttributes}/${diagnostics.attributesRequested.withoutAttributes}</dd></div>
+          <div><dt>registry</dt><dd>${diagnostics.discovery?.registryAvailable ? "זמין" : "fallback"}</dd></div>
+        </dl>
+        <p class="ahc-debug__meta" dir="ltr">
+          ${diagnostics.historyRange ? `${diagnostics.historyRange.start.toISOString()} → ${diagnostics.historyRange.end.toISOString()}` : "no range"}
+        </p>
+        <p class="ahc-debug__meta">מסננים: ${JSON.stringify(diagnostics.activeFilters)}</p>
+        ${diagnostics.discovery?.unavailableReasons.length
+          ? html`<p class="ahc-debug__meta">Registry warnings: ${diagnostics.discovery.unavailableReasons.join(", ")}</p>`
+          : nothing}
+      </section>
+    `;
   }
 
   private _renderInsights(): TemplateResult {
@@ -436,11 +517,15 @@ export class ActivityHistoryCard extends LitElement {
 
   private _openFilterSheet = (): void => {
     this._filterSheetOpen = true;
+    document.addEventListener("keydown", this._onDocumentKeyDown);
     this.requestUpdate();
   };
 
   private _closeFilterSheet = (): void => {
     this._filterSheetOpen = false;
+    if (!this._fullscreen) {
+      document.removeEventListener("keydown", this._onDocumentKeyDown);
+    }
     this.requestUpdate();
   };
 
@@ -460,17 +545,33 @@ export class ActivityHistoryCard extends LitElement {
       this._usingMockData = false;
       this._loading = true;
       this._error = undefined;
+      this._emptyReason = undefined;
       this.requestUpdate();
       return;
     }
 
-    const entities = useMockData ? getMockEntities() : await resolveEntityMetas(this._config, this._hass);
+    const token = ++this._fetchToken;
+    this._loading = !useMockData;
+    this._error = undefined;
+    this._emptyReason = undefined;
+    this._usingMockData = useMockData;
+    this.requestUpdate();
+
+    const resolved = useMockData
+      ? { entities: getMockEntities(), diagnostics: undefined }
+      : await resolveEntityMetasWithDiagnostics(this._config, this._hass);
+    if (token !== this._fetchToken) return;
+
+    const entities = resolved.entities;
     const range = this._resolveRange();
+    const requestPlan = getHistoryRequestPlan(entities);
     const key = JSON.stringify({
       mock: useMockData,
       start: range.start.toISOString(),
       end: range.end.toISOString(),
       entities: entities.map((entity) => entity.entity_id),
+      withAttributes: requestPlan.withAttributes.map((entity) => entity.entity_id),
+      withoutAttributes: requestPlan.withoutAttributes.map((entity) => entity.entity_id),
       includeLabels: this._config.include_labels ?? [],
       excludeLabels: this._config.exclude_labels ?? [],
       significant: this._config.significant_changes_only,
@@ -482,6 +583,21 @@ export class ActivityHistoryCard extends LitElement {
       this._rows = [];
       this._groups = [];
       this._summary = summarizeActivity([]);
+      this._emptyReason = this._config.auto_discover === false && !(this._config.entities?.length) ? "no_entities_selected" : "no_resolved_entities";
+      this._setDiagnostics({
+        resolvedEntityCount: 0,
+        historyRecordCount: 0,
+        timelineSegmentCount: 0,
+        activeTimelineSegmentCount: 0,
+        filteredRowCount: 0,
+        renderedGroupCount: 0,
+        activeFilters: { ...this._filter },
+        historyRange: range,
+        attributesRequested: { withAttributes: 0, withoutAttributes: 0 },
+        cacheHit: false,
+        mockData: useMockData,
+        discovery: resolved.diagnostics,
+      });
       this._loading = false;
       this._error = undefined;
       this.requestUpdate();
@@ -491,17 +607,15 @@ export class ActivityHistoryCard extends LitElement {
     if (key === this._lastFetchKey) {
       const cached = this._historyCache.get(key);
       if (cached) {
+        const historyRecordCount = countHistoryRecords(cached);
         this._rows = intervalizeHistory(cached, entities, range, this._config, this._hass?.states ?? {});
+        this._setPostLoadState(historyRecordCount, range, requestPlan, true, useMockData, resolved.diagnostics);
+        this._loading = false;
+        this._error = undefined;
         this._rebuildGroups();
         return;
       }
     }
-
-    const token = ++this._fetchToken;
-    this._loading = !useMockData;
-    this._error = undefined;
-    this._usingMockData = useMockData;
-    this.requestUpdate();
 
     try {
       let history = this._historyCache.get(key);
@@ -510,7 +624,9 @@ export class ActivityHistoryCard extends LitElement {
         this._historyCache.set(key, history);
       }
       if (token !== this._fetchToken) return;
+      const historyRecordCount = countHistoryRecords(history);
       this._rows = intervalizeHistory(history, entities, range, this._config, this._hass?.states ?? {});
+      this._setPostLoadState(historyRecordCount, range, requestPlan, false, useMockData, resolved.diagnostics);
       this._lastFetchKey = key;
       this._rebuildGroups();
     } catch (error) {
@@ -518,6 +634,7 @@ export class ActivityHistoryCard extends LitElement {
       this._rows = [];
       this._groups = [];
       this._summary = summarizeActivity([]);
+      this._emptyReason = undefined;
     } finally {
       if (token === this._fetchToken) {
         this._loading = false;
@@ -530,7 +647,62 @@ export class ActivityHistoryCard extends LitElement {
     const filtered = filterRows(this._rows, this._filter);
     this._groups = groupRows(filtered, this._filter.groupBy);
     this._summary = summarizeActivity(this._groups);
+    if (this._rows.length && !filtered.length) {
+      this._emptyReason = "all_entities_filtered";
+    } else if (this._emptyReason === "all_entities_filtered") {
+      this._emptyReason = undefined;
+    }
+    if (this._diagnostics) {
+      this._setDiagnostics({
+        ...this._diagnostics,
+        filteredRowCount: filtered.length,
+        renderedGroupCount: this._groups.length,
+        activeFilters: { ...this._filter },
+      });
+    }
     this.requestUpdate();
+  }
+
+  private _setPostLoadState(
+    historyRecordCount: number,
+    range: TimeRange,
+    requestPlan: ReturnType<typeof getHistoryRequestPlan>,
+    cacheHit: boolean,
+    mockData: boolean,
+    discovery: ActivityDiagnostics["discovery"],
+  ): void {
+    const timelineSegmentCount = this._rows.reduce((sum, row) => sum + row.segments.length, 0);
+    const activeTimelineSegmentCount = this._rows.reduce((sum, row) => sum + row.segments.filter((segment) => segment.active).length, 0);
+
+    if (historyRecordCount === 0 && activeTimelineSegmentCount === 0) {
+      this._emptyReason = "no_history_returned";
+    } else if (historyRecordCount > 0 && timelineSegmentCount === 0) {
+      this._emptyReason = "history_unusable";
+    } else {
+      this._emptyReason = undefined;
+    }
+
+    this._setDiagnostics({
+      resolvedEntityCount: this._rows.length,
+      historyRecordCount,
+      timelineSegmentCount,
+      activeTimelineSegmentCount,
+      filteredRowCount: this._rows.length,
+      renderedGroupCount: 0,
+      activeFilters: { ...this._filter },
+      historyRange: range,
+      attributesRequested: {
+        withAttributes: requestPlan.withAttributes.length,
+        withoutAttributes: requestPlan.withoutAttributes.length,
+      },
+      cacheHit,
+      mockData,
+      discovery,
+    });
+  }
+
+  private _setDiagnostics(diagnostics: ActivityDiagnostics): void {
+    this._diagnostics = diagnostics;
   }
 
   private _resolveRange(): TimeRange {
@@ -627,8 +799,10 @@ export class ActivityHistoryCard extends LitElement {
       await this.updateComplete;
       (this.renderRoot.querySelector(".ahc") as HTMLElement | null)?.focus();
     } else {
-      document.removeEventListener("keydown", this._onDocumentKeyDown);
       document.removeEventListener("fullscreenchange", this._onFullscreenChange);
+      if (!this._filterSheetOpen) {
+        document.removeEventListener("keydown", this._onDocumentKeyDown);
+      }
       if (document.fullscreenElement) {
         await document.exitFullscreen().catch(() => undefined);
       }
@@ -637,7 +811,12 @@ export class ActivityHistoryCard extends LitElement {
   };
 
   private _onDocumentKeyDown = (event: KeyboardEvent): void => {
-    if (event.key === "Escape" && this._fullscreen) {
+    if (event.key !== "Escape") return;
+    if (this._filterSheetOpen) {
+      this._closeFilterSheet();
+      return;
+    }
+    if (this._fullscreen) {
       void this._toggleFullscreen();
     }
   };
@@ -645,8 +824,10 @@ export class ActivityHistoryCard extends LitElement {
   private _onFullscreenChange = (): void => {
     if (!document.fullscreenElement && this._fullscreen) {
       this._fullscreen = false;
-      document.removeEventListener("keydown", this._onDocumentKeyDown);
       document.removeEventListener("fullscreenchange", this._onFullscreenChange);
+      if (!this._filterSheetOpen) {
+        document.removeEventListener("keydown", this._onDocumentKeyDown);
+      }
       this.requestUpdate();
     }
   };
@@ -661,6 +842,10 @@ export class ActivityHistoryCard extends LitElement {
     if (preset === "custom") return "טווח מותאם";
     return "24 שעות אחרונות";
   }
+}
+
+function countHistoryRecords(history: Record<string, HistoryStateRecord[]>): number {
+  return Object.values(history).reduce((sum, records) => sum + records.length, 0);
 }
 
 if (!customElements.get("activity-history-card")) {

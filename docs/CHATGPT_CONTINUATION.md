@@ -26,7 +26,7 @@ Technology:
 
 ## Current MVP Status
 
-The first MVP is implemented and pushed.
+The first MVP is implemented and has been stabilized for real Home Assistant usage.
 
 Implemented:
 
@@ -41,7 +41,9 @@ Implemented:
 - Automatic discovery with `auto_discover: true` for entities assigned to Home Assistant areas
 - Label filtering with `include_labels` and `exclude_labels`
 - Home Assistant history fetching via `history/history_during_period`
-- Conservative entity auto-discovery only when `domains` or `areas` are configured
+- Real Home Assistant discovery through area, device, entity, and label registries when available
+- Graceful fallback and diagnostics when registries are unavailable
+- Conservative mock behavior: `mock_data: false` never generates mock entities
 - Swimlane timeline grouped by area or domain
 - RTL-friendly Hebrew UI
 - Chronological left-to-right timeline internals
@@ -56,6 +58,15 @@ Implemented:
 - Desktop/panel styling based on `mockups/05-desktop-fullscreen-rtl-panel.png`
 - Full-screen mode using native Fullscreen API with CSS fallback
 - Loading, error, and empty states
+- Specific empty states for:
+  - no entities selected
+  - no resolved entities
+  - no history returned
+  - malformed/unusable history
+  - all entities filtered out
+- `debug: true` diagnostics panel with entity, history, timeline, filter, cache, range, attribute-request, and registry information
+- Debounced history reloads, stale request protection, and range/entity/options cache
+- Split history requests for entities that need attributes and entities that can use minimal history
 - Placeholder renderers only for heatmap, detail, and correlation
 - HACS custom repository metadata via `hacs.json`
 - HACS-installable bundle at `dist/activity-history-card.js`
@@ -95,7 +106,7 @@ npm run build
 Latest verified results:
 
 - `npm run typecheck` passed
-- `npm run test` passed, 3 tests
+- `npm run test` passed, 18 tests
 - `npm run build` passed
 
 The generated `dist/activity-history-card.js` is intentionally tracked for HACS. `dist/activity-history-card.js.map` remains ignored.
@@ -157,10 +168,7 @@ Summarize changed files and Home Assistant testing steps.
 1. Test the HACS installation inside Home Assistant.
 2. Verify the card loads as a resource and renders with `mock_data: true`.
 3. Test real `entities` from `sample-config.yaml`.
-4. Improve tooltip/popover behavior for touch.
-5. Add more tests for:
-   - unknown/unavailable handling
-   - domain classification
-   - RTL chronological x positions
-   - filter combinations
-6. Only after the MVP works in a real dashboard, plan drill-down/detail mode.
+4. Test `debug: true` against a real Home Assistant instance when no data appears.
+5. Improve tooltip/popover behavior for touch.
+6. Add more tests for RTL chronological x positions and complex filter combinations.
+7. Only after the MVP works in a real dashboard, plan drill-down/detail mode.

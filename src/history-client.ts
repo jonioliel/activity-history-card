@@ -12,8 +12,7 @@ export async function fetchHistory(
   range: TimeRange,
   config: ActivityHistoryCardConfig,
 ): Promise<Record<string, HistoryStateRecord[]>> {
-  const withAttributes = entities.filter(needsAttributes);
-  const withoutAttributes = entities.filter((entity) => !needsAttributes(entity));
+  const { withAttributes, withoutAttributes } = getHistoryRequestPlan(entities);
 
   const batches = await Promise.all([
     withoutAttributes.length ? fetchHistoryBatch(hass, withoutAttributes, range, config, true) : Promise.resolve({}),
@@ -21,6 +20,13 @@ export async function fetchHistory(
   ]);
 
   return Object.assign({}, ...batches);
+}
+
+export function getHistoryRequestPlan(entities: EntityMeta[]): { withAttributes: EntityMeta[]; withoutAttributes: EntityMeta[] } {
+  return {
+    withAttributes: entities.filter(needsAttributes),
+    withoutAttributes: entities.filter((entity) => !needsAttributes(entity)),
+  };
 }
 
 async function fetchHistoryBatch(

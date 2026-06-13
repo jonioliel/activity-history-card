@@ -37,6 +37,7 @@ export const DEFAULT_CONFIG: Required<
     ActivityHistoryCardConfig,
     | "title"
     | "auto_discover"
+    | "debug"
     | "hours_to_show"
     | "live"
     | "display_mode"
@@ -55,6 +56,7 @@ export const DEFAULT_CONFIG: Required<
 > = {
   title: "היסטוריית פעילות חכמה",
   auto_discover: true,
+  debug: false,
   hours_to_show: 24,
   live: true,
   display_mode: "card",

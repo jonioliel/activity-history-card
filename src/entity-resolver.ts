@@ -1,6 +1,6 @@
 import { DEFAULT_DISCOVERY_DOMAINS } from "./defaults";
 import { getDomain, humanizeEntityId } from "./format";
-import type { ActivityHistoryCardConfig, EntityConfig, EntityMeta, HassEntity, HomeAssistant } from "./types";
+import type { ActivityHistoryCardConfig, DiscoveryDiagnostics, EntityConfig, EntityMeta, HomeAssistant } from "./types";
 
 interface AreaRegistryEntry {
   area_id: string;
@@ -38,27 +38,50 @@ interface RegistrySnapshot {
   devices: DeviceRegistryEntry[];
   entities: EntityRegistryEntry[];
   labels: LabelRegistryEntry[];
+  areaRegistryAvailable: boolean;
+  deviceRegistryAvailable: boolean;
+  entityRegistryAvailable: boolean;
+  labelRegistryAvailable: boolean;
 }
 
-let registrySnapshotPromise: Promise<RegistrySnapshot> | undefined;
+const registrySnapshotPromises = new WeakMap<HomeAssistant, Promise<RegistrySnapshot>>();
 
 export async function resolveEntityMetas(config: ActivityHistoryCardConfig, hass?: HomeAssistant): Promise<EntityMeta[]> {
+  return (await resolveEntityMetasWithDiagnostics(config, hass)).entities;
+}
+
+export async function resolveEntityMetasWithDiagnostics(
+  config: ActivityHistoryCardConfig,
+  hass?: HomeAssistant,
+): Promise<{ entities: EntityMeta[]; diagnostics: DiscoveryDiagnostics }> {
   const configured = config.entities ?? [];
   const registry = hass ? await loadRegistrySnapshot(hass) : emptyRegistry();
   const entities: EntityConfig[] = configured.map((item) => (typeof item === "string" ? { entity: item } : item));
+  let fallbackUsed = false;
 
   if (!entities.length && hass && config.auto_discover !== false) {
-    entities.push(...discoverAreaEntities(config, hass, registry));
+    const discovered = discoverAreaEntities(config, hass, registry);
+    fallbackUsed = discovered.fallbackUsed;
+    entities.push(...discovered.entities);
   }
 
-  return entities
+  const resolved = entities
     .filter((entry) => entry.entity && !entry.hidden && !isExcluded(entry.entity, config.exclude_entities ?? []))
     .map((entry) => toEntityMeta(entry, config, hass, registry))
     .filter((entity): entity is EntityMeta => Boolean(entity))
     .filter((entity) => labelConfigAllows(entity.labels ?? [], config, registry.labels));
+
+  return {
+    entities: resolved,
+    diagnostics: buildDiscoveryDiagnostics(registry, fallbackUsed, config),
+  };
 }
 
-function discoverAreaEntities(config: ActivityHistoryCardConfig, hass: HomeAssistant, registry: RegistrySnapshot): EntityConfig[] {
+function discoverAreaEntities(
+  config: ActivityHistoryCardConfig,
+  hass: HomeAssistant,
+  registry: RegistrySnapshot,
+): { entities: EntityConfig[]; fallbackUsed: boolean } {
   const allowedDomains = config.domains?.length ? config.domains : DEFAULT_DISCOVERY_DOMAINS;
   const areaFilters = normalizedSet(config.areas ?? []);
   const entities: EntityConfig[] = [];
@@ -91,7 +114,7 @@ function discoverAreaEntities(config: ActivityHistoryCardConfig, hass: HomeAssis
       });
     }
 
-    return entities;
+    return { entities, fallbackUsed: false };
   }
 
   for (const [entityId, stateObj] of Object.entries(hass.states)) {
@@ -103,7 +126,7 @@ function discoverAreaEntities(config: ActivityHistoryCardConfig, hass: HomeAssis
     entities.push({ entity: entityId, area, domain });
   }
 
-  return entities;
+  return { entities, fallbackUsed: true };
 }
 
 function toEntityMeta(
@@ -155,27 +178,76 @@ function labelConfigAllows(entityLabels: string[], config: ActivityHistoryCardCo
 }
 
 async function loadRegistrySnapshot(hass: HomeAssistant): Promise<RegistrySnapshot> {
-  registrySnapshotPromise ??= Promise.all([
+  const existing = registrySnapshotPromises.get(hass);
+  if (existing) return existing;
+
+  const promise = Promise.all([
     safeRegistryCall<AreaRegistryEntry>(hass, "config/area_registry/list"),
     safeRegistryCall<DeviceRegistryEntry>(hass, "config/device_registry/list"),
     safeRegistryCall<EntityRegistryEntry>(hass, "config/entity_registry/list"),
     safeRegistryCall<LabelRegistryEntry>(hass, "config/label_registry/list"),
-  ]).then(([areas, devices, entities, labels]) => ({ areas, devices, entities, labels }));
+  ]).then(([areas, devices, entities, labels]) => ({
+    areas: areas.items,
+    devices: devices.items,
+    entities: entities.items,
+    labels: labels.items,
+    areaRegistryAvailable: areas.available,
+    deviceRegistryAvailable: devices.available,
+    entityRegistryAvailable: entities.available,
+    labelRegistryAvailable: labels.available,
+  }));
 
-  return registrySnapshotPromise;
+  registrySnapshotPromises.set(hass, promise);
+  return promise;
 }
 
-async function safeRegistryCall<T>(hass: HomeAssistant, type: string): Promise<T[]> {
+async function safeRegistryCall<T>(hass: HomeAssistant, type: string): Promise<{ items: T[]; available: boolean }> {
   try {
     const value = await hass.callWS<unknown>({ type });
-    return Array.isArray(value) ? (value as T[]) : [];
+    return { items: Array.isArray(value) ? (value as T[]) : [], available: Array.isArray(value) };
   } catch {
-    return [];
+    return { items: [], available: false };
   }
 }
 
 function emptyRegistry(): RegistrySnapshot {
-  return { areas: [], devices: [], entities: [], labels: [] };
+  return {
+    areas: [],
+    devices: [],
+    entities: [],
+    labels: [],
+    areaRegistryAvailable: false,
+    deviceRegistryAvailable: false,
+    entityRegistryAvailable: false,
+    labelRegistryAvailable: false,
+  };
+}
+
+function buildDiscoveryDiagnostics(
+  registry: RegistrySnapshot,
+  fallbackUsed: boolean,
+  config: ActivityHistoryCardConfig,
+): DiscoveryDiagnostics {
+  const unavailableReasons: string[] = [];
+  if (!registry.areaRegistryAvailable) unavailableReasons.push("area_registry_unavailable");
+  if (!registry.entityRegistryAvailable) unavailableReasons.push("entity_registry_unavailable");
+  if (!registry.deviceRegistryAvailable) unavailableReasons.push("device_registry_unavailable");
+  if ((config.include_labels?.length || config.exclude_labels?.length) && !registry.labelRegistryAvailable) {
+    unavailableReasons.push("label_registry_unavailable");
+  }
+
+  return {
+    registryAvailable: registry.areaRegistryAvailable || registry.entityRegistryAvailable || registry.deviceRegistryAvailable,
+    areaRegistryAvailable: registry.areaRegistryAvailable,
+    entityRegistryAvailable: registry.entityRegistryAvailable,
+    deviceRegistryAvailable: registry.deviceRegistryAvailable,
+    labelRegistryAvailable: registry.labelRegistryAvailable,
+    registryEntityCount: registry.entities.length,
+    areaCount: registry.areas.length,
+    labelCount: registry.labels.length,
+    fallbackUsed,
+    unavailableReasons,
+  };
 }
 
 function resolveAreaName(areaId: string | undefined, registry: RegistrySnapshot): string | undefined {

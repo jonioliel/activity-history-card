@@ -1,83 +1,55 @@
-# Activity History Card — Codex Handoff Pack
+# Activity History Card
 
-חבילת עבודה מלאה להעברה ל-Codex עבור פיתוח כרטיס Home Assistant בשם:
+כרטיס Lovelace ל-Home Assistant שמציג היסטוריית פעילות כציר זמן מסוג swimlane, עם תמיכה מלאה בעברית, RTL, מובייל, אזורים, סינון לפי סוג רכיב ו-labels.
 
 ```yaml
 type: custom:activity-history-card
 ```
 
-המטרה: כרטיס היסטוריית פעילות חכם, נקי וברור, עם תמיכה מלאה ב-RTL, סינון רכיבים, מצב מסך מלא, ונייד.
-
-## מה יש בחבילה
-
-```text
-CODEX_PROMPT.md                 # הפרומט הראשי להעברה ל-Codex
-activity-history-card.css       # CSS מלא כבסיס עיצובי
-sample-config.yaml              # דוגמת YAML לכרטיס
-package.json                    # שלד פרויקט Vite/Lit
-vite.config.ts
-src/                            # שלד TypeScript ראשוני
-mockups/                        # כל ההדמיות
-mockups/index.html              # גלריית צפייה מהירה בהדמיות
-docs/IMPLEMENTATION_SPEC.md     # מפרט פיתוח מפורט
-docs/MOBILE_RTL_FILTER_SPEC.md  # מפרט מובייל/RTL/סינון
-docs/MOCKUP_MANIFEST.md         # פירוט ההדמיות
-docs/legacy-codex-brief.md      # הבריף הקודם, לשימור הקשר
-docs/legacy-mockups-gallery.html# גלריית ההדמיות המקורית
-```
-
-## איך להשתמש מול Codex
-
-1. העלה ל-Codex את כל התיקייה או את קובץ ה-ZIP.
-2. פתח את `CODEX_PROMPT.md` והדבק אותו כהנחיית העבודה הראשית.
-3. בקש מ-Codex להתחיל מ-MVP של `swimlane` עם תמיכה ב-RTL, פילטרים, ומובייל.
-4. אחרי שה-MVP עובד, המשך למצבי `heatmap`, `detail`, ו-`correlation`.
-
-## סדר עדיפות לפיתוח
-
-1. תשתית Custom Card: Lit + TypeScript + build.
-2. קריאת History מ-Home Assistant.
-3. המרת היסטוריה ל-Segments.
-4. תצוגת Swimlane לפי אזורים.
-5. סינון לפי זמן, אזור, סוג רכיב, חיפוש, active-only.
-6. RTL אמיתי, כולל מובייל.
-7. מצב full-screen/panel.
-8. Drill-down לרכיב.
-9. Heatmap וקורלציות.
-
-## ההדמיות החשובות ביותר
-
-- `mockups/05-desktop-fullscreen-rtl-panel.png`
-- `mockups/06-mobile-overview-rtl.png`
-- `mockups/07-mobile-advanced-filter-sheet-rtl.png`
-- `mockups/08-mobile-entity-detail-rtl.png`
+הכרטיס מיועד להתחיל מנתוני Home Assistant אמיתיים: הוא יכול לגלות אוטומטית רכיבים שמשויכים לאזורים, למשוך את ההיסטוריה מה-Recorder, ולהציג פעילות לפי אזור או סוג רכיב. נתוני דוגמה מוצגים רק כאשר מגדירים במפורש `mock_data: true`.
 
 ## התקנה דרך HACS
 
-הרפו מוכן להוספה כ-Custom repository ב-HACS:
+1. פתח את HACS.
+2. עבור אל Custom repositories.
+3. הוסף את הרפו:
 
-1. פתח HACS.
-2. הוסף Custom repository:
-   `https://github.com/jonioliel/activity-history-card`
-3. בחר Category: `Dashboard`.
-4. התקן את הכרטיס.
-5. הוסף כרטיס Lovelace. ברירת המחדל מושכת אוטומטית רכיבים שמשויכים לאזורים ב-Home Assistant:
+```text
+https://github.com/jonioliel/activity-history-card
+```
+
+4. בחר Category: `Dashboard`.
+5. התקן את הכרטיס.
+6. אם Home Assistant לא הוסיף resource אוטומטית, הוסף ידנית:
+
+```text
+/hacsfiles/activity-history-card/activity-history-card.js
+```
+
+Type: `JavaScript Module`
+
+## שימוש בסיסי עם נתוני אמת
 
 ```yaml
 type: custom:activity-history-card
+title: היסטוריית פעילות חכמה
 mock_data: false
 auto_discover: true
 display_mode: panel
 hours_to_show: 24
+group_by: area
 exclude_labels:
   - לא להצגה
   - רכיבים מוגנים
 ```
 
-אפשר להגביל לאזורים או לדומיינים מסוימים:
+במצב הזה הכרטיס מנסה למצוא אוטומטית רכיבים שמוגדרים באזורים של Home Assistant. אם אין אזורים, או שה-Registry לא זמין לגרסת Home Assistant שלך, הכרטיס יציג הודעה ברורה ויציע YAML חלופי.
+
+## סינון לפי אזורים ודומיינים
 
 ```yaml
 type: custom:activity-history-card
+mock_data: false
 auto_discover: true
 areas:
   - סלון
@@ -91,18 +63,71 @@ domains:
   - fan
 ```
 
-אפשר גם לעבוד ידנית עם רשימת entities:
+אם לא מגדירים `domains`, הכרטיס משתמש בדומיינים שימושיים כברירת מחדל כדי להימנע מרעש של חיישנים כלליים.
+
+## רשימת entities ידנית
 
 ```yaml
 type: custom:activity-history-card
+mock_data: false
 auto_discover: false
 entities:
   - entity: light.living_room_main
     name: תאורת סלון
     area: סלון
+    active_states: ["on"]
+  - entity: climate.living_room_ac
+    name: מזגן סלון
+    area: סלון
+    active_states: ["cool", "heat", "dry", "fan_only"]
+    active_attributes:
+      hvac_action: ["cooling", "heating", "drying", "fan"]
 ```
 
-לבדיקה מהירה בלי נתוני Recorder אפשר להפעיל נתוני דוגמה:
+כאשר `auto_discover: false`, חייבים להגדיר `entities`. אחרת הכרטיס יציג מצב ריק של "לא נבחרו רכיבים".
+
+## Labels
+
+אפשר להסתיר או להציג רכיבים לפי labels של Home Assistant:
+
+```yaml
+type: custom:activity-history-card
+auto_discover: true
+exclude_labels:
+  - לא להצגה
+  - רכיבים מוגנים
+include_labels:
+  - להצגה בלוח ראשי
+```
+
+הסתרה באמצעות `exclude_labels` גוברת על הצגה באמצעות `include_labels`. אפשר להשתמש בשם ה-label או ב-ID שלו.
+
+## מצב debug
+
+אם הכרטיס לא מציג נתונים, הפעל אבחון:
+
+```yaml
+type: custom:activity-history-card
+mock_data: false
+auto_discover: true
+debug: true
+```
+
+כאשר `debug: true`, הכרטיס מציג פאנל קטן עם:
+
+- מספר רכיבים שנמצאו
+- מספר רשומות היסטוריה שחזרו מה-Recorder
+- מספר מקטעי timeline
+- המסננים הפעילים
+- טווח בקשת ההיסטוריה
+- האם נדרשו attributes
+- זמינות area/entity/device/label registries
+
+כאשר `debug: false`, הכרטיס לא אמור להציף את ה-console.
+
+## מצב נתוני דוגמה
+
+לבדיקה מהירה בלי Home Assistant Recorder:
 
 ```yaml
 type: custom:activity-history-card
@@ -110,7 +135,33 @@ mock_data: true
 display_mode: panel
 ```
 
-אם מופיעים אזורים כמו סלון, מטבח וחדרי ילדים בלי קשר לבית שלך, כנראה שהכרטיס עדיין מוגדר עם `mock_data: true`.
+אם אתה רואה אזורי דוגמה כמו סלון, מטבח או חדרי ילדים שלא קשורים לבית שלך, בדוק שהכרטיס לא מוגדר עם `mock_data: true`.
+
+## אפשרויות עיקריות
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `mock_data` | `false` | מציג נתוני דוגמה רק כאשר מוגדר `true` במפורש |
+| `auto_discover` | `true` | מגלה רכיבים שמשויכים לאזורים |
+| `areas` | all | רשימת אזורים להצגה |
+| `domains` | useful activity domains | סוגי רכיבים להצגה |
+| `include_labels` | none | מציג רק רכיבים עם labels אלה |
+| `exclude_labels` | none | מסתיר רכיבים עם labels אלה |
+| `hours_to_show` | `24` | טווח זמן להצגה |
+| `group_by` | `area` | `area`, `domain`, `entity`, `none` |
+| `display_mode` | `panel` | `card`, `panel`, `fullscreen` |
+| `debug` | `false` | מציג דיאגנוסטיקה בכרטיס |
+
+ראו דוגמה מלאה ב-[sample-config.yaml](sample-config.yaml).
+
+## פיתוח מקומי
+
+```bash
+npm install
+npm run typecheck
+npm run test
+npm run build
+```
 
 הקובץ ש-HACS מתקין הוא:
 
@@ -118,16 +169,21 @@ display_mode: panel
 dist/activity-history-card.js
 ```
 
+הקובץ הזה נשמר במכוון בתוך הרפו, ולכן אחרי כל שינוי בקוד יש להריץ build ולעדכן אותו.
+
 ## המשך עבודה עם ChatGPT / Codex
 
-כדי להמשיך פיתוח בלי לאבד הקשר, פתח את:
+הקובץ [docs/CHATGPT_CONTINUATION.md](docs/CHATGPT_CONTINUATION.md) נשמר כהערות פנימיות להמשך פיתוח. הוא לא מחליף את ה-README למשתמשים.
 
-```text
-docs/CHATGPT_CONTINUATION.md
-```
-
-בכל סשן חדש מומלץ לבקש מ-ChatGPT/Codex לקרוא קודם את:
+לפני המשך פיתוח מומלץ לקרוא:
 
 - `AGENTS.md`
 - `CODEX_PROMPT.md`
 - `docs/CHATGPT_CONTINUATION.md`
+
+## מגבלות MVP
+
+- מצב swimlane הוא המצב הפעיל של ה-MVP.
+- Heatmap, drill-down ו-correlation נשארים placeholders בלבד בשלב הזה.
+- Timeline נשאר כרונולוגי משמאל לימין, בזמן שכל הטקסטים והפקדים מותאמים ל-RTL.
+- היסטוריה תלויה ב-Home Assistant Recorder ובזמינות הרשומות עבור הישויות שבחרת.

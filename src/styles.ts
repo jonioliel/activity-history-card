@@ -957,6 +957,68 @@ export const activityHistoryCardStyles = css`
   font-weight: 850;
 }
 
+.ahc-state-card__yaml {
+  direction: ltr;
+  text-align: left;
+  max-inline-size: min(520px, 100%);
+  margin: var(--ahc-gap-md) auto 0;
+  padding: var(--ahc-gap-md);
+  overflow: auto;
+  border: 1px solid var(--ahc-border-soft);
+  border-radius: var(--ahc-radius-sm);
+  background: rgba(2, 6, 23, 0.34);
+  color: var(--ahc-text);
+  font-size: 0.82rem;
+}
+
+.ahc-debug {
+  display: grid;
+  gap: var(--ahc-gap-sm);
+  padding: var(--ahc-gap-md);
+  border: 1px dashed rgba(56, 189, 248, 0.42);
+  border-radius: var(--ahc-radius-md);
+  background: rgba(2, 6, 23, 0.32);
+  color: var(--ahc-muted);
+  font-size: 0.82rem;
+}
+
+.ahc-debug__header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--ahc-gap-sm);
+  color: var(--ahc-text);
+}
+
+.ahc-debug__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--ahc-gap-xs);
+  margin: 0;
+}
+
+.ahc-debug__grid div {
+  display: grid;
+  gap: 2px;
+  padding: var(--ahc-gap-xs);
+  border-radius: var(--ahc-radius-xs);
+  background: rgba(15, 23, 42, 0.42);
+}
+
+.ahc-debug dt,
+.ahc-debug dd {
+  margin: 0;
+}
+
+.ahc-debug dd {
+  color: var(--ahc-text);
+  font-weight: 800;
+}
+
+.ahc-debug__meta {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
 /* Responsive */
 @media (max-width: 1100px) {
   .ahc__body {

@@ -156,8 +156,8 @@ function effectiveAttributesKey(record: HistoryStateRecord): string {
 }
 
 function mergeAdjacentSegments(segments: TimelineSegment[], mergeGapSeconds: number): TimelineSegment[] {
-  if (!segments.length || mergeGapSeconds <= 0) return segments;
-  const gapMs = mergeGapSeconds * 1000;
+  if (!segments.length) return segments;
+  const gapMs = Math.max(0, mergeGapSeconds) * 1000;
   const out: TimelineSegment[] = [];
   for (const segment of segments) {
     const previous = out.at(-1);
