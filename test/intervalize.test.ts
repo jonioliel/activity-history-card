@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { filterRows } from "../src/filters";
 import { intervalizeHistory } from "../src/intervalize";
 import type { EntityMeta, HistoryStateRecord, TimeRange } from "../src/types";
 
@@ -28,5 +29,47 @@ describe("intervalizeHistory", () => {
     const [row] = intervalizeHistory(history, [entity], range, { type: "custom:activity-history-card" });
     expect(row?.segments.some((segment) => segment.active)).toBe(true);
     expect(row?.totalActiveMs).toBe(30 * 60 * 1000);
+  });
+
+  it("uses the current hass state when recorder history is empty", () => {
+    const [row] = intervalizeHistory(
+      {},
+      [entity],
+      range,
+      { type: "custom:activity-history-card" },
+      {
+        "switch.test": {
+          entity_id: "switch.test",
+          state: "on",
+          attributes: {},
+          last_changed: "2025-12-31T22:00:00.000Z",
+          last_updated: "2025-12-31T22:00:00.000Z",
+        },
+      },
+    );
+
+    expect(row?.segments).toHaveLength(1);
+    expect(row?.totalActiveMs).toBe(2 * 60 * 60 * 1000);
+  });
+
+  it("filters rows by area, domain, search and active-only mode", () => {
+    const history: Record<string, HistoryStateRecord[]> = {
+      "switch.test": [
+        { entity_id: "switch.test", state: "on", last_changed: "2026-01-01T00:00:00.000Z" },
+        { entity_id: "switch.test", state: "off", last_changed: "2026-01-01T01:00:00.000Z" },
+      ],
+    };
+    const rows = intervalizeHistory(history, [entity], range, { type: "custom:activity-history-card" });
+
+    const filtered = filterRows(rows, {
+      search: "בדיקה",
+      areas: ["סלון"],
+      domains: ["switch"],
+      stateMode: "active_only",
+      groupBy: "area",
+      timePreset: "24h",
+    });
+
+    expect(filtered).toHaveLength(1);
   });
 });

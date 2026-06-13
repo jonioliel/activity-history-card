@@ -1,4 +1,5 @@
 import type { FilterState, TimelineGroup, TimelineRow } from "./types";
+import { DOMAIN_LABELS_HE } from "./defaults";
 
 export function filterRows(rows: TimelineRow[], filter: FilterState): TimelineRow[] {
   const search = filter.search.trim().toLowerCase();
@@ -13,7 +14,7 @@ export function filterRows(rows: TimelineRow[], filter: FilterState): TimelineRo
     if (filter.stateMode === "active_only" && row.totalActiveMs <= 0) return false;
     if (filter.stateMode === "currently_active") {
       const now = Date.now();
-      if (!row.segments.some((segment) => segment.active && segment.start.getTime() <= now && segment.end.getTime() >= now)) return false;
+      if (!row.segments.some((segment) => segment.active && segment.start.getTime() <= now && segment.end.getTime() >= now - 90000)) return false;
     }
     return true;
   });
@@ -32,7 +33,7 @@ export function groupRows(rows: TimelineRow[], groupBy: FilterState["groupBy"]):
     groups.set(key, current);
   }
 
-  return [...groups.entries()].map(([key, groupRowsValue]) => toGroup(key, key, groupRowsValue));
+  return [...groups.entries()].map(([key, groupRowsValue]) => toGroup(key, groupBy === "domain" ? DOMAIN_LABELS_HE[key] ?? key : key, groupRowsValue));
 }
 
 function toGroup(id: string, title: string, rows: TimelineRow[]): TimelineGroup {

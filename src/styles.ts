@@ -169,10 +169,10 @@ export const activityHistoryCardStyles = css`
 .ahc__title {
   margin: 0;
   color: var(--ahc-text);
-  font-size: clamp(1.35rem, 1.1rem + 1vw, 2rem);
+  font-size: 1.75rem;
   line-height: 1.15;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 
 .ahc__subtitle {
@@ -269,7 +269,8 @@ export const activityHistoryCardStyles = css`
 .ahc__chip:focus-visible,
 .ahc__segmented-button:focus-visible,
 .ahc__search-input:focus-visible,
-.ahc__row-action:focus-visible {
+.ahc__row-action:focus-visible,
+.ahc-filter-option:focus-visible {
   outline: 2px solid var(--ahc-focus);
   outline-offset: 2px;
 }
@@ -374,10 +375,10 @@ export const activityHistoryCardStyles = css`
 .ahc__metric-value {
   display: block;
   color: var(--ahc-text);
-  font-size: clamp(1.35rem, 1.05rem + 0.9vw, 2rem);
+  font-size: 1.8rem;
   line-height: 1.05;
   font-weight: 850;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 
 .ahc__metric-value--positive {
@@ -653,6 +654,44 @@ export const activityHistoryCardStyles = css`
   background-size: calc(100% / 8) 100%;
 }
 
+.ahc-row__svg {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: visible;
+}
+
+.ahc-row__svg-track {
+  stroke: var(--ahc-track);
+  stroke-width: 8;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.ahc-segment-svg {
+  cursor: pointer;
+  stroke: rgba(255,255,255,0.20);
+  stroke-width: 0.8;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 3px 7px rgba(0,0,0,0.22));
+}
+
+.ahc-segment-svg:focus-visible {
+  outline: 2px solid var(--ahc-focus);
+  outline-offset: 3px;
+}
+
+.ahc-segment-svg[data-category="on"] { fill: var(--ahc-on); }
+.ahc-segment-svg[data-category="off"] { fill: var(--ahc-off); }
+.ahc-segment-svg[data-category="cooling"] { fill: var(--ahc-cooling); }
+.ahc-segment-svg[data-category="heating"] { fill: var(--ahc-heating); }
+.ahc-segment-svg[data-category="playing"] { fill: var(--ahc-playing); }
+.ahc-segment-svg[data-category="opening"] { fill: var(--ahc-opening); }
+.ahc-segment-svg[data-category="closing"] { fill: var(--ahc-closing); }
+.ahc-segment-svg[data-category="idle"] { fill: var(--ahc-idle); }
+.ahc-segment-svg[data-category="unknown"] { fill: var(--ahc-unknown); stroke-dasharray: 3 2; }
+
 .ahc-row__track::before {
   content: "";
   position: absolute;
@@ -792,9 +831,11 @@ export const activityHistoryCardStyles = css`
 .ahc-filter-sheet {
   direction: rtl;
   position: fixed;
-  inset-inline: 0;
+  inset-inline: max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-right));
   inset-block-end: 0;
   z-index: 2147483639;
+  inline-size: min(720px, calc(100vw - 24px));
+  margin-inline: auto;
   max-block-size: min(88svh, 900px);
   overflow: auto;
   padding:
@@ -843,6 +884,12 @@ export const activityHistoryCardStyles = css`
   margin-block-end: var(--ahc-gap-md);
 }
 
+.ahc-filter-section__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ahc-gap-xs);
+}
+
 .ahc-filter-section__title {
   display: flex;
   align-items: center;
@@ -850,6 +897,36 @@ export const activityHistoryCardStyles = css`
   gap: var(--ahc-gap-sm);
   color: var(--ahc-text);
   font-weight: 850;
+}
+
+.ahc-filter-option {
+  appearance: none;
+  display: grid;
+  gap: 4px;
+  min-block-size: 64px;
+  padding-block: 10px;
+  padding-inline: 16px;
+  border: 1px solid var(--ahc-border-soft);
+  border-radius: var(--ahc-radius-sm);
+  background: rgba(15, 23, 42, 0.46);
+  color: var(--ahc-text);
+  text-align: start;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ahc-filter-option small {
+  color: var(--ahc-muted);
+  font-size: 0.78rem;
+}
+
+.ahc-filter-option[aria-pressed="true"] {
+  border-color: rgba(56, 189, 248, 0.75);
+  background: linear-gradient(180deg, rgba(14, 165, 233, 0.24), rgba(37, 99, 235, 0.16));
+}
+
+.ahc__search--sheet {
+  inline-size: 100%;
 }
 
 .ahc-filter-sheet__footer {
@@ -924,8 +1001,13 @@ export const activityHistoryCardStyles = css`
   }
 
   .ahc__title-block {
+    order: -1;
     justify-items: center;
     text-align: center;
+  }
+
+  .ahc__title {
+    font-size: 1.45rem;
   }
 
   .ahc__toolbar {
@@ -989,6 +1071,8 @@ export const activityHistoryCardStyles = css`
 
   .ahc-timeline-card {
     border-radius: var(--ahc-radius-md);
+    background: transparent;
+    border: 0;
   }
 
   .ahc-timeline-toolbar {
@@ -1001,6 +1085,24 @@ export const activityHistoryCardStyles = css`
 
   .ahc-timeline {
     min-inline-size: 760px;
+  }
+
+  .ahc-timeline__groups {
+    display: grid;
+    gap: var(--ahc-gap-md);
+    padding: var(--ahc-gap-sm);
+  }
+
+  .ahc-group {
+    border: 1px solid var(--ahc-border-soft);
+    border-radius: var(--ahc-radius-md);
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(30, 41, 59, 0.48), rgba(15, 23, 42, 0.58));
+  }
+
+  .ahc-group__header {
+    position: static;
+    min-block-size: 64px;
   }
 
   .ahc-timeline__axis,
@@ -1034,6 +1136,19 @@ export const activityHistoryCardStyles = css`
     inset-block-end: 12px !important;
     inset-block-start: auto !important;
     max-inline-size: none;
+  }
+
+  .ahc-filter-sheet {
+    inset-inline: max(10px, env(safe-area-inset-left)) max(10px, env(safe-area-inset-right));
+    inline-size: auto;
+    max-block-size: min(86svh, 820px);
+    border-start-start-radius: 28px;
+    border-start-end-radius: 28px;
+  }
+
+  .ahc-filter-section__chips {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

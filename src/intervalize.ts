@@ -3,6 +3,7 @@ import { getDomain } from "./format";
 import type {
   ActivityHistoryCardConfig,
   EntityMeta,
+  HassEntity,
   HistoryStateRecord,
   StateCategory,
   TimelineRow,
@@ -15,9 +16,10 @@ export function intervalizeHistory(
   entities: EntityMeta[],
   range: TimeRange,
   config: ActivityHistoryCardConfig,
+  currentStates: Record<string, HassEntity> = {},
 ): TimelineRow[] {
   return entities.map((entity) => {
-    const records = [...(historyByEntity[entity.entity_id] ?? [])]
+    const records = withCurrentStateBoundary(historyByEntity[entity.entity_id] ?? [], currentStates[entity.entity_id], range, entity.entity_id)
       .filter((record) => record.state != null && record.last_changed)
       .sort((a, b) => new Date(a.last_changed).getTime() - new Date(b.last_changed).getTime());
 
@@ -34,6 +36,35 @@ export function intervalizeHistory(
       currentCategory: segments.at(-1)?.category,
     } satisfies TimelineRow;
   });
+}
+
+function withCurrentStateBoundary(
+  records: HistoryStateRecord[],
+  current: HassEntity | undefined,
+  range: TimeRange,
+  entityId: string,
+): HistoryStateRecord[] {
+  const out = [...records];
+  if (!current) return out;
+
+  const currentChangedMs = new Date(current.last_changed || current.last_updated).getTime();
+  const boundaryMs = Number.isFinite(currentChangedMs) ? Math.min(Math.max(currentChangedMs, range.start.getTime()), range.end.getTime()) : range.start.getTime();
+  const last = out
+    .filter((record) => record.entity_id === entityId)
+    .sort((a, b) => new Date(a.last_changed).getTime() - new Date(b.last_changed).getTime())
+    .at(-1);
+
+  if (!last || new Date(last.last_changed).getTime() < boundaryMs || last.state !== current.state) {
+    out.push({
+      entity_id: entityId,
+      state: current.state,
+      attributes: current.attributes,
+      last_changed: new Date(boundaryMs).toISOString(),
+      last_updated: current.last_updated,
+    });
+  }
+
+  return out;
 }
 
 export function classifyState(
@@ -84,10 +115,6 @@ function recordsToSegments(
     const classification = classifyState(entity, current.state, current.attributes);
     const durationMs = segEnd - segStart;
 
-    if (classification.active && config.min_duration_seconds && durationMs < config.min_duration_seconds * 1000) {
-      continue;
-    }
-
     segments.push({
       entity_id: entity.entity_id,
       state: current.state,
@@ -100,7 +127,8 @@ function recordsToSegments(
     });
   }
 
-  return mergeAdjacentSegments(segments, config.merge_gap_seconds ?? 0);
+  const merged = mergeAdjacentSegments(segments, config.merge_gap_seconds ?? 0);
+  return merged.filter((segment) => !segment.active || !config.min_duration_seconds || segment.durationMs >= config.min_duration_seconds * 1000);
 }
 
 function dedupeRecords(records: HistoryStateRecord[]): HistoryStateRecord[] {

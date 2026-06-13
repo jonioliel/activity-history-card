@@ -80,15 +80,17 @@ function normalizeHistoryArray(raw: unknown[], fallbackEntityId?: string): Histo
       const state = stringValue(record.state) ?? stringValue(record.s);
       if (!entityId || !state || !lastChanged) return undefined;
       const attrs = objectValue(record.attributes) ?? objectValue(record.a);
-      return {
+      const normalized: HistoryStateRecord = {
         entity_id: entityId,
         state,
-        attributes: attrs,
         last_changed: lastChanged,
-        last_updated: stringValue(record.last_updated) ?? stringValue(record.lu),
-      } satisfies HistoryStateRecord;
+      };
+      if (attrs) normalized.attributes = attrs;
+      const lastUpdated = stringValue(record.last_updated) ?? stringValue(record.lu);
+      if (lastUpdated) normalized.last_updated = lastUpdated;
+      return normalized;
     })
-    .filter((item): item is HistoryStateRecord => Boolean(item));
+    .filter((item): item is HistoryStateRecord => item !== undefined);
 }
 
 function stringValue(value: unknown): string | undefined {

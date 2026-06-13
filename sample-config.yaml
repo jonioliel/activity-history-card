@@ -13,6 +13,7 @@ show_legend: true
 show_fullscreen_button: true
 significant_changes_only: true
 minimal_response: true
+mock_data: false # true מציג נתוני דוגמה בלי היסטוריית Home Assistant
 min_duration_seconds: 20
 merge_gap_seconds: 15
 mobile_breakpoint: 760

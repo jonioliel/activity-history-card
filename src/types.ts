@@ -3,6 +3,7 @@ export type DisplayMode = "card" | "panel" | "fullscreen";
 export type ViewMode = "swimlane" | "heatmap" | "detail" | "correlation";
 export type GroupBy = "area" | "domain" | "floor" | "entity" | "none";
 export type StateMode = "all" | "active_only" | "currently_active";
+export type TimePreset = "24h" | "7d" | "custom";
 
 export interface HassEntity {
   entity_id: string;
@@ -78,6 +79,7 @@ export interface ActivityHistoryCardConfig {
   show_fullscreen_button?: boolean;
   significant_changes_only?: boolean;
   minimal_response?: boolean;
+  mock_data?: boolean;
   min_duration_seconds?: number;
   merge_gap_seconds?: number;
   mobile_breakpoint?: number;
@@ -157,6 +159,7 @@ export interface FilterState {
   domains: string[];
   stateMode: StateMode;
   groupBy: GroupBy;
+  timePreset: TimePreset;
 }
 
 export interface ActivitySummary {

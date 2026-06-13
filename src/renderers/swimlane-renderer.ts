@@ -13,8 +13,12 @@ export interface SwimlaneRendererOptions {
 
 export function renderSwimlaneTimeline(options: SwimlaneRendererOptions): TemplateResult {
   const ticks = buildTicks(options.range);
-  const nowPercent = timeToPercent(new Date(), options.range);
-  const showNow = options.config.show_now_line !== false && nowPercent >= 0 && nowPercent <= 100;
+  const now = new Date();
+  const nowPercent = timeToPercent(now, options.range);
+  const showNow =
+    options.config.show_now_line !== false &&
+    now.getTime() >= options.range.start.getTime() &&
+    now.getTime() <= options.range.end.getTime() + 90000;
 
   return html`
     <section class="ahc-timeline-card" aria-label="ציר זמן פעילות">
@@ -51,21 +55,45 @@ export function renderSwimlaneTimeline(options: SwimlaneRendererOptions): Templa
                             : null}
                         </div>
                         <div class="ahc-row__track">
-                          ${row.segments.map((segment, index) => {
-                            const left = timeToPercent(segment.start, options.range);
-                            const right = timeToPercent(segment.end, options.range);
-                            const width = Math.max(0.4, right - left);
-                            if (!segment.active && segment.category !== "unknown") return null;
-                            return html`
-                              <button
-                                class="ahc-segment"
-                                data-category=${segment.category}
-                                style="left:${left}%;width:${width}%"
-                                aria-label=${`${row.entity.name}, ${CATEGORY_LABELS_HE[segment.category]}, ${formatTime(segment.start)} עד ${formatTime(segment.end)}, ${formatDuration(segment.durationMs)}`}
-                                @click=${(event: Event) => options.onSegmentClick?.(event, row.entity.entity_id, index)}
-                              ></button>
-                            `;
-                          })}
+                          <svg
+                            class="ahc-row__svg"
+                            viewBox="0 0 100 32"
+                            preserveAspectRatio="none"
+                            role="img"
+                            aria-label=${`ציר זמן עבור ${row.entity.name}`}
+                          >
+                            <line class="ahc-row__svg-track" x1="1" x2="99" y1="16" y2="16"></line>
+                            ${row.segments.map((segment, index) => {
+                              const left = timeToPercent(segment.start, options.range);
+                              const right = timeToPercent(segment.end, options.range);
+                              const width = Math.max(0.35, right - left);
+                              if (!segment.active && segment.category !== "unknown") return null;
+                              const label = `${row.entity.name}, ${CATEGORY_LABELS_HE[segment.category]}, ${formatTime(segment.start)} עד ${formatTime(segment.end)}, ${formatDuration(segment.durationMs)}`;
+                              return html`
+                                <rect
+                                  class="ahc-segment-svg"
+                                  data-category=${segment.category}
+                                  x=${left}
+                                  y="10"
+                                  width=${width}
+                                  height="12"
+                                  rx="6"
+                                  tabindex="0"
+                                  role="button"
+                                  aria-label=${label}
+                                  @click=${(event: Event) => options.onSegmentClick?.(event, row.entity.entity_id, index)}
+                                  @keydown=${(event: KeyboardEvent) => {
+                                    if (event.key === "Enter" || event.key === " ") {
+                                      event.preventDefault();
+                                      options.onSegmentClick?.(event, row.entity.entity_id, index);
+                                    }
+                                  }}
+                                >
+                                  <title>${label}</title>
+                                </rect>
+                              `;
+                            })}
+                          </svg>
                         </div>
                       </div>
                     `,

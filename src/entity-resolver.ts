@@ -1,21 +1,24 @@
 import type { ActivityHistoryCardConfig, EntityConfig, EntityMeta, HomeAssistant } from "./types";
-import { getDomain, humanizeEntityId, normalizeEntityConfig } from "./format";
+import { getDomain, humanizeEntityId } from "./format";
 
 export function resolveEntityMetas(config: ActivityHistoryCardConfig, hass?: HomeAssistant): EntityMeta[] {
   const configured = config.entities ?? [];
-  const entities: EntityConfig[] = configured.map((item) => normalizeEntityConfig(item) as EntityConfig);
+  const entities: EntityConfig[] = configured.map((item) => (typeof item === "string" ? { entity: item } : item));
 
   // Conservative auto-discovery: only use configured domains/areas, never load every entity by default.
-  if (!entities.length && hass && config.domains?.length) {
+  if (!entities.length && hass && (config.domains?.length || config.areas?.length)) {
     for (const entityId of Object.keys(hass.states)) {
+      const stateObj = hass.states[entityId];
       const domain = getDomain(entityId);
-      if (!config.domains.includes(domain)) continue;
-      entities.push({ entity: entityId });
+      const area = stringAttr(stateObj?.attributes?.area) ?? stringAttr(stateObj?.attributes?.area_id);
+      if (config.domains?.length && !config.domains.includes(domain)) continue;
+      if (config.areas?.length && (!area || !config.areas.includes(area))) continue;
+      entities.push({ entity: entityId, area });
     }
   }
 
   return entities
-    .filter((entry) => entry.entity && !entry.hidden)
+    .filter((entry) => entry.entity && !entry.hidden && !isExcluded(entry.entity, config.exclude_entities ?? []))
     .map((entry) => {
       const stateObj = hass?.states[entry.entity];
       const domain = entry.domain ?? getDomain(entry.entity);
@@ -31,6 +34,15 @@ export function resolveEntityMetas(config: ActivityHistoryCardConfig, hass?: Hom
         config: entry,
       } satisfies EntityMeta;
     });
+}
+
+function isExcluded(entityId: string, patterns: string[]): boolean {
+  return patterns.some((pattern) => wildcardToRegExp(pattern).test(entityId));
+}
+
+function wildcardToRegExp(pattern: string): RegExp {
+  const escaped = pattern.replace(/[|\\{}()[\]^$+?.]/g, "\\$&").replace(/\*/g, ".*");
+  return new RegExp(`^${escaped}$`);
 }
 
 function stringAttr(value: unknown): string | undefined {
