@@ -52,3 +52,39 @@ docs/legacy-mockups-gallery.html# גלריית ההדמיות המקורית
 - `mockups/07-mobile-advanced-filter-sheet-rtl.png`
 - `mockups/08-mobile-entity-detail-rtl.png`
 
+## התקנה דרך HACS
+
+הרפו מוכן להוספה כ-Custom repository ב-HACS:
+
+1. פתח HACS.
+2. הוסף Custom repository:
+   `https://github.com/jonioliel/activity-history-card`
+3. בחר Category: `Dashboard`.
+4. התקן את הכרטיס.
+5. הוסף כרטיס Lovelace:
+
+```yaml
+type: custom:activity-history-card
+mock_data: true
+display_mode: panel
+```
+
+הקובץ ש-HACS מתקין הוא:
+
+```text
+dist/activity-history-card.js
+```
+
+## המשך עבודה עם ChatGPT / Codex
+
+כדי להמשיך פיתוח בלי לאבד הקשר, פתח את:
+
+```text
+docs/CHATGPT_CONTINUATION.md
+```
+
+בכל סשן חדש מומלץ לבקש מ-ChatGPT/Codex לקרוא קודם את:
+
+- `AGENTS.md`
+- `CODEX_PROMPT.md`
+- `docs/CHATGPT_CONTINUATION.md`

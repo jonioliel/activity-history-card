@@ -1,5 +1,7 @@
 node_modules/
-dist/
+dist/*
+!dist/
+!dist/activity-history-card.js
 .DS_Store
 .env
 .env.*
