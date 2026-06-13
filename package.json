@@ -1,0 +1,33 @@
+{
+  "name": "activity-history-card",
+  "version": "0.1.0",
+  "description": "Home Assistant Lovelace custom card for RTL/mobile-friendly activity history timelines.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "lit": "^3.2.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-legacy": "^5.4.3",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.5",
+    "prettier": "^3.3.3"
+  },
+  "files": [
+    "dist/activity-history-card.js"
+  ],
+  "keywords": [
+    "home-assistant",
+    "lovelace",
+    "custom-card",
+    "history",
+    "rtl"
+  ]
+}
