@@ -45,12 +45,12 @@ describe("resolveRendererMode", () => {
     ).toBe("legacy_swimlane");
   });
 
-  it("uses legacy styling for show-all troubleshooting without a fetch signal", () => {
+  it("keeps show-all inside the activity dashboard inventory view", () => {
     expect(
       resolveRendererMode(
         { type: "custom:activity-history-card", view_mode: "activity" },
         true,
       ),
-    ).toBe("legacy_swimlane");
+    ).toBe("activity");
   });
 });

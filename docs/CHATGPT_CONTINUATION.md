@@ -80,9 +80,13 @@ Implemented:
 - Last-event summary and insights prefer friendly names
 - Desktop filters are compact; mobile keeps the advanced filter bottom sheet
 - Smart row curation is enabled by default with `smart_filter: true`
+- `view_mode: activity` now separates `activityRows` from `inventoryItems`
+- Each area card can show a compact accessory inventory including inactive normal entities
+- Area inventory options are available through `show_area_inventory` and `area_inventory_*`
+- Inventory chip clicks fire Home Assistant `hass-more-info`
 - Empty rows, tiny activity rows, registry `config`/`diagnostic` rows, and noisy technical rows are hidden by default
 - Manual `entities:` are protected from smart filtering unless explicitly excluded
-- A session-level "הצג הכל" / "סינון חכם" toggle exposes hidden rows without changing YAML
+- A session-level "כל האביזרים" / "פעילות בלבד" toggle expands area inventories without switching to legacy rows
 - `debug: true` includes smart curation counts and hidden-reason diagnostics
 - UI polish pass for the stable activity MVP:
   - body grid is rendered through a dedicated structure
@@ -134,7 +138,7 @@ npm run build
 Latest verified results:
 
 - `npm run typecheck` passed
-- `npm run test` passed, 86 tests
+- `npm run test` passed, 92 tests
 - `npm run build` passed
 
 The generated `dist/activity-history-card.js` is intentionally tracked for HACS. `dist/activity-history-card.js.map` remains ignored.
@@ -147,6 +151,8 @@ The latest pass changed the default view from raw swimlane rows to a polished ac
 - `view_mode: activity_legacy` keeps the previous activity renderer for short-term comparison.
 - `view_mode: legacy_swimlane` keeps the old dense/raw renderer for debugging.
 - The activity dashboard shows a top density strip, compact area cards, aggregate group bands, active rows only, and active segments only.
+- Area cards include a compact inventory section for all normal accessories in that area.
+- The "כל האביזרים" toggle expands area inventories. Raw row inspection remains under `view_mode: legacy_swimlane`.
 - Empty/off baselines are not rendered by default.
 - Default `max_visible_rows`/`max_total_rows` is `18`, with `max_rows_per_group: 4` and `min_row_active_seconds: 10`.
 - `show_activity_density: true` is enabled by default.
@@ -175,6 +181,9 @@ show_inactive_baselines: false
 max_rows_per_group: 4
 max_total_rows: 18
 show_activity_density: true
+show_area_inventory: true
+area_inventory_mode: compact
+area_inventory_include_inactive: true
 exclude_labels:
   - לא להצגה
   - רכיבים מוגנים
@@ -217,6 +226,7 @@ Summarize changed files and Home Assistant testing steps.
 3. Test real `entities` from `sample-config.yaml`.
 4. Test `debug: true` against a real Home Assistant instance when no data appears.
 5. Test that repeated Home Assistant state updates do not flicker the card.
-6. Improve tooltip/popover behavior for touch.
-7. Add more tests for RTL chronological x positions and complex filter combinations.
-8. Only after the MVP works in a real dashboard, plan drill-down/detail mode.
+6. Verify that area inventory names match friendly names in real Home Assistant.
+7. Improve tooltip/popover behavior for touch.
+8. Add more tests for RTL chronological x positions and complex filter combinations.
+9. Only after the MVP works in a real dashboard, plan drill-down/detail mode.

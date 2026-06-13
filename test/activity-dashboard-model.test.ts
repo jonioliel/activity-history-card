@@ -86,15 +86,17 @@ describe("buildActivityDashboardModel", () => {
           row("switch.active"),
           row("switch.empty", { activeMs: 0 }),
         ]),
-        group("ריק", [row("switch.empty_only", { activeMs: 0 })]),
+        group("ריק", [row("switch.empty_only", { area: "ריק", activeMs: 0 })]),
       ],
       range,
       config(),
     );
 
-    expect(model.groups.map((item) => item.title)).toEqual(["סלון"]);
+    expect(model.groups.map((item) => item.title)).toEqual(["סלון", "ריק"]);
     expect(model.visibleRowsCount).toBe(1);
     expect(model.groups[0]?.aggregateSegments.length).toBeGreaterThan(0);
+    expect(model.groups[1]?.activityRows).toEqual([]);
+    expect(model.groups[1]?.inventoryItems).toHaveLength(1);
   });
 
   it("has rendered segments whenever visible active time is positive", () => {
@@ -104,7 +106,7 @@ describe("buildActivityDashboardModel", () => {
       config(),
     );
     const renderedSegments = model.groups.flatMap((item) =>
-      item.rows.flatMap((dashboardRow) => dashboardRow.segments),
+      item.activityRows.flatMap((dashboardRow) => dashboardRow.segments),
     );
 
     expect(model.totalVisibleActiveMs).toBeGreaterThan(0);
@@ -169,9 +171,87 @@ describe("buildActivityDashboardModel", () => {
     );
 
     expect(
-      model.groups.flatMap((item) => item.rows).map((item) => item.name),
+      model.groups
+        .flatMap((item) => item.activityRows)
+        .map((item) => item.name),
     ).toEqual(["תאורת סלון"]);
     expect(model.hiddenRowsCount).toBe(1);
+  });
+
+  it("keeps inactive normal accessories in the area inventory", () => {
+    const inactive = row("switch.inactive", {
+      name: "מנורת צד",
+      activeMs: 0,
+    });
+    const active = row("switch.active", { name: "תאורה ראשית" });
+    const model = buildActivityDashboardModel(
+      groupRows([active], "area"),
+      range,
+      config(),
+      undefined,
+      { inventoryRows: [active, inactive], groupBy: "area" },
+    );
+
+    expect(model.visibleRowsCount).toBe(1);
+    expect(model.totalInventoryItemCount).toBe(2);
+    expect(model.groups[0]?.inventoryItems.map((item) => item.name)).toEqual([
+      "תאורה ראשית",
+      "מנורת צד",
+    ]);
+  });
+
+  it("excludes hidden diagnostic inventory items by default", () => {
+    const normal = row("switch.normal", { name: "תאורת מטבח" });
+    const diagnostic = row("switch.router_lan", {
+      name: "Router LAN",
+      technical: true,
+    });
+    const model = buildActivityDashboardModel(
+      groupRows([normal], "area"),
+      range,
+      config(),
+      undefined,
+      { inventoryRows: [normal, diagnostic], groupBy: "area" },
+    );
+
+    expect(model.totalInventoryItemCount).toBe(1);
+    expect(model.groups[0]?.inventoryItems[0]?.name).toBe("תאורת מטבח");
+  });
+
+  it("marks a single selected area as focused for default inventory expansion", () => {
+    const model = buildActivityDashboardModel(
+      groupRows([row("switch.active", { area: "מטבח" })], "area"),
+      range,
+      config(),
+      undefined,
+      {
+        inventoryRows: [row("switch.active", { area: "מטבח" })],
+        selectedAreas: ["מטבח"],
+        groupBy: "area",
+      },
+    );
+
+    expect(model.singleAreaFocused).toBe(true);
+  });
+
+  it("can omit inactive accessories from inventory when configured", () => {
+    const active = row("switch.active", { name: "תאורה" });
+    const inactive = row("switch.inactive", {
+      name: "שקע",
+      activeMs: 0,
+    });
+    const model = buildActivityDashboardModel(
+      groupRows([active], "area"),
+      range,
+      config({ area_inventory_include_inactive: false }),
+      undefined,
+      { inventoryRows: [active, inactive], groupBy: "area" },
+    );
+
+    expect(model.totalInventoryItemCount).toBe(1);
+    expect(model.groups[0]?.inventoryItems.map((item) => item.name)).toEqual([
+      "תאורה",
+    ]);
   });
 
   it("respects explicitly configured technical entities", () => {

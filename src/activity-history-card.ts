@@ -12,6 +12,7 @@ import {
 import { formatEntityLine, formatSegmentSummary } from "./display-text";
 import { resolveEntityMetasWithDiagnostics } from "./entity-resolver";
 import { filterRows, groupRows } from "./filters";
+import { createHassMoreInfoEvent } from "./hass-events";
 import { buildHistoryCacheKey } from "./history-key";
 import { fetchHistory, getHistoryRequestPlan } from "./history-client";
 import { formatDuration, formatTime, isRtl, resolveTimeRange } from "./format";
@@ -102,6 +103,8 @@ export class ActivityHistoryCard extends LitElement {
   private _filterSheetOpen = false;
   private _usingMockData = false;
   private _showAllRows = false;
+  private _expandedInventoryGroups = new Set<string>();
+  private _collapsedInventoryGroups = new Set<string>();
   private _curation?: RowCurationDiagnostics;
   private _fetchToken = 0;
   private _lastFetchKey = "";
@@ -164,6 +167,8 @@ export class ActivityHistoryCard extends LitElement {
     this._lastFetchKey = "";
     this._lastResolvedEntityKey = "";
     this._showAllRows = false;
+    this._expandedInventoryGroups.clear();
+    this._collapsedInventoryGroups.clear();
     this._historyCache.clear();
     this._syncRefreshTimer();
     this._requestHistoryRefresh(this._hasFetchedOnce ? "config" : "initial", {
@@ -347,9 +352,20 @@ export class ActivityHistoryCard extends LitElement {
   private _renderFilters(): TemplateResult | typeof nothing {
     if (this._config.filters?.show === false) return nothing;
     const curationSummary = formatCurationSummary(this._curation);
+    const rendererMode = resolveRendererMode(this._config, this._showAllRows);
+    const activityDashboard = rendererMode === "activity";
     const canToggleSmartFilter = Boolean(
-      this._curation?.hiddenRows || this._showAllRows,
+      activityDashboard
+        ? this._canToggleAreaInventory()
+        : this._curation?.hiddenRows || this._showAllRows,
     );
+    const showAllLabel = activityDashboard
+      ? this._showAllRows
+        ? "פעילות בלבד"
+        : "כל האביזרים"
+      : this._showAllRows
+        ? "הצג רק פעילות"
+        : "הצג הכל";
 
     return html`
       <section class="ahc__filters" aria-label="מסננים">
@@ -418,7 +434,7 @@ export class ActivityHistoryCard extends LitElement {
                 aria-pressed=${this._showAllRows ? "true" : "false"}
                 @click=${this._toggleShowAllRows}
               >
-                ${this._showAllRows ? "הצג רק פעילות" : "הצג הכל"}
+                ${showAllLabel}
               </button>`
             : nothing}
           ${curationSummary
@@ -525,7 +541,10 @@ export class ActivityHistoryCard extends LitElement {
             <span class="ahc__metric-label">רכיבים שפעלו</span>
             <span class="ahc__metric-value">${dashboard.visibleRowsCount}</span>
             <span class="ahc__metric-subtitle">
-              מתוך ${dashboard.totalRowsBeforeCuration} רכיבים
+              מתוך
+              ${dashboard.totalInventoryItemCount ||
+              dashboard.totalRowsBeforeCuration}
+              אביזרים
             </span>
           </div>
           <span class="ahc__metric-icon" aria-hidden="true">▣</span>
@@ -621,7 +640,15 @@ export class ActivityHistoryCard extends LitElement {
         </div>
       </div>`;
     }
-    if (this._emptyReason || !this._groups.length) {
+    const hasDashboardContent = Boolean(
+      this._dashboardModel &&
+      (this._dashboardModel.visibleRowsCount ||
+        this._dashboardModel.totalInventoryItemCount),
+    );
+    if (
+      (this._emptyReason && !hasDashboardContent) ||
+      (!this._groups.length && !hasDashboardContent)
+    ) {
       return this._renderEmptyState(
         this._emptyReason ?? "no_resolved_entities",
       );
@@ -681,9 +708,19 @@ export class ActivityHistoryCard extends LitElement {
               range,
               this._config,
               this._curation,
+              {
+                inventoryRows: filterRows(this._rows, this._filter),
+                selectedAreas: this._filter.areas,
+                groupBy: this._filter.groupBy,
+              },
             ),
           config: this._config,
+          expandedInventoryGroups: this._expandedInventoryGroups,
+          collapsedInventoryGroups: this._collapsedInventoryGroups,
+          showAllInventory: this._showAllRows,
           onSegmentClick: this._openSegmentPopover,
+          onInventoryToggle: this._toggleInventoryGroup,
+          onInventoryItemClick: this._openInventoryMoreInfo,
         });
     }
   }
@@ -1104,7 +1141,7 @@ export class ActivityHistoryCard extends LitElement {
             ${insights.mostActiveArea
               ? `${formatDuration(insights.mostActiveArea.totalActiveMs)} · ${
                   insights.mostActiveArea.rowCount
-                } רכיבים`
+                } רכיבי פעילות מתוך ${insights.mostActiveArea.inventoryCount} אביזרים`
               : "אין אזור עם פעילות משמעותית"}
           </span>
         </article>
@@ -1131,9 +1168,10 @@ export class ActivityHistoryCard extends LitElement {
             ${insights.shortUsePattern ?? "אין מספיק נתונים משמעותיים"}
           </span>
           <span class="ahc__insight-subtitle">
-            ${dashboard.hiddenRowsCount
+            ${insights.inventoryPattern ??
+            (dashboard.hiddenRowsCount
               ? `${dashboard.hiddenRowsCount} רכיבים הוסתרו כדי לשמור על תצוגה נקייה`
-              : "כל הפעילות המשמעותית מוצגת"}
+              : "כל הפעילות המשמעותית מוצגת")}
           </span>
         </article>
       </aside>
@@ -1265,7 +1303,16 @@ export class ActivityHistoryCard extends LitElement {
             aria-pressed=${this._showAllRows ? "true" : "false"}
             @click=${this._toggleShowAllRows}
           >
-            <span>${this._showAllRows ? "הצג רק פעילות" : "הצג הכל"}</span>
+            <span>
+              ${resolveRendererMode(this._config, this._showAllRows) ===
+              "activity"
+                ? this._showAllRows
+                  ? "פעילות בלבד"
+                  : "כל האביזרים"
+                : this._showAllRows
+                  ? "הצג רק פעילות"
+                  : "הצג הכל"}
+            </span>
             <small
               >${formatCurationSummary(this._curation) ||
               "הסתר שורות ריקות, טכניות וקצרות מאוד"}</small
@@ -1586,8 +1633,10 @@ export class ActivityHistoryCard extends LitElement {
 
   private _rebuildGroups(): void {
     const filtered = filterRows(this._rows, this._filter);
+    const rendererMode = resolveRendererMode(this._config, this._showAllRows);
+    const showAllForCuration = rendererMode !== "activity" && this._showAllRows;
     const curated = curateRows(filtered, this._config, {
-      showAll: this._showAllRows,
+      showAll: showAllForCuration,
       groupBy: this._filter.groupBy,
     });
     this._visibleRows = curated.rows;
@@ -1596,7 +1645,6 @@ export class ActivityHistoryCard extends LitElement {
       (group) =>
         this._config.hide_empty_groups === false || group.rows.length > 0,
     );
-    const rendererMode = resolveRendererMode(this._config, this._showAllRows);
     this._dashboardModel =
       rendererMode === "activity"
         ? buildActivityDashboardModel(
@@ -1604,6 +1652,11 @@ export class ActivityHistoryCard extends LitElement {
             this._resolveRange(),
             this._config,
             curated.diagnostics,
+            {
+              inventoryRows: filtered,
+              selectedAreas: this._filter.areas,
+              groupBy: this._filter.groupBy,
+            },
           )
         : undefined;
     this._summary =
@@ -1630,7 +1683,8 @@ export class ActivityHistoryCard extends LitElement {
       this._setDiagnostics({
         ...this._diagnostics,
         filteredRowCount: filtered.length,
-        renderedGroupCount: this._groups.length,
+        renderedGroupCount:
+          this._dashboardModel?.groups.length ?? this._groups.length,
         curation: curated.diagnostics,
         activeFilters: { ...this._filter },
       });
@@ -1777,6 +1831,7 @@ export class ActivityHistoryCard extends LitElement {
 
   private _setAreas(areas: string[]): void {
     this._filter = { ...this._filter, areas };
+    this._resetInventoryExpansion();
     this._rebuildGroups();
   }
 
@@ -1789,11 +1844,13 @@ export class ActivityHistoryCard extends LitElement {
 
   private _setDomains(domains: string[]): void {
     this._filter = { ...this._filter, domains };
+    this._resetInventoryExpansion();
     this._rebuildGroups();
   }
 
   private _setGroupBy(groupBy: FilterState["groupBy"]): void {
     this._filter = { ...this._filter, groupBy };
+    this._resetInventoryExpansion();
     this._rebuildGroups();
   }
 
@@ -1813,6 +1870,8 @@ export class ActivityHistoryCard extends LitElement {
     const previousTimePreset = this._filter.timePreset;
     const nextTimePreset = this._initialTimePreset(this._config);
     this._showAllRows = false;
+    this._expandedInventoryGroups.clear();
+    this._collapsedInventoryGroups.clear();
     this._filter = {
       search: "",
       areas: [],
@@ -1830,8 +1889,55 @@ export class ActivityHistoryCard extends LitElement {
 
   private _toggleShowAllRows = (): void => {
     this._showAllRows = !this._showAllRows;
+    this._expandedInventoryGroups.clear();
+    this._collapsedInventoryGroups.clear();
     this._rebuildGroups();
   };
+
+  private _toggleInventoryGroup = (groupId: string): void => {
+    const defaultExpanded = this._isInventoryGroupDefaultExpanded();
+    if (this._collapsedInventoryGroups.has(groupId)) {
+      this._collapsedInventoryGroups.delete(groupId);
+      this._expandedInventoryGroups.add(groupId);
+    } else if (defaultExpanded || this._expandedInventoryGroups.has(groupId)) {
+      this._expandedInventoryGroups.delete(groupId);
+      this._collapsedInventoryGroups.add(groupId);
+    } else {
+      this._expandedInventoryGroups.add(groupId);
+    }
+    this.requestUpdate();
+  };
+
+  private _openInventoryMoreInfo = (event: Event, entityId: string): void => {
+    event.stopPropagation();
+    this.dispatchEvent(createHassMoreInfoEvent(entityId));
+  };
+
+  private _resetInventoryExpansion(): void {
+    this._showAllRows = false;
+    this._expandedInventoryGroups.clear();
+    this._collapsedInventoryGroups.clear();
+  }
+
+  private _canToggleAreaInventory(): boolean {
+    if (
+      this._config.show_area_inventory === false ||
+      this._config.area_inventory_mode === "off"
+    ) {
+      return false;
+    }
+    return Boolean(
+      this._showAllRows || this._dashboardModel?.totalInventoryItemCount,
+    );
+  }
+
+  private _isInventoryGroupDefaultExpanded(): boolean {
+    return (
+      this._showAllRows ||
+      this._config.area_inventory_mode === "expanded" ||
+      this._dashboardModel?.singleAreaFocused === true
+    );
+  }
 
   private _manualRefresh = (): void => {
     this._historyCache.clear();

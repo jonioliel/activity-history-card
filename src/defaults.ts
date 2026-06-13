@@ -76,6 +76,13 @@ export const DEFAULT_CONFIG: Required<
     | "show_entity_id_when_name_missing"
     | "summary_scope"
     | "collapse_groups"
+    | "show_area_inventory"
+    | "area_inventory_mode"
+    | "area_inventory_include_inactive"
+    | "area_inventory_max_items"
+    | "area_inventory_group_by_domain"
+    | "area_inventory_show_state"
+    | "area_inventory_show_last_activity"
     | "timeline_height"
     | "mobile_breakpoint"
   >
@@ -115,6 +122,13 @@ export const DEFAULT_CONFIG: Required<
   show_entity_id_when_name_missing: false,
   summary_scope: "visible",
   collapse_groups: false,
+  show_area_inventory: true,
+  area_inventory_mode: "compact",
+  area_inventory_include_inactive: true,
+  area_inventory_max_items: 16,
+  area_inventory_group_by_domain: true,
+  area_inventory_show_state: true,
+  area_inventory_show_last_activity: true,
   timeline_height: "min(62svh, 680px)",
   mobile_breakpoint: 760,
 };

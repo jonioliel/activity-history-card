@@ -97,11 +97,11 @@ export const activityHistoryCardStyles = css`
     --ahc-activity-segment-height: 9px;
     --ahc-activity-segment-min-width: 4px;
     --ahc-activity-group-gap: 12px;
-    --ahc-dashboard-row-height: 38px;
+    --ahc-dashboard-row-height: 36px;
     --ahc-dashboard-label-width: 230px;
-    --ahc-dashboard-segment-height: 10px;
+    --ahc-dashboard-segment-height: 12px;
     --ahc-dashboard-segment-min-width: 5px;
-    --ahc-dashboard-group-gap: 14px;
+    --ahc-dashboard-group-gap: 10px;
     --ahc-insights-width: 340px;
 
     --ahc-chip-height: 40px;
@@ -979,10 +979,10 @@ export const activityHistoryCardStyles = css`
   .ahc-dashboard {
     direction: rtl;
     display: grid;
-    gap: var(--ahc-gap-md);
+    gap: var(--ahc-gap-sm);
     min-inline-size: 0;
-    min-block-size: 420px;
-    padding: var(--ahc-gap-md);
+    min-block-size: 360px;
+    padding: var(--ahc-gap-sm);
     border: 1px solid var(--ahc-border-soft);
     border-radius: var(--ahc-radius-md);
     background: linear-gradient(
@@ -1000,7 +1000,7 @@ export const activityHistoryCardStyles = css`
     justify-content: space-between;
     gap: var(--ahc-gap-md);
     min-inline-size: 0;
-    padding-block-end: var(--ahc-gap-xs);
+    padding-block-end: 8px;
     border-block-end: 1px solid rgba(148, 163, 184, 0.12);
   }
 
@@ -1042,8 +1042,8 @@ export const activityHistoryCardStyles = css`
 
   .ahc-dashboard__overview {
     display: grid;
-    gap: var(--ahc-gap-xs);
-    padding: 10px;
+    gap: 6px;
+    padding: 8px 10px;
     border: 1px solid rgba(148, 163, 184, 0.12);
     border-radius: var(--ahc-radius-sm);
     background: rgba(2, 6, 23, 0.26);
@@ -1054,14 +1054,14 @@ export const activityHistoryCardStyles = css`
     display: flex;
     align-items: end;
     gap: 3px;
-    min-block-size: 40px;
-    padding: 5px 2px;
+    min-block-size: 34px;
+    padding: 3px 2px;
   }
 
   .ahc-dashboard-density-bucket {
     flex: 1 1 0;
     min-inline-size: 3px;
-    block-size: 32px;
+    block-size: 28px;
     display: flex;
     align-items: end;
     justify-content: center;
@@ -1073,8 +1073,8 @@ export const activityHistoryCardStyles = css`
     inline-size: 100%;
     block-size: 0;
     min-block-size: 0;
-    max-block-size: 28px;
-    border-radius: 999px 999px 3px 3px;
+    max-block-size: 24px;
+    border-radius: 5px 5px 2px 2px;
     background: linear-gradient(180deg, #7dd3fc, #22c55e);
     opacity: 0.22;
     transition:
@@ -1084,7 +1084,7 @@ export const activityHistoryCardStyles = css`
 
   .ahc-dashboard-density-bucket[data-active="true"]
     .ahc-dashboard-density-fill {
-    block-size: max(4px, calc(var(--intensity, 0) * 28px));
+    block-size: max(4px, calc(var(--intensity, 0) * 24px));
     opacity: max(0.38, calc(var(--intensity, 0) * 0.96));
   }
 
@@ -1124,19 +1124,31 @@ export const activityHistoryCardStyles = css`
 
   .ahc-dashboard-group {
     display: grid;
-    gap: var(--ahc-gap-sm);
-    padding: var(--ahc-gap-sm);
+    gap: 8px;
+    padding: 10px;
     border: 1px solid rgba(148, 163, 184, 0.14);
     border-radius: var(--ahc-radius-md);
     background: rgba(15, 23, 42, 0.52);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   }
 
+  .ahc-area-card {
+    overflow: hidden;
+  }
+
   .ahc-dashboard-group__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--ahc-gap-sm);
+    gap: 10px;
+    min-inline-size: 0;
+  }
+
+  .ahc-area-card__actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
     min-inline-size: 0;
   }
 
@@ -1166,6 +1178,29 @@ export const activityHistoryCardStyles = css`
     white-space: nowrap;
   }
 
+  .ahc-area-card__inventory-button,
+  .ahc-area-inventory__more {
+    appearance: none;
+    min-block-size: 32px;
+    border: 1px solid rgba(125, 211, 252, 0.28);
+    border-radius: 999px;
+    background: rgba(14, 165, 233, 0.1);
+    color: #bae6fd;
+    font: inherit;
+    font-size: 0.76rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .ahc-area-card__inventory-button {
+    padding-inline: 12px;
+  }
+
+  .ahc-area-card__inventory-button:hover,
+  .ahc-area-inventory__more:hover {
+    background: rgba(14, 165, 233, 0.18);
+  }
+
   .ahc-dashboard-icon {
     display: inline-grid;
     place-items: center;
@@ -1184,7 +1219,7 @@ export const activityHistoryCardStyles = css`
   .ahc-dashboard-group__aggregate {
     direction: ltr;
     position: relative;
-    min-block-size: 28px;
+    min-block-size: 24px;
     border-radius: 999px;
     background:
       linear-gradient(to right, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
@@ -1195,7 +1230,7 @@ export const activityHistoryCardStyles = css`
 
   .ahc-dashboard-group__rows {
     display: grid;
-    gap: 5px;
+    gap: 3px;
   }
 
   .ahc-dashboard-row {
@@ -1207,7 +1242,7 @@ export const activityHistoryCardStyles = css`
     align-items: center;
     gap: var(--ahc-gap-xs);
     min-block-size: var(--ahc-dashboard-row-height);
-    padding-block: 2px;
+    padding-block: 1px;
     padding-inline: 6px;
     border-radius: var(--ahc-radius-sm);
   }
@@ -1250,7 +1285,7 @@ export const activityHistoryCardStyles = css`
     border-radius: 999px;
     background:
       linear-gradient(to right, rgba(148, 163, 184, 0.07) 1px, transparent 1px),
-      rgba(2, 6, 23, 0.14);
+      rgba(15, 23, 42, 0.36);
     background-size: calc(100% / 8) 100%;
     overflow: visible;
   }
@@ -1290,7 +1325,7 @@ export const activityHistoryCardStyles = css`
   }
 
   .ahc-dashboard-segment--aggregate {
-    block-size: 14px;
+    block-size: 13px;
     opacity: 0.86;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.18),
@@ -1339,6 +1374,133 @@ export const activityHistoryCardStyles = css`
 
   .ahc-dashboard-segment[data-category="closing"] {
     background: linear-gradient(90deg, var(--ahc-closing), #e2e8f0);
+  }
+
+  .ahc-area-card__quiet {
+    min-block-size: 36px;
+    display: grid;
+    align-items: center;
+    padding-inline: 10px;
+    border: 1px dashed rgba(148, 163, 184, 0.18);
+    border-radius: var(--ahc-radius-sm);
+    background: rgba(2, 6, 23, 0.16);
+    color: var(--ahc-muted);
+    font-size: 0.78rem;
+  }
+
+  .ahc-area-inventory {
+    display: grid;
+    gap: 8px;
+    padding-block-start: 6px;
+    border-block-start: 1px solid rgba(148, 163, 184, 0.12);
+  }
+
+  .ahc-area-inventory__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    color: var(--ahc-text);
+    font-size: 0.78rem;
+    font-weight: 850;
+  }
+
+  .ahc-area-inventory__header small {
+    color: var(--ahc-muted);
+    font-size: 0.74rem;
+    font-weight: 700;
+  }
+
+  .ahc-area-inventory__groups {
+    display: grid;
+    gap: 7px;
+  }
+
+  .ahc-area-inventory__domain {
+    display: grid;
+    gap: 5px;
+  }
+
+  .ahc-area-inventory__domain-title {
+    color: var(--ahc-muted);
+    font-size: 0.72rem;
+    font-weight: 800;
+  }
+
+  .ahc-area-inventory__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-inline-size: 0;
+  }
+
+  .ahc-inventory-chip {
+    appearance: none;
+    min-inline-size: 0;
+    max-inline-size: min(100%, 230px);
+    min-block-size: 44px;
+    display: inline-grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 7px;
+    padding: 6px 9px;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.58);
+    color: var(--ahc-text);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .ahc-inventory-chip:hover {
+    border-color: rgba(125, 211, 252, 0.34);
+    background: rgba(30, 41, 59, 0.68);
+  }
+
+  .ahc-inventory-chip[data-active-now="true"] {
+    border-color: rgba(187, 247, 208, 0.38);
+    background: rgba(34, 197, 94, 0.1);
+  }
+
+  .ahc-inventory-chip[data-had-activity="false"] {
+    color: rgba(226, 232, 240, 0.78);
+  }
+
+  .ahc-inventory-chip .ahc-dashboard-icon {
+    inline-size: 26px;
+    block-size: 26px;
+    border-radius: 8px;
+  }
+
+  .ahc-inventory-chip__copy {
+    display: grid;
+    gap: 1px;
+    min-inline-size: 0;
+  }
+
+  .ahc-inventory-chip__copy strong,
+  .ahc-inventory-chip__copy small {
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ahc-inventory-chip__copy strong {
+    color: inherit;
+    font-size: 0.78rem;
+    font-weight: 850;
+  }
+
+  .ahc-inventory-chip__copy small {
+    color: var(--ahc-muted);
+    font-size: 0.7rem;
+  }
+
+  .ahc-area-inventory__more {
+    justify-self: start;
+    padding-inline: 12px;
   }
 
   .ahc-dashboard-empty {
@@ -2490,6 +2652,10 @@ export const activityHistoryCardStyles = css`
       flex-direction: column;
     }
 
+    .ahc-area-card__actions {
+      justify-content: space-between;
+    }
+
     .ahc-dashboard__range-pill,
     .ahc-dashboard-group__meta {
       align-self: start;
@@ -2510,6 +2676,21 @@ export const activityHistoryCardStyles = css`
 
     .ahc-dashboard-row__meta span {
       display: none;
+    }
+
+    .ahc-area-inventory__chips {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-block-end: 2px;
+      scrollbar-width: none;
+    }
+
+    .ahc-area-inventory__chips::-webkit-scrollbar {
+      display: none;
+    }
+
+    .ahc-inventory-chip {
+      flex: 0 0 min(72vw, 230px);
     }
 
     .ahc-timeline-card {
@@ -2669,6 +2850,10 @@ export const activityHistoryCardStyles = css`
 
     .ahc-dashboard-row__meta strong {
       font-size: 0.74rem;
+    }
+
+    .ahc-inventory-chip {
+      flex-basis: min(78vw, 210px);
     }
   }
 

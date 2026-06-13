@@ -24,6 +24,8 @@ function model(
     totalVisibleActiveMs: 3_600_000,
     visibleEventCount: 1,
     activeNowCount: 0,
+    totalInventoryItemCount: 2,
+    singleAreaFocused: false,
     densityBuckets: [],
     groups: [
       {
@@ -31,6 +33,9 @@ function model(
         title: "סלון",
         icon: "mdi:home-outline",
         area: "סלון",
+        totalEntityCount: 2,
+        visibleActivityRowCount: 1,
+        inventoryItemCount: 2,
         totalActiveMs: 3_600_000,
         eventCount: 1,
         activeNowCount: 0,
@@ -47,7 +52,7 @@ function model(
             minVisible: false,
           },
         ],
-        rows: [
+        activityRows: [
           {
             entityId: "switch.living_room",
             name: "תאורת סלון",
@@ -70,6 +75,28 @@ function model(
                 minVisible: false,
               },
             ],
+          },
+        ],
+        inventoryItems: [
+          {
+            entityId: "switch.living_room",
+            name: "תאורת סלון",
+            domain: "switch",
+            area: "סלון",
+            activeNow: false,
+            hadActivityInRange: true,
+            totalActiveMs: 3_600_000,
+            eventCount: 1,
+            currentStateLabel: "דלוק",
+          },
+          {
+            entityId: "switch.side_lamp",
+            name: "מנורת צד",
+            domain: "switch",
+            area: "סלון",
+            activeNow: false,
+            hadActivityInRange: false,
+            currentStateLabel: "כבוי",
           },
         ],
       },
@@ -107,19 +134,53 @@ describe("renderActivityDashboard", () => {
     );
 
     expect(html).toContain("ahc-dashboard__overview");
+    expect(html).toContain("ahc-area-card");
     expect(html).toContain("ahc-dashboard-group__aggregate");
     expect(html).toContain("ahc-dashboard-row__plot");
     expect(html).toContain("ahc-dashboard-segment--row");
+    expect(html).toContain("ahc-area-inventory");
+    expect(html).toContain("מנורת צד");
   });
 
   it("renders a compact dashboard empty state when no rows are visible", () => {
     const html = flattenTemplate(
       renderActivityDashboard({
-        model: model({ visibleRowsCount: 0, groups: [] }),
+        model: model({
+          visibleRowsCount: 0,
+          totalInventoryItemCount: 0,
+          groups: [],
+        }),
         config: { type: "custom:activity-history-card" },
       }),
     );
 
     expect(html).toContain("ahc-dashboard-empty");
+  });
+
+  it("keeps the dashboard visible when there are inventory items but no activity rows", () => {
+    const html = flattenTemplate(
+      renderActivityDashboard({
+        model: model({
+          visibleRowsCount: 0,
+          visibleEventCount: 0,
+          totalVisibleActiveMs: 0,
+          groups: [
+            {
+              ...model().groups[0]!,
+              totalActiveMs: 0,
+              eventCount: 0,
+              activeNowCount: 0,
+              visibleActivityRowCount: 0,
+              aggregateSegments: [],
+              activityRows: [],
+            },
+          ],
+        }),
+        config: { type: "custom:activity-history-card" },
+      }),
+    );
+
+    expect(html).toContain("ahc-area-card");
+    expect(html).toContain("אין פעילות משמעותית בטווח הנוכחי");
   });
 });

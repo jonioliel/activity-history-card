@@ -39,6 +39,13 @@ show_entity_id_when_name_missing: false
 summary_scope: visible # visible | all
 show_activity_density: true
 activity_density_buckets: 0 # 0 = auto
+show_area_inventory: true
+area_inventory_mode: compact # compact | expanded | off
+area_inventory_include_inactive: true
+area_inventory_max_items: 16
+area_inventory_group_by_domain: true
+area_inventory_show_state: true
+area_inventory_show_last_activity: true
 
 max_visible_rows: 18
 collapse_groups: false

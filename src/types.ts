@@ -14,6 +14,7 @@ export type StateMode = "all" | "active_only" | "currently_active";
 export type TimePreset = "24h" | "7d" | "custom";
 export type SummaryScope = "visible" | "all";
 export type ActivityMode = "meaningful" | "all";
+export type AreaInventoryMode = "compact" | "expanded" | "off";
 
 export interface HassEntity {
   entity_id: string;
@@ -114,6 +115,14 @@ export interface ActivityHistoryCardConfig {
   show_entity_id_when_name_missing?: boolean;
   summary_scope?: SummaryScope;
   collapse_groups?: boolean;
+  show_area_inventory?: boolean;
+  area_inventory_mode?: AreaInventoryMode;
+  area_inventory_include_inactive?: boolean;
+  area_inventory_max_items?: number;
+  area_inventory_group_by_domain?: boolean;
+  area_inventory_show_state?: boolean;
+  area_inventory_show_last_activity?: boolean;
+  area_inventory_domains?: string[];
   default_collapsed_groups?: string[];
   timeline_height?: string;
   mobile_breakpoint?: number;

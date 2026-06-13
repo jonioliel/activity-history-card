@@ -6,6 +6,7 @@ import {
 } from "./defaults";
 import { getDomain } from "./format";
 import type {
+  AreaInventoryMode,
   ActivityMode,
   ActivityHistoryCardConfig,
   DisplayMode,
@@ -138,6 +139,13 @@ export class ActivityHistoryCardEditor extends LitElement {
       display_mode: config.display_mode ?? DEFAULT_CONFIG.display_mode,
       view_mode: config.view_mode ?? DEFAULT_CONFIG.view_mode,
       group_by: config.group_by ?? DEFAULT_CONFIG.group_by,
+      show_area_inventory:
+        config.show_area_inventory ?? DEFAULT_CONFIG.show_area_inventory,
+      area_inventory_mode:
+        config.area_inventory_mode ?? DEFAULT_CONFIG.area_inventory_mode,
+      area_inventory_max_items:
+        config.area_inventory_max_items ??
+        DEFAULT_CONFIG.area_inventory_max_items,
     };
     this.requestUpdate();
   }
@@ -254,6 +262,98 @@ export class ActivityHistoryCardEditor extends LitElement {
           <p class="hint">
             כאשר האפשרות פעילה ואין רשימת entities ידנית, הכרטיס מאתר ישויות לפי
             אזורי Home Assistant ומסנן לפי הדומיינים והלייבלים שבחרת.
+          </p>
+        </section>
+
+        <section class="section">
+          <h3>מלאי אביזרים לפי אזור</h3>
+          <div class="row">
+            <label class="check">
+              <input
+                type="checkbox"
+                .checked=${config.show_area_inventory !== false}
+                @change=${(event: Event) =>
+                  this._setChecked("show_area_inventory", event)}
+              />
+              הצג אביזרים בכל אזור
+            </label>
+            <label>
+              מצב מלאי
+              <select
+                .value=${config.area_inventory_mode ??
+                DEFAULT_CONFIG.area_inventory_mode}
+                @change=${(event: Event) =>
+                  this._setValue(
+                    "area_inventory_mode",
+                    inputValue(event) as AreaInventoryMode,
+                  )}
+              >
+                <option value="compact">קומפקטי</option>
+                <option value="expanded">פתוח</option>
+                <option value="off">כבוי</option>
+              </select>
+            </label>
+          </div>
+          <div class="row">
+            <label>
+              אביזרים לפני “עוד”
+              <input
+                type="number"
+                min="1"
+                max="80"
+                .value=${String(
+                  config.area_inventory_max_items ??
+                    DEFAULT_CONFIG.area_inventory_max_items,
+                )}
+                @input=${(event: Event) =>
+                  this._setNumber(
+                    "area_inventory_max_items",
+                    inputValue(event),
+                  )}
+              />
+            </label>
+            <label class="check">
+              <input
+                type="checkbox"
+                .checked=${config.area_inventory_include_inactive !== false}
+                @change=${(event: Event) =>
+                  this._setChecked("area_inventory_include_inactive", event)}
+              />
+              כלול אביזרים שלא פעלו
+            </label>
+          </div>
+          <div class="check-grid">
+            <label class="check">
+              <input
+                type="checkbox"
+                .checked=${config.area_inventory_group_by_domain !== false}
+                @change=${(event: Event) =>
+                  this._setChecked("area_inventory_group_by_domain", event)}
+              />
+              קבץ לפי סוג
+            </label>
+            <label class="check">
+              <input
+                type="checkbox"
+                .checked=${config.area_inventory_show_state !== false}
+                @change=${(event: Event) =>
+                  this._setChecked("area_inventory_show_state", event)}
+              />
+              הצג מצב נוכחי
+            </label>
+            <label class="check">
+              <input
+                type="checkbox"
+                .checked=${config.area_inventory_show_last_activity !== false}
+                @change=${(event: Event) =>
+                  this._setChecked("area_inventory_show_last_activity", event)}
+              />
+              הצג משך פעילות
+            </label>
+          </div>
+          <p class="hint">
+            ציר הזמן נשאר נקי ומציג רק פעילות משמעותית; מלאי האביזרים מציג גם
+            מפסקים ותאורות שלא פעלו בטווח כדי שתוכל לזהות מה קיים בכל אזור.
           </p>
         </section>
 
@@ -527,7 +627,8 @@ export class ActivityHistoryCardEditor extends LitElement {
       | "hours_to_show"
       | "min_row_active_seconds"
       | "max_rows_per_group"
-      | "max_total_rows",
+      | "max_total_rows"
+      | "area_inventory_max_items",
     value: string,
   ): void {
     const parsed = Number(value);
@@ -548,7 +649,12 @@ export class ActivityHistoryCardEditor extends LitElement {
       | "show_config_entities"
       | "show_diagnostic_entities"
       | "show_inactive_baselines"
-      | "show_activity_density",
+      | "show_activity_density"
+      | "show_area_inventory"
+      | "area_inventory_include_inactive"
+      | "area_inventory_group_by_domain"
+      | "area_inventory_show_state"
+      | "area_inventory_show_last_activity",
     event: Event,
   ): void {
     const checked = (event.target as HTMLInputElement).checked;
