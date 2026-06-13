@@ -2,13 +2,14 @@ import { html, type TemplateResult } from "lit";
 import { CATEGORY_LABELS_HE } from "../defaults";
 import { renderEntityIcon, renderGroupIcon } from "../entity-icons";
 import { formatDuration, formatTime, timeToPercent } from "../format";
-import { formatCurationSummary } from "../row-curation";
+import { formatCurationSummary } from "../activity-curation";
 import { limitTimelineGroups } from "../timeline-layout";
 import type {
   ActivityHistoryCardConfig,
   ActivitySummary,
   RowCurationDiagnostics,
   TimelineGroup,
+  TimelineSegment,
   TimeRange,
 } from "../types";
 
@@ -36,6 +37,7 @@ export function renderSwimlaneTimeline(
   const curationSummary = formatCurationSummary(options.curation);
   const now = new Date();
   const nowPercent = timeToPercent(now, options.range);
+  const showInactiveBaselines = options.config.show_inactive_baselines === true;
   const showNow =
     options.config.show_now_line !== false &&
     now.getTime() >= options.range.start.getTime() &&
@@ -43,7 +45,9 @@ export function renderSwimlaneTimeline(
 
   return html`
     <section
-      class=${`ahc-timeline-card ahc-timeline-card--${display.density}`}
+      class=${`ahc-timeline-card ahc-timeline-card--${display.density}${
+        showInactiveBaselines ? " ahc-timeline-card--baselines" : ""
+      }`}
       aria-label="ציר זמן פעילות"
       style=${options.config.timeline_height
         ? `--ahc-timeline-height:${options.config.timeline_height}`
@@ -62,9 +66,8 @@ export function renderSwimlaneTimeline(
           : null}
       </div>
       <div class="ahc-timeline-scroll">
-        <div class="ahc-timeline">
+        <div class="ahc-timeline" dir="ltr">
           <div class="ahc-timeline__axis" aria-hidden="true">
-            <div class="ahc-timeline__axis-spacer">רכיב / אזור</div>
             <div class="ahc-timeline__ticks">
               ${ticks.map(
                 (tick) =>
@@ -75,6 +78,7 @@ export function renderSwimlaneTimeline(
                   >`,
               )}
             </div>
+            <div class="ahc-timeline__axis-spacer" dir="rtl">רכיב / אזור</div>
           </div>
           <div class="ahc-timeline__groups">
             ${display.groups.map((group) => {
@@ -102,25 +106,6 @@ export function renderSwimlaneTimeline(
                   ${group.rows.map(
                     (row) => html`
                       <div class="ahc-row">
-                        <div class="ahc-row__label">
-                          ${renderEntityIcon(row.entity)}
-                          <span
-                            class="ahc-row__name"
-                            title=${options.config.debug
-                              ? row.entity.entity_id
-                              : row.entity.name}
-                            >${row.entity.name}</span
-                          >
-                          ${row.currentCategory
-                            ? html`<span
-                                class="ahc-row__state-chip"
-                                data-state=${row.currentCategory}
-                                >${CATEGORY_LABELS_HE[
-                                  row.currentCategory
-                                ]}</span
-                              >`
-                            : null}
-                        </div>
                         <div class="ahc-row__track">
                           <svg
                             class="ahc-row__svg"
@@ -129,13 +114,15 @@ export function renderSwimlaneTimeline(
                             role="img"
                             aria-label=${`ציר זמן עבור ${row.entity.name}`}
                           >
-                            <line
-                              class="ahc-row__svg-track"
-                              x1="1"
-                              x2="99"
-                              y1="16"
-                              y2="16"
-                            ></line>
+                            ${showInactiveBaselines
+                              ? html`<line
+                                  class="ahc-row__svg-track"
+                                  x1="1"
+                                  x2="99"
+                                  y1="16"
+                                  y2="16"
+                                ></line>`
+                              : null}
                             ${row.segments.map((segment, index) => {
                               const left = timeToPercent(
                                 segment.start,
@@ -147,10 +134,10 @@ export function renderSwimlaneTimeline(
                               );
                               const width = Math.max(0.65, right - left);
                               if (
-                                !segment.active &&
-                                segment.category !== "unknown" &&
-                                segment.category !== "off" &&
-                                segment.category !== "idle"
+                                !shouldRenderTimelineSegment(
+                                  segment,
+                                  options.config,
+                                )
                               )
                                 return null;
                               const label = `${row.entity.name}, ${CATEGORY_LABELS_HE[segment.category]}, ${formatTime(segment.start)} עד ${formatTime(segment.end)}, ${formatDuration(segment.durationMs)}`;
@@ -164,10 +151,10 @@ export function renderSwimlaneTimeline(
                                     ? "true"
                                     : "false"}
                                   x=${left}
-                                  y=${segment.active ? "9" : "12"}
+                                  y=${segment.active ? "12" : "15"}
                                   width=${width}
-                                  height=${segment.active ? "14" : "8"}
-                                  rx=${segment.active ? "7" : "4"}
+                                  height=${segment.active ? "8" : "2"}
+                                  rx=${segment.active ? "4" : "1"}
                                   tabindex="0"
                                   role="button"
                                   aria-label=${label}
@@ -196,6 +183,25 @@ export function renderSwimlaneTimeline(
                               `;
                             })}
                           </svg>
+                        </div>
+                        <div class="ahc-row__label" dir="rtl">
+                          ${renderEntityIcon(row.entity)}
+                          <span
+                            class="ahc-row__name"
+                            title=${options.config.debug
+                              ? row.entity.entity_id
+                              : row.entity.name}
+                            >${row.entity.name}</span
+                          >
+                          ${row.currentCategory
+                            ? html`<span
+                                class="ahc-row__state-chip"
+                                data-state=${row.currentCategory}
+                                >${CATEGORY_LABELS_HE[
+                                  row.currentCategory
+                                ]}</span
+                              >`
+                            : null}
                         </div>
                       </div>
                     `,
@@ -230,11 +236,19 @@ function groupShouldStartCollapsed(
   return Boolean(config.collapse_groups && group.totalActiveMs <= 0);
 }
 
+export function shouldRenderTimelineSegment(
+  segment: TimelineSegment,
+  config: ActivityHistoryCardConfig,
+): boolean {
+  return segment.active || config.show_inactive_baselines === true;
+}
+
 function renderLegend(): TemplateResult {
   const items: Array<[keyof typeof CATEGORY_LABELS_HE, string]> = [
     ["on", "var(--ahc-on)"],
     ["cooling", "var(--ahc-cooling)"],
     ["heating", "var(--ahc-heating)"],
+    ["fan", "var(--ahc-idle)"],
     ["playing", "var(--ahc-playing)"],
     ["opening", "var(--ahc-opening)"],
     ["off", "var(--ahc-off)"],

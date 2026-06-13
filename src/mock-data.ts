@@ -6,6 +6,8 @@ interface MockEntitySeed {
   area: string;
   domain: string;
   icon: string;
+  entity_category?: string;
+  labels?: string[];
   pattern: Array<{
     startHour: number;
     endHour: number;
@@ -172,24 +174,27 @@ const MOCK_ENTITIES: MockEntitySeed[] = [
   },
 ];
 
-export function getMockEntities(): EntityMeta[] {
-  return MOCK_ENTITIES.map((entity) => ({
+export function getMockEntities(profile?: string): EntityMeta[] {
+  return mockSeedsForProfile(profile).map((entity) => ({
     entity_id: entity.entity_id,
     name: entity.name,
     area: entity.area,
     domain: entity.domain,
     icon: entity.icon,
+    labels: entity.labels,
+    entity_category: entity.entity_category,
     config: { entity: entity.entity_id, name: entity.name, area: entity.area },
   }));
 }
 
 export function getMockHistory(
   range: TimeRange,
+  profile?: string,
 ): Record<string, HistoryStateRecord[]> {
   const result: Record<string, HistoryStateRecord[]> = {};
   const endMs = range.end.getTime();
 
-  for (const entity of MOCK_ENTITIES) {
+  for (const entity of mockSeedsForProfile(profile)) {
     const records: HistoryStateRecord[] = [
       makeRecord(entity.entity_id, "off", range.start.getTime(), undefined),
     ];
@@ -231,6 +236,67 @@ export function getMockHistory(
   }
 
   return result;
+}
+
+function mockSeedsForProfile(profile?: string): MockEntitySeed[] {
+  if (profile === "large_noisy_home") {
+    return [...MOCK_ENTITIES, ...buildLargeNoisyHome()];
+  }
+  return MOCK_ENTITIES;
+}
+
+function buildLargeNoisyHome(): MockEntitySeed[] {
+  const noisyNames = [
+    "Power",
+    "Extra dry",
+    "Half load",
+    "Silence on demand",
+    "Vario speed",
+    "Program",
+    "Progress",
+    "Finish",
+    "Remote start",
+    "Child lock",
+    "Router LAN0",
+    "WLAN signal",
+    "Firmware update",
+    "Battery level",
+    "Cloud connection",
+    "תוכנית כביסה",
+    "חצי כמות",
+    "נעילת ילדים",
+    "מהירות ייבוש",
+    "ראוטר רשת",
+  ];
+  const areas = ["בריכה", "מטבח", "סלון", "חדר שירות", "חדרי ילדים"];
+  const domains = ["switch", "sensor", "binary_sensor", "switch", "switch"];
+  const seeds: MockEntitySeed[] = [];
+
+  for (let index = 0; index < 170; index += 1) {
+    const name = noisyNames[index % noisyNames.length] ?? "Power";
+    const domain = domains[index % domains.length] ?? "switch";
+    const category =
+      index % 7 === 0 ? "diagnostic" : index % 11 === 0 ? "config" : undefined;
+    const slug = name
+      .toLowerCase()
+      .replace(/[^a-z0-9\u0590-\u05ff]+/gi, "_")
+      .replace(/^_+|_+$/g, "");
+    seeds.push({
+      entity_id: `${domain}.large_noisy_${index}_${slug || "entity"}`,
+      name,
+      area: areas[index % areas.length] ?? "ללא אזור",
+      domain,
+      icon: domain === "sensor" ? "mdi:gauge" : "mdi:toggle-switch",
+      entity_category: category,
+      labels: index % 13 === 0 ? ["לא להצגה"] : undefined,
+      pattern:
+        index % 19 === 0
+          ? [{ startHour: -2, endHour: -1.95, state: "on" }]
+          : [],
+    });
+  }
+
+  return seeds;
 }
 
 function makeRecord(

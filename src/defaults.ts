@@ -28,11 +28,14 @@ export const DEFAULT_COLORS: Record<StateCategory, string> = {
   off: "var(--ahc-off)",
   cooling: "var(--ahc-cooling)",
   heating: "var(--ahc-heating)",
+  drying: "var(--ahc-idle)",
+  fan: "var(--ahc-idle)",
   playing: "var(--ahc-playing)",
   opening: "var(--ahc-opening)",
   closing: "var(--ahc-closing)",
   idle: "var(--ahc-idle)",
   unknown: "var(--ahc-unknown)",
+  unavailable: "var(--ahc-unknown)",
 };
 
 export const DEFAULT_CONFIG: Required<
@@ -57,6 +60,7 @@ export const DEFAULT_CONFIG: Required<
     | "merge_gap_seconds"
     | "max_visible_rows"
     | "smart_filter"
+    | "activity_mode"
     | "hide_empty_rows"
     | "hide_empty_groups"
     | "min_row_active_seconds"
@@ -65,6 +69,7 @@ export const DEFAULT_CONFIG: Required<
     | "show_technical_entities"
     | "show_config_entities"
     | "show_diagnostic_entities"
+    | "show_inactive_baselines"
     | "show_entity_id_when_name_missing"
     | "summary_scope"
     | "collapse_groups"
@@ -76,7 +81,7 @@ export const DEFAULT_CONFIG: Required<
   auto_discover: true,
   debug: false,
   hours_to_show: 24,
-  live: true,
+  live: false,
   display_mode: "card",
   group_by: "area",
   show_summary: true,
@@ -89,16 +94,18 @@ export const DEFAULT_CONFIG: Required<
   refresh_interval_seconds: 300,
   min_duration_seconds: 20,
   merge_gap_seconds: 15,
-  max_visible_rows: 60,
+  max_visible_rows: 40,
   smart_filter: true,
+  activity_mode: "meaningful",
   hide_empty_rows: true,
   hide_empty_groups: true,
   min_row_active_seconds: 30,
-  max_rows_per_group: 12,
-  max_total_rows: 60,
+  max_rows_per_group: 8,
+  max_total_rows: 40,
   show_technical_entities: false,
   show_config_entities: false,
   show_diagnostic_entities: false,
+  show_inactive_baselines: false,
   show_entity_id_when_name_missing: false,
   summary_scope: "visible",
   collapse_groups: false,
@@ -134,9 +141,12 @@ export const CATEGORY_LABELS_HE: Record<StateCategory, string> = {
   off: "כבוי",
   cooling: "קירור",
   heating: "חימום",
+  drying: "ייבוש",
+  fan: "מאוורר",
   playing: "מנגן",
   opening: "פתוח",
   closing: "נסגר",
   idle: "המתנה",
   unknown: "לא ידוע",
+  unavailable: "לא זמין",
 };

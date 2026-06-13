@@ -22,7 +22,7 @@ import { renderCorrelationPlaceholder } from "./renderers/correlation-renderer";
 import { renderDetailPlaceholder } from "./renderers/detail-renderer";
 import { renderHeatmapPlaceholder } from "./renderers/heatmap-renderer";
 import { renderSwimlaneTimeline } from "./renderers/swimlane-renderer";
-import { curateRows, formatCurationSummary } from "./row-curation";
+import { curateRows, formatCurationSummary } from "./activity-curation";
 import { activityHistoryCardStyles } from "./styles";
 import { summarizeActivity } from "./summary";
 import "./activity-history-card-editor";
@@ -257,12 +257,12 @@ export class ActivityHistoryCard extends LitElement {
   private _renderBody(): TemplateResult {
     const showInsights = this._config.show_insights !== false;
     return html`
-      <div
+      <section
         class=${showInsights ? "ahc__body" : "ahc__body ahc__body--no-insights"}
       >
-        <main class="ahc__main">${this._renderMainContent()}</main>
+        <main class="ahc__timeline-panel">${this._renderMainContent()}</main>
         ${showInsights ? this._renderInsights() : nothing}
-      </div>
+      </section>
     `;
   }
 
@@ -407,7 +407,7 @@ export class ActivityHistoryCard extends LitElement {
                 aria-pressed=${this._showAllRows ? "true" : "false"}
                 @click=${this._toggleShowAllRows}
               >
-                ${this._showAllRows ? "סינון חכם" : "הצג הכל"}
+                ${this._showAllRows ? "הצג רק פעילות" : "הצג הכל"}
               </button>`
             : nothing}
           ${curationSummary
@@ -437,6 +437,10 @@ export class ActivityHistoryCard extends LitElement {
     if (this._config.show_summary === false) return nothing;
     const summary = this._summary;
     const visibleCount = this._visibleRows.length || this._rows.length;
+    const summaryScopeLabel =
+      this._config.summary_scope === "all"
+        ? "לפי כל הרכיבים שנמצאו"
+        : "לפי הרכיבים שמוצגים";
     return html`
       <section class="ahc__summary-grid" aria-label="סיכום פעילות">
         <article class="ahc__metric">
@@ -475,9 +479,7 @@ export class ActivityHistoryCard extends LitElement {
             <span class="ahc__metric-value ahc__metric-value--positive"
               >${formatDuration(summary?.totalActiveMs ?? 0)}</span
             >
-            <span class="ahc__metric-subtitle"
-              >סכום פעילות על פני כל הרכיבים</span
-            >
+            <span class="ahc__metric-subtitle">${summaryScopeLabel}</span>
           </div>
           <span class="ahc__metric-icon" aria-hidden="true">◴</span>
         </article>
@@ -720,9 +722,9 @@ export class ActivityHistoryCard extends LitElement {
         yaml: "type: custom:activity-history-card\nauto_discover: true\nfilters:\n  active_only: false",
       },
       no_meaningful_activity: {
-        title: "לא נמצאה פעילות משמעותית",
-        body: "הכרטיס מצא רכיבים והיסטוריה, אבל הסינון החכם הסתיר שורות ריקות, טכניות או קצרות מאוד כדי לשמור על ציר זמן קריא.",
-        yaml: "type: custom:activity-history-card\nauto_discover: true\nsmart_filter: false",
+        title: "לא נמצאה פעילות משמעותית בטווח הזה",
+        body: "הכרטיס מצא רכיבים והיסטוריה, אבל הסינון החכם הסתיר שורות בלי פעילות אמיתית, רכיבים טכניים או מקטעים קצרים מאוד. אפשר להציג הכל לבדיקה או להגדיל את הטווח.",
+        yaml: "type: custom:activity-history-card\nauto_discover: true\nactivity_mode: all\nshow_inactive_baselines: true",
       },
     };
     const state = states[reason];
@@ -740,6 +742,11 @@ export class ActivityHistoryCard extends LitElement {
             ? html`<p>
                 אזהרת discovery: ${discoveryWarnings}. אם האזורים לא זמינים, נסה
                 להגדיר entities ידנית או להפעיל debug.
+              </p>`
+            : nothing}
+          ${reason === "no_meaningful_activity" && this._config.debug
+            ? html`<p class="ahc-debug__meta">
+                ${formatCurationSummary(this._curation)}
               </p>`
             : nothing}
           <pre
@@ -896,7 +903,10 @@ export class ActivityHistoryCard extends LitElement {
     const mostActiveArea = summary?.mostActiveArea;
     const hasData = Boolean(summary && summary.eventCount > 0);
     return html`
-      <aside class="ahc__insights" aria-label="תובנות חכמות">
+      <aside
+        class="ahc__insights ahc__insights-panel"
+        aria-label="תובנות חכמות"
+      >
         <h3 class="ahc__insights-title">
           <span>תובנות חכמות</span><span aria-hidden="true">✦</span>
         </h3>
@@ -1076,7 +1086,7 @@ export class ActivityHistoryCard extends LitElement {
             aria-pressed=${this._showAllRows ? "true" : "false"}
             @click=${this._toggleShowAllRows}
           >
-            <span>${this._showAllRows ? "הפעל סינון חכם" : "הצג הכל"}</span>
+            <span>${this._showAllRows ? "הצג רק פעילות" : "הצג הכל"}</span>
             <small
               >${formatCurationSummary(this._curation) ||
               "הסתר שורות ריקות, טכניות וקצרות מאוד"}</small
@@ -1225,7 +1235,10 @@ export class ActivityHistoryCard extends LitElement {
     this.requestUpdate();
 
     const resolved = useMockData
-      ? { entities: getMockEntities(), diagnostics: undefined }
+      ? {
+          entities: getMockEntities(this._config.mock_profile),
+          diagnostics: undefined,
+        }
       : await resolveEntityMetasWithDiagnostics(this._config, this._hass);
     if (token !== this._fetchToken) return;
 
@@ -1350,7 +1363,7 @@ export class ActivityHistoryCard extends LitElement {
       let history = bypassCache ? undefined : this._historyCache.get(key);
       if (!history) {
         history = useMockData
-          ? getMockHistory(range)
+          ? getMockHistory(range, this._config.mock_profile)
           : await fetchHistory(
               this._hass as HomeAssistant,
               entities,

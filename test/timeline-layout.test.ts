@@ -3,6 +3,7 @@ import {
   getTimelineDensity,
   limitTimelineGroups,
 } from "../src/timeline-layout";
+import { timeToPercent } from "../src/format";
 import type { TimelineGroup, TimelineRow } from "../src/types";
 
 function row(index: number): TimelineRow {
@@ -44,5 +45,16 @@ describe("timeline layout", () => {
     expect(getTimelineDensity(12)).toBe("normal");
     expect(getTimelineDensity(31)).toBe("dense");
     expect(getTimelineDensity(71)).toBe("ultra-dense");
+  });
+
+  it("keeps the time axis chronological left to right", () => {
+    const range = {
+      start: new Date("2026-01-01T00:00:00.000Z"),
+      end: new Date("2026-01-01T02:00:00.000Z"),
+    };
+
+    expect(timeToPercent(range.start, range)).toBe(0);
+    expect(timeToPercent(new Date("2026-01-01T01:00:00.000Z"), range)).toBe(50);
+    expect(timeToPercent(range.end, range)).toBe(100);
   });
 });

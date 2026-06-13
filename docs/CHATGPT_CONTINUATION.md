@@ -129,7 +129,7 @@ npm run build
 Latest verified results:
 
 - `npm run typecheck` passed
-- `npm run test` passed, 47 tests
+- `npm run test` passed, 58 tests
 - `npm run build` passed
 
 The generated `dist/activity-history-card.js` is intentionally tracked for HACS. `dist/activity-history-card.js.map` remains ignored.
@@ -140,10 +140,10 @@ The latest pass focused on making the swimlane MVP closer to the desktop/mobile 
 
 - Home Assistant `mdi:` entity icons now render through `<ha-icon>` instead of appearing as raw text.
 - Timeline groups and rows are ordered by real activity first, so active rows are visible before inactive discovery noise.
-- Inactive/off/idle timeline segments render as subtle grey bars, while active segments remain taller and colorful.
+- Inactive/off/idle timeline segments are hidden by default; `show_inactive_baselines: true` shows very subtle baselines for debugging.
 - The desktop summary strip is more compact; last event is a compact header pill.
 - `debug: true` diagnostics are visually compact when collapsed.
-- Default `max_visible_rows` changed to `60`, with smart curation limiting automatic rows before the renderer.
+- Default `max_visible_rows`/`max_total_rows` changed to `40`, with `max_rows_per_group: 8` and smart curation limiting automatic rows before the renderer.
 - Generic or blank switch names from Home Assistant registry now fall back safely and are prefixed with the device name when useful, for example `מדיח כלים - Power`.
 - Noisy rows like router LAN/WLAN, update/firmware, program options, half load, extra dry, remote start, child lock, and diagnostic/config entities are hidden by default unless explicitly configured.
 
@@ -165,7 +165,10 @@ auto_discover: true
 display_mode: panel
 hours_to_show: 24
 smart_filter: true
-max_total_rows: 60
+activity_mode: meaningful
+show_inactive_baselines: false
+max_rows_per_group: 8
+max_total_rows: 40
 exclude_labels:
   - לא להצגה
   - רכיבים מוגנים

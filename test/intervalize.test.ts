@@ -290,6 +290,42 @@ describe("intervalizeHistory", () => {
     expect(row?.segments[1]?.active).toBe(true);
   });
 
+  it("treats climate drying and fan actions as active categories", () => {
+    const climateEntity: EntityMeta = {
+      entity_id: "climate.test",
+      name: "מזגן",
+      domain: "climate",
+      area: "סלון",
+      config: { entity: "climate.test" },
+    };
+    const history: Record<string, HistoryStateRecord[]> = {
+      "climate.test": [
+        {
+          entity_id: "climate.test",
+          state: "dry",
+          attributes: { hvac_action: "drying" },
+          last_changed: "2026-01-01T00:00:00.000Z",
+        },
+        {
+          entity_id: "climate.test",
+          state: "fan_only",
+          attributes: { hvac_action: "fan" },
+          last_changed: "2026-01-01T01:00:00.000Z",
+        },
+      ],
+    };
+
+    const [row] = intervalizeHistory(history, [climateEntity], range, {
+      type: "custom:activity-history-card",
+    });
+
+    expect(row?.segments.map((segment) => segment.category)).toEqual([
+      "drying",
+      "fan",
+    ]);
+    expect(row?.segments.every((segment) => segment.active)).toBe(true);
+  });
+
   it("filters rows by area, domain, search and active-only mode", () => {
     const history: Record<string, HistoryStateRecord[]> = {
       "switch.test": [

@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { curateRows, isTechnicalRow } from "../src/row-curation";
-import type { ActivityHistoryCardConfig, TimelineRow } from "../src/types";
+import {
+  classifyEntityVisibility,
+  curateRows,
+  isTechnicalRow,
+} from "../src/activity-curation";
+import type {
+  ActivityHistoryCardConfig,
+  TimelineRow,
+  TimelineSegment,
+} from "../src/types";
 
 function row(
   entityId: string,
@@ -10,21 +18,16 @@ function row(
     totalActiveMs?: number;
     entityCategory?: string;
     deviceName?: string;
+    hiddenBy?: string;
+    disabledBy?: string;
+    segments?: TimelineSegment[];
   } = {},
 ): TimelineRow {
   const totalActiveMs = options.totalActiveMs ?? 60_000;
   const active = totalActiveMs > 0;
-  return {
-    entity: {
-      entity_id: entityId,
-      name: options.name ?? entityId,
-      domain: entityId.split(".")[0] ?? "switch",
-      area: options.area ?? "Kitchen",
-      entity_category: options.entityCategory,
-      device_name: options.deviceName,
-      config: { entity: entityId },
-    },
-    segments: active
+  const segments =
+    options.segments ??
+    (active
       ? [
           {
             entity_id: entityId,
@@ -34,11 +37,24 @@ function row(
             start: new Date("2026-01-01T00:00:00.000Z"),
             end: new Date(1_767_225_600_000 + totalActiveMs),
             durationMs: totalActiveMs,
-          },
+          } satisfies TimelineSegment,
         ]
-      : [],
+      : []);
+  return {
+    entity: {
+      entity_id: entityId,
+      name: options.name ?? entityId,
+      domain: entityId.split(".")[0] ?? "switch",
+      area: options.area ?? "Kitchen",
+      entity_category: options.entityCategory,
+      device_name: options.deviceName,
+      hidden_by: options.hiddenBy,
+      disabled_by: options.disabledBy,
+      config: { entity: entityId },
+    },
+    segments,
     totalActiveMs,
-    eventCount: active ? 1 : 0,
+    eventCount: segments.length,
     currentCategory: active ? "on" : "off",
   };
 }
@@ -102,7 +118,7 @@ describe("curateRows", () => {
     expect(result.rows.map((item) => item.entity.entity_id)).toEqual([
       "switch.real_light",
     ]);
-    expect(result.diagnostics.hiddenTechnicalRows).toBe(1);
+    expect(result.diagnostics.hiddenNoisyNameRows).toBe(1);
     expect(result.diagnostics.hiddenConfigRows).toBe(1);
     expect(result.diagnostics.hiddenDiagnosticRows).toBe(1);
   });
@@ -146,6 +162,93 @@ describe("curateRows", () => {
     expect(result.diagnostics.showAll).toBe(true);
     expect(result.diagnostics.smartFilter).toBe(false);
   });
+
+  it("rewrites visible rows to meaningful active segments only", () => {
+    const offSegment: TimelineSegment = {
+      entity_id: "switch.kettle",
+      state: "off",
+      category: "off",
+      active: false,
+      start: new Date("2026-01-01T00:00:00.000Z"),
+      end: new Date("2026-01-01T01:00:00.000Z"),
+      durationMs: 3_600_000,
+    };
+    const activeSegment: TimelineSegment = {
+      entity_id: "switch.kettle",
+      state: "on",
+      category: "on",
+      active: true,
+      start: new Date("2026-01-01T01:00:00.000Z"),
+      end: new Date("2026-01-01T01:10:00.000Z"),
+      durationMs: 600_000,
+    };
+
+    const result = curateRows(
+      [
+        row("switch.kettle", {
+          totalActiveMs: 600_000,
+          segments: [offSegment, activeSegment],
+        }),
+      ],
+      config(),
+    );
+
+    expect(result.rows).toHaveLength(1);
+    expect(result.rows[0]?.segments).toEqual([activeSegment]);
+    expect(result.rows[0]?.totalActiveMs).toBe(600_000);
+  });
+
+  it("hides rows that only contain inactive baselines", () => {
+    const result = curateRows(
+      [
+        row("switch.baseline", {
+          totalActiveMs: 0,
+          segments: [
+            {
+              entity_id: "switch.baseline",
+              state: "off",
+              category: "off",
+              active: false,
+              start: new Date("2026-01-01T00:00:00.000Z"),
+              end: new Date("2026-01-02T00:00:00.000Z"),
+              durationMs: 86_400_000,
+            },
+          ],
+        }),
+      ],
+      config(),
+    );
+
+    expect(result.rows).toEqual([]);
+    expect(result.diagnostics.hiddenNoMeaningfulRows).toBe(1);
+  });
+
+  it("detects noisy Hebrew labels and registry hidden entities", () => {
+    const result = curateRows(
+      [
+        row("switch.washer_half_load", { name: "חצי כמות" }),
+        row("switch.hidden", { hiddenBy: "user" }),
+        row("switch.disabled", { disabledBy: "integration" }),
+      ],
+      config(),
+    );
+
+    expect(result.rows).toEqual([]);
+    expect(result.diagnostics.hiddenNoisyNameRows).toBe(1);
+    expect(result.diagnostics.hiddenHiddenRows).toBe(1);
+    expect(result.diagnostics.hiddenDisabledRows).toBe(1);
+  });
+
+  it("activity_mode all disables smart filtering", () => {
+    const result = curateRows(
+      [row("switch.empty", { totalActiveMs: 0 })],
+      config({ activity_mode: "all" }),
+    );
+
+    expect(result.rows).toHaveLength(1);
+    expect(result.diagnostics.activityMode).toBe("all");
+    expect(result.diagnostics.smartFilter).toBe(false);
+  });
 });
 
 describe("isTechnicalRow", () => {
@@ -156,5 +259,18 @@ describe("isTechnicalRow", () => {
     expect(
       isTechnicalRow(row("switch.dishwasher", { name: "Dishwasher" })),
     ).toBe(false);
+  });
+});
+
+describe("classifyEntityVisibility", () => {
+  it("returns explicit confidence for configured entities", () => {
+    const item = row("switch.router_lan0", { name: "Router LAN0" }).entity;
+
+    expect(
+      classifyEntityVisibility(
+        item,
+        config({ entities: ["switch.router_lan0"] }),
+      ),
+    ).toEqual({ visible: true, confidence: "explicit" });
   });
 });

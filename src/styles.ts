@@ -87,7 +87,11 @@ export const activityHistoryCardStyles = css`
     --ahc-grid-line: rgba(148, 163, 184, 0.16);
     --ahc-row-hover: rgba(56, 189, 248, 0.08);
     --ahc-now: #60a5fa;
-    --ahc-label-width: clamp(280px, 17vw, 340px);
+    --ahc-label-width: 240px;
+    --ahc-row-height: 34px;
+    --ahc-group-gap: 12px;
+    --ahc-segment-height: 8px;
+    --ahc-segment-min-width: 4px;
 
     --ahc-chip-height: 40px;
     --ahc-touch-target: 44px;
@@ -581,7 +585,7 @@ export const activityHistoryCardStyles = css`
   /* Layout body */
   .ahc__body {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(250px, 300px);
+    grid-template-columns: minmax(0, 4fr) minmax(260px, 1fr);
     gap: var(--ahc-gap-md);
     align-items: start;
     max-inline-size: 1920px;
@@ -591,7 +595,8 @@ export const activityHistoryCardStyles = css`
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .ahc__main {
+  .ahc__main,
+  .ahc__timeline-panel {
     min-inline-size: 0;
     display: grid;
     gap: var(--ahc-gap-md);
@@ -609,6 +614,11 @@ export const activityHistoryCardStyles = css`
       rgba(30, 41, 59, 0.5),
       rgba(15, 23, 42, 0.52)
     );
+  }
+
+  .ahc__insights-panel {
+    inline-size: 100%;
+    max-inline-size: 340px;
   }
 
   .ahc__insights-title {
@@ -730,7 +740,7 @@ export const activityHistoryCardStyles = css`
     inset-block-start: 0;
     z-index: 3;
     display: grid;
-    grid-template-columns: var(--ahc-label-width) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) var(--ahc-label-width);
     min-block-size: 48px;
     background: rgba(15, 23, 42, 0.92);
     backdrop-filter: blur(14px);
@@ -739,7 +749,7 @@ export const activityHistoryCardStyles = css`
 
   .ahc-timeline__axis-spacer {
     position: sticky;
-    inset-inline-start: 0;
+    inset-inline-end: 0;
     z-index: 4;
     direction: rtl;
     display: flex;
@@ -777,7 +787,7 @@ export const activityHistoryCardStyles = css`
 
   .ahc-group {
     direction: rtl;
-    margin: 10px;
+    margin: var(--ahc-group-gap);
     border: 1px solid rgba(148, 163, 184, 0.12);
     border-radius: var(--ahc-radius-sm);
     background: rgba(15, 23, 42, 0.3);
@@ -833,8 +843,8 @@ export const activityHistoryCardStyles = css`
   .ahc-row {
     direction: ltr;
     display: grid;
-    grid-template-columns: var(--ahc-label-width) minmax(0, 1fr);
-    min-block-size: 42px;
+    grid-template-columns: minmax(0, 1fr) var(--ahc-label-width);
+    min-block-size: var(--ahc-row-height);
     border-block-start: 1px solid rgba(148, 163, 184, 0.09);
   }
 
@@ -844,16 +854,17 @@ export const activityHistoryCardStyles = css`
 
   .ahc-row__label {
     position: sticky;
-    inset-inline-start: 0;
+    inset-inline-start: auto;
+    inset-inline-end: 0;
     z-index: 2;
     direction: rtl;
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
     gap: var(--ahc-gap-xs);
-    padding-inline: 14px 12px;
-    border-inline-end: 1px solid rgba(148, 163, 184, 0.12);
-    background: rgba(4, 10, 24, 0.82);
+    padding-inline: 12px 14px;
+    border-inline-start: 1px solid rgba(148, 163, 184, 0.12);
+    background: rgba(8, 15, 32, 0.72);
     backdrop-filter: blur(10px);
     min-inline-size: 0;
   }
@@ -925,7 +936,7 @@ export const activityHistoryCardStyles = css`
     direction: ltr;
     position: relative;
     min-inline-size: 0;
-    min-block-size: 42px;
+    min-block-size: var(--ahc-row-height);
     background-image: linear-gradient(
       to right,
       var(--ahc-grid-line) 1px,
@@ -943,8 +954,8 @@ export const activityHistoryCardStyles = css`
   }
 
   .ahc-row__svg-track {
-    stroke: rgba(148, 163, 184, 0.13);
-    stroke-width: 6;
+    stroke: rgba(148, 163, 184, 0.08);
+    stroke-width: 2;
     stroke-linecap: round;
     vector-effect: non-scaling-stroke;
   }
@@ -959,8 +970,8 @@ export const activityHistoryCardStyles = css`
 
   .ahc-segment-svg--inactive {
     cursor: pointer;
-    opacity: 0.52;
-    stroke: rgba(255, 255, 255, 0.1);
+    opacity: 0.28;
+    stroke: rgba(255, 255, 255, 0.04);
     filter: none;
   }
 
@@ -985,6 +996,10 @@ export const activityHistoryCardStyles = css`
   .ahc-segment-svg[data-category="heating"] {
     fill: var(--ahc-heating);
   }
+  .ahc-segment-svg[data-category="drying"],
+  .ahc-segment-svg[data-category="fan"] {
+    fill: var(--ahc-idle);
+  }
   .ahc-segment-svg[data-category="playing"] {
     fill: var(--ahc-playing);
   }
@@ -1002,15 +1017,15 @@ export const activityHistoryCardStyles = css`
     stroke-dasharray: 3 2;
   }
 
-  .ahc-row__track::before {
+  .ahc-timeline-card--baselines .ahc-row__track::before {
     content: "";
     position: absolute;
     inset-inline: 14px;
     inset-block-start: 50%;
-    block-size: 4px;
+    block-size: 1px;
     transform: translateY(-50%);
     border-radius: 999px;
-    background: rgba(148, 163, 184, 0.1);
+    background: rgba(148, 163, 184, 0.08);
   }
 
   .ahc-segment {
@@ -1057,6 +1072,14 @@ export const activityHistoryCardStyles = css`
       90deg,
       var(--ahc-heating),
       color-mix(in srgb, var(--ahc-heating) 70%, #7c2d12)
+    );
+  }
+  .ahc-segment[data-category="drying"],
+  .ahc-segment[data-category="fan"] {
+    background: linear-gradient(
+      90deg,
+      var(--ahc-idle),
+      color-mix(in srgb, var(--ahc-idle) 70%, #0f766e)
     );
   }
   .ahc-segment[data-category="playing"] {
@@ -1564,8 +1587,16 @@ export const activityHistoryCardStyles = css`
 
   /* Responsive */
   @media (max-width: 1100px) {
+    :host {
+      --ahc-label-width: 180px;
+    }
+
     .ahc__body {
       grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ahc__insights-panel {
+      max-inline-size: none;
     }
 
     .ahc__insights {
@@ -1577,9 +1608,16 @@ export const activityHistoryCardStyles = css`
     }
   }
 
+  @media (max-width: 900px) {
+    :host {
+      --ahc-label-width: 180px;
+    }
+  }
+
   @media (max-width: 760px) {
     :host {
       --ahc-chip-height: 44px;
+      --ahc-label-width: 180px;
     }
 
     .ahc {
@@ -1759,7 +1797,7 @@ export const activityHistoryCardStyles = css`
 
     .ahc-timeline__axis,
     .ahc-row {
-      grid-template-columns: 180px minmax(560px, 1fr);
+      grid-template-columns: minmax(560px, 1fr) var(--ahc-label-width);
     }
 
     .ahc-row {
@@ -1816,7 +1854,17 @@ export const activityHistoryCardStyles = css`
     }
   }
 
+  @media (max-width: 600px) {
+    :host {
+      --ahc-label-width: 150px;
+    }
+  }
+
   @media (max-width: 420px) {
+    :host {
+      --ahc-label-width: 130px;
+    }
+
     .ahc__summary-grid {
       margin-inline: -2px;
     }
@@ -1827,11 +1875,15 @@ export const activityHistoryCardStyles = css`
 
     .ahc-timeline__axis,
     .ahc-row {
-      grid-template-columns: 164px minmax(540px, 1fr);
+      grid-template-columns: minmax(540px, 1fr) var(--ahc-label-width);
     }
 
     .ahc-row__name {
       font-size: 0.8rem;
+    }
+
+    .ahc-row__state-chip {
+      display: none;
     }
   }
 

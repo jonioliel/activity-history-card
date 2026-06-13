@@ -242,10 +242,8 @@ function categoryFromState(domain: string, state: string): StateCategory {
   if (["playing"].includes(state)) return "playing";
   if (["opening", "open"].includes(state)) return "opening";
   if (["closing"].includes(state)) return "closing";
-  if (
-    domain === "climate" &&
-    ["drying", "fan", "fan_only", "dry"].includes(state)
-  )
-    return "idle";
+  if (domain === "climate" && ["drying", "dry"].includes(state))
+    return "drying";
+  if (domain === "climate" && ["fan", "fan_only"].includes(state)) return "fan";
   return "on";
 }

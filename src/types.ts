@@ -5,6 +5,7 @@ export type GroupBy = "area" | "domain" | "floor" | "entity" | "none";
 export type StateMode = "all" | "active_only" | "currently_active";
 export type TimePreset = "24h" | "7d" | "custom";
 export type SummaryScope = "visible" | "all";
+export type ActivityMode = "meaningful" | "all";
 
 export interface HassEntity {
   entity_id: string;
@@ -83,11 +84,13 @@ export interface ActivityHistoryCardConfig {
   significant_changes_only?: boolean;
   minimal_response?: boolean;
   mock_data?: boolean;
+  mock_profile?: string;
   refresh_interval_seconds?: number;
   min_duration_seconds?: number;
   merge_gap_seconds?: number;
   max_visible_rows?: number;
   smart_filter?: boolean;
+  activity_mode?: ActivityMode;
   hide_empty_rows?: boolean;
   hide_empty_groups?: boolean;
   min_row_active_seconds?: number;
@@ -96,6 +99,7 @@ export interface ActivityHistoryCardConfig {
   show_technical_entities?: boolean;
   show_config_entities?: boolean;
   show_diagnostic_entities?: boolean;
+  show_inactive_baselines?: boolean;
   show_entity_id_when_name_missing?: boolean;
   summary_scope?: SummaryScope;
   collapse_groups?: boolean;
@@ -120,11 +124,14 @@ export type StateCategory =
   | "off"
   | "cooling"
   | "heating"
+  | "drying"
+  | "fan"
   | "playing"
   | "opening"
   | "closing"
   | "idle"
-  | "unknown";
+  | "unknown"
+  | "unavailable";
 
 export interface HistoryStateRecord {
   entity_id: string;
@@ -222,10 +229,14 @@ export interface DiscoveryDiagnostics {
 
 export type RowCurationHiddenReason =
   | "empty"
+  | "no_meaningful_activity"
+  | "too_short"
   | "technical"
+  | "noisy_name"
   | "config"
   | "diagnostic"
-  | "min_duration"
+  | "hidden"
+  | "disabled"
   | "max_rows";
 
 export interface RowCurationDiagnostics {
@@ -233,13 +244,20 @@ export interface RowCurationDiagnostics {
   visibleRows: number;
   hiddenRows: number;
   hiddenEmptyRows: number;
+  hiddenNoMeaningfulRows: number;
+  hiddenTooShortRows: number;
   hiddenTechnicalRows: number;
+  hiddenNoisyNameRows: number;
   hiddenConfigRows: number;
   hiddenDiagnosticRows: number;
+  hiddenHiddenRows: number;
+  hiddenDisabledRows: number;
   hiddenMinDurationRows: number;
   hiddenMaxRows: number;
   hiddenByReason: Partial<Record<RowCurationHiddenReason, number>>;
   smartFilter: boolean;
+  activityMode: ActivityMode;
+  showInactiveBaselines: boolean;
   showAll: boolean;
   manualRowsProtected: number;
   maxRowsPerGroup: number;

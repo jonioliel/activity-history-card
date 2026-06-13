@@ -6,6 +6,7 @@ import {
 } from "./defaults";
 import { getDomain } from "./format";
 import type {
+  ActivityMode,
   ActivityHistoryCardConfig,
   DisplayMode,
   HomeAssistant,
@@ -252,6 +253,20 @@ export class ActivityHistoryCardEditor extends LitElement {
           </div>
           <div class="row">
             <label>
+              מצב פעילות
+              <select
+                .value=${config.activity_mode ?? DEFAULT_CONFIG.activity_mode}
+                @change=${(event: Event) =>
+                  this._setValue(
+                    "activity_mode",
+                    inputValue(event) as ActivityMode,
+                  )}
+              >
+                <option value="meaningful">פעילות משמעותית</option>
+                <option value="all">כל הרכיבים</option>
+              </select>
+            </label>
+            <label>
               מינימום פעילות בשניות
               <input
                 type="number"
@@ -266,7 +281,21 @@ export class ActivityHistoryCardEditor extends LitElement {
               />
             </label>
             <label>
-              מקסימום שורות להצגה
+              מקסימום שורות לקבוצה
+              <input
+                type="number"
+                min="1"
+                max="60"
+                .value=${String(
+                  config.max_rows_per_group ??
+                    DEFAULT_CONFIG.max_rows_per_group,
+                )}
+                @input=${(event: Event) =>
+                  this._setNumber("max_rows_per_group", inputValue(event))}
+              />
+            </label>
+            <label>
+              מקסימום שורות כולל
               <input
                 type="number"
                 min="1"
@@ -306,6 +335,15 @@ export class ActivityHistoryCardEditor extends LitElement {
                   this._setChecked("show_diagnostic_entities", event)}
               />
               הצג ישויות אבחון
+            </label>
+            <label class="check">
+              <input
+                type="checkbox"
+                .checked=${config.show_inactive_baselines === true}
+                @change=${(event: Event) =>
+                  this._setChecked("show_inactive_baselines", event)}
+              />
+              הצג גם קווי בסיס כבויים
             </label>
           </div>
           <p class="hint">
@@ -457,7 +495,11 @@ export class ActivityHistoryCardEditor extends LitElement {
   }
 
   private _setNumber(
-    key: "hours_to_show" | "min_row_active_seconds" | "max_total_rows",
+    key:
+      | "hours_to_show"
+      | "min_row_active_seconds"
+      | "max_rows_per_group"
+      | "max_total_rows",
     value: string,
   ): void {
     const parsed = Number(value);
@@ -476,7 +518,8 @@ export class ActivityHistoryCardEditor extends LitElement {
       | "hide_empty_rows"
       | "show_technical_entities"
       | "show_config_entities"
-      | "show_diagnostic_entities",
+      | "show_diagnostic_entities"
+      | "show_inactive_baselines",
     event: Event,
   ): void {
     const checked = (event.target as HTMLInputElement).checked;
