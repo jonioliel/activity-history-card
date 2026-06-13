@@ -1,5 +1,6 @@
 import { html, type TemplateResult } from "lit";
 import { CATEGORY_LABELS_HE } from "../defaults";
+import { renderEntityIcon, renderGroupIcon } from "../entity-icons";
 import { formatDuration, formatTime, timeToPercent } from "../format";
 import { limitTimelineGroups } from "../timeline-layout";
 import type { ActivityHistoryCardConfig, ActivitySummary, TimelineGroup, TimeRange } from "../types";
@@ -51,14 +52,14 @@ export function renderSwimlaneTimeline(options: SwimlaneRendererOptions): Templa
               return html`
                 <details class="ahc-group" aria-label=${group.title} ?open=${!collapsed}>
                   <summary class="ahc-group__header">
-                    <span class="ahc-group__title">${group.icon ? html`<span>${group.icon}</span>` : null}${group.title}</span>
+                    <span class="ahc-group__title">${renderGroupIcon(group)}<span>${group.title}</span></span>
                     <span class="ahc-group__meta">${formatDuration(group.totalActiveMs)} • ${group.subtitle ?? ""}</span>
                   </summary>
                   ${group.rows.map(
                     (row) => html`
                       <div class="ahc-row">
                         <div class="ahc-row__label">
-                          <span class="ahc-row__icon" aria-hidden="true">${row.entity.icon ?? "●"}</span>
+                          ${renderEntityIcon(row.entity)}
                           <span class="ahc-row__name" title=${options.config.debug ? row.entity.entity_id : row.entity.name}>${row.entity.name}</span>
                           ${row.currentCategory
                             ? html`<span class="ahc-row__state-chip" data-state=${row.currentCategory}>${CATEGORY_LABELS_HE[row.currentCategory]}</span>`
@@ -77,17 +78,18 @@ export function renderSwimlaneTimeline(options: SwimlaneRendererOptions): Templa
                               const left = timeToPercent(segment.start, options.range);
                               const right = timeToPercent(segment.end, options.range);
                               const width = Math.max(0.35, right - left);
-                              if (!segment.active && segment.category !== "unknown") return null;
+                              if (!segment.active && segment.category !== "unknown" && segment.category !== "off" && segment.category !== "idle") return null;
                               const label = `${row.entity.name}, ${CATEGORY_LABELS_HE[segment.category]}, ${formatTime(segment.start)} עד ${formatTime(segment.end)}, ${formatDuration(segment.durationMs)}`;
                               return html`
                                 <rect
-                                  class="ahc-segment-svg"
+                                  class=${segment.active ? "ahc-segment-svg" : "ahc-segment-svg ahc-segment-svg--inactive"}
                                   data-category=${segment.category}
+                                  data-active=${segment.active ? "true" : "false"}
                                   x=${left}
-                                  y="10"
+                                  y=${segment.active ? "9" : "12"}
                                   width=${width}
-                                  height="12"
-                                  rx="6"
+                                  height=${segment.active ? "14" : "8"}
+                                  rx=${segment.active ? "7" : "4"}
                                   tabindex="0"
                                   role="button"
                                   aria-label=${label}

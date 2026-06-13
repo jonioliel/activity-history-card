@@ -244,11 +244,10 @@ export class ActivityHistoryCard extends LitElement {
         </div>
         <div class="ahc__title-block">
           <div class="ahc__title-row">
-            <span class="ahc__icon-badge" aria-hidden="true">▥</span>
+            <span class="ahc__icon-badge" aria-hidden="true"><ha-icon icon="mdi:chart-timeline-variant"></ha-icon></span>
             <h2 class="ahc__title">${this._config.title ?? DEFAULT_CONFIG.title}</h2>
           </div>
           <p class="ahc__subtitle">${subtitle}</p>
-          ${this._renderLastEventPill()}
         </div>
       </header>
     `;
@@ -309,8 +308,22 @@ export class ActivityHistoryCard extends LitElement {
   private _renderSummary(): TemplateResult | typeof nothing {
     if (this._config.show_summary === false) return nothing;
     const summary = this._summary;
+    const lastEventRow = summary?.lastEventRow;
+    const lastEvent = summary?.lastEvent;
     return html`
       <section class="ahc__summary-grid" aria-label="סיכום פעילות">
+        <article class="ahc__metric">
+          <div class="ahc__metric-copy">
+            <span class="ahc__metric-label">אירוע אחרון</span>
+            <span class="ahc__metric-value ahc__metric-value--compact">${lastEventRow?.entity.name ?? "אין"}</span>
+            <span class="ahc__metric-subtitle">
+              ${lastEvent && lastEventRow
+                ? `${formatTime(lastEvent.start)} · ${CATEGORY_LABELS_HE[lastEvent.category]} · ${formatEntityLine(lastEventRow, this._config.debug === true)}`
+                : "לא נמצאו אירועים בטווח"}
+            </span>
+          </div>
+          <span class="ahc__metric-icon" aria-hidden="true">♪</span>
+        </article>
         <article class="ahc__metric">
           <div class="ahc__metric-copy">
             <span class="ahc__metric-label">סה״כ שעות־רכיב</span>
@@ -318,14 +331,6 @@ export class ActivityHistoryCard extends LitElement {
             <span class="ahc__metric-subtitle">סכום פעילות על פני כל הרכיבים</span>
           </div>
           <span class="ahc__metric-icon" aria-hidden="true">◷</span>
-        </article>
-        <article class="ahc__metric">
-          <div class="ahc__metric-copy">
-            <span class="ahc__metric-label">רכיבים שפעלו</span>
-            <span class="ahc__metric-value">${summary?.activeEntityCount ?? 0}</span>
-            <span class="ahc__metric-subtitle">מתוך ${this._rows.length} רכיבים שנבחרו</span>
-          </div>
-          <span class="ahc__metric-icon" aria-hidden="true">▣</span>
         </article>
         <article class="ahc__metric">
           <div class="ahc__metric-copy">
@@ -339,7 +344,7 @@ export class ActivityHistoryCard extends LitElement {
           <div class="ahc__metric-copy">
             <span class="ahc__metric-label">פעילים עכשיו</span>
             <span class="ahc__metric-value">${summary?.activeNowCount ?? 0}</span>
-            <span class="ahc__metric-subtitle">רכיבים פעילים</span>
+            <span class="ahc__metric-subtitle">${summary?.activeEntityCount ?? 0} רכיבים פעלו בטווח</span>
           </div>
           <span class="ahc__metric-icon" aria-hidden="true">●</span>
         </article>

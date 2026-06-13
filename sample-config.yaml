@@ -24,7 +24,7 @@ min_duration_seconds: 20
 merge_gap_seconds: 15
 mobile_breakpoint: 760
 
-max_visible_rows: 80
+max_visible_rows: 48
 collapse_groups: false
 default_collapsed_groups: []
 timeline_height: min(62svh, 680px)

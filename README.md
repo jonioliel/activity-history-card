@@ -39,7 +39,7 @@ display_mode: panel
 hours_to_show: 24
 refresh_interval_seconds: 300
 group_by: area
-max_visible_rows: 80
+max_visible_rows: 48
 timeline_height: min(62svh, 680px)
 collapse_groups: false
 exclude_labels:
@@ -61,7 +61,7 @@ refresh_interval_seconds: 300
 display_mode: panel
 hours_to_show: 24
 group_by: area
-max_visible_rows: 80
+max_visible_rows: 48
 timeline_height: min(62svh, 680px)
 exclude_labels:
   - לא להצגה
@@ -203,7 +203,7 @@ display_mode: panel
 | `exclude_labels` | none | מסתיר רכיבים עם labels אלה |
 | `hours_to_show` | `24` | טווח זמן להצגה |
 | `refresh_interval_seconds` | `300` | תדירות רענון רקע כאשר `live: true` |
-| `max_visible_rows` | `80` | מגביל את מספר השורות הגלויות כדי לשמור על ביצועים וקריאות |
+| `max_visible_rows` | `48` | מגביל את מספר השורות הגלויות כדי לשמור על ביצועים וקריאות |
 | `timeline_height` | `min(62svh, 680px)` | גובה פנימי של אזור הטיימליין לפני גלילה |
 | `collapse_groups` | `false` | מאפשר קיפול קבוצות; קבוצות ללא פעילות יכולות להתחיל סגורות |
 | `default_collapsed_groups` | `[]` | רשימת שמות/IDs של קבוצות שייפתחו סגורות |

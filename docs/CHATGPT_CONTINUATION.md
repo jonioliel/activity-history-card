@@ -124,10 +124,21 @@ npm run build
 Latest verified results:
 
 - `npm run typecheck` passed
-- `npm run test` passed, 35 tests
+- `npm run test` passed, 36 tests
 - `npm run build` passed
 
 The generated `dist/activity-history-card.js` is intentionally tracked for HACS. `dist/activity-history-card.js.map` remains ignored.
+
+## Latest UI Polish Pass
+
+The latest pass focused on making the swimlane MVP closer to the desktop/mobile mockups without adding new feature modes:
+
+- Home Assistant `mdi:` entity icons now render through `<ha-icon>` instead of appearing as raw text.
+- Timeline groups and rows are ordered by real activity first, so active rows are visible before inactive discovery noise.
+- Inactive/off/idle timeline segments render as subtle grey bars, while active segments remain taller and colorful.
+- The desktop summary strip is more compact and includes the last event as a first-class metric.
+- `debug: true` diagnostics are visually compact when collapsed.
+- Default `max_visible_rows` changed from `80` to `48` for better readability in large real homes.
 
 ## HACS Install Path
 

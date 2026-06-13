@@ -137,6 +137,12 @@ export const activityHistoryCardStyles = css`
   grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--ahc-gap-md);
   align-items: start;
+  padding: 12px 14px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: var(--ahc-radius-md);
+  background:
+    linear-gradient(90deg, rgba(15, 23, 42, 0.28), rgba(30, 64, 175, 0.10)),
+    rgba(2, 6, 23, 0.14);
 }
 
 .ahc__title-block {
@@ -164,6 +170,11 @@ export const activityHistoryCardStyles = css`
   border: 1px solid rgba(56, 189, 248, 0.42);
   color: var(--ahc-accent);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.11), 0 10px 28px rgba(14, 165, 233, 0.10);
+}
+
+.ahc__icon-badge ha-icon {
+  inline-size: 26px;
+  block-size: 26px;
 }
 
 .ahc__title {
@@ -398,20 +409,31 @@ export const activityHistoryCardStyles = css`
 .ahc__summary-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--ahc-gap-sm);
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--ahc-border-soft);
+  border-radius: var(--ahc-radius-md);
+  background:
+    linear-gradient(180deg, rgba(30, 41, 59, 0.50), rgba(15, 23, 42, 0.54)),
+    rgba(2, 6, 23, 0.20);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.045);
 }
 
 .ahc__metric {
-  min-block-size: 82px;
+  min-block-size: 88px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--ahc-gap-sm);
-  padding: 12px 14px;
-  border: 1px solid var(--ahc-border-soft);
-  border-radius: var(--ahc-radius-md);
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.54), rgba(15, 23, 42, 0.58));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.045);
+  padding: 12px 16px;
+  border: 0;
+  border-inline-start: 1px solid rgba(148, 163, 184, 0.13);
+  background: transparent;
+  box-shadow: none;
+}
+
+.ahc__metric:first-child {
+  border-inline-start: 0;
 }
 
 .ahc__metric-copy {
@@ -434,6 +456,14 @@ export const activityHistoryCardStyles = css`
   line-height: 1.05;
   font-weight: 850;
   letter-spacing: 0;
+}
+
+.ahc__metric-value--compact {
+  font-size: 1.12rem;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .ahc__metric-value--positive {
@@ -551,7 +581,9 @@ export const activityHistoryCardStyles = css`
   min-block-size: 420px;
   border: 1px solid var(--ahc-border-soft);
   border-radius: var(--ahc-radius-md);
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.66), rgba(2, 6, 23, 0.34));
+  background:
+    linear-gradient(180deg, rgba(30, 41, 59, 0.42), rgba(2, 6, 23, 0.30)),
+    radial-gradient(circle at 88% 12%, rgba(56, 189, 248, 0.10), transparent 32%);
   overflow: hidden;
 }
 
@@ -560,8 +592,10 @@ export const activityHistoryCardStyles = css`
   align-items: center;
   justify-content: space-between;
   gap: var(--ahc-gap-sm);
-  padding: var(--ahc-gap-md);
+  min-block-size: 58px;
+  padding: 12px 16px;
   border-block-end: 1px solid var(--ahc-border-soft);
+  background: rgba(15, 23, 42, 0.40);
 }
 
 .ahc-timeline-title {
@@ -582,7 +616,7 @@ export const activityHistoryCardStyles = css`
 .ahc-timeline {
   direction: ltr;
   position: relative;
-  min-inline-size: 860px;
+  min-inline-size: 920px;
   padding: 0;
 }
 
@@ -591,9 +625,9 @@ export const activityHistoryCardStyles = css`
   inset-block-start: 0;
   z-index: 3;
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
-  min-block-size: 44px;
-  background: rgba(15, 23, 42, 0.88);
+  grid-template-columns: 210px minmax(0, 1fr);
+  min-block-size: 48px;
+  background: rgba(15, 23, 42, 0.92);
   backdrop-filter: blur(14px);
   border-block-end: 1px solid var(--ahc-border-soft);
 }
@@ -638,11 +672,15 @@ export const activityHistoryCardStyles = css`
 
 .ahc-group {
   direction: rtl;
-  border-block-end: 1px solid rgba(148, 163, 184, 0.10);
+  margin: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: var(--ahc-radius-sm);
+  background: rgba(15, 23, 42, 0.30);
+  overflow: clip;
 }
 
 .ahc-group:nth-child(even) {
-  background: rgba(15, 23, 42, 0.18);
+  background: rgba(15, 23, 42, 0.36);
 }
 
 .ahc-group__header {
@@ -653,10 +691,12 @@ export const activityHistoryCardStyles = css`
   align-items: center;
   justify-content: space-between;
   gap: var(--ahc-gap-sm);
-  min-block-size: 56px;
+  min-block-size: 54px;
   padding-block: 0;
   padding-inline: var(--ahc-gap-md);
-  background: linear-gradient(90deg, rgba(15, 23, 42, 0.78), rgba(30, 41, 59, 0.70));
+  background:
+    linear-gradient(90deg, rgba(15, 23, 42, 0.82), rgba(30, 41, 59, 0.72)),
+    rgba(2, 6, 23, 0.34);
   cursor: pointer;
   list-style: none;
 }
@@ -688,8 +728,8 @@ export const activityHistoryCardStyles = css`
 .ahc-row {
   direction: ltr;
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
-  min-block-size: 40px;
+  grid-template-columns: 210px minmax(0, 1fr);
+  min-block-size: 38px;
   border-block-start: 1px solid rgba(148, 163, 184, 0.09);
 }
 
@@ -708,13 +748,29 @@ export const activityHistoryCardStyles = css`
   gap: var(--ahc-gap-xs);
   padding-inline: var(--ahc-gap-md) var(--ahc-gap-sm);
   border-inline-end: 1px solid rgba(148, 163, 184, 0.12);
-  background: rgba(4, 10, 24, 0.88);
+  background: rgba(4, 10, 24, 0.82);
   backdrop-filter: blur(10px);
   min-inline-size: 0;
 }
 
-.ahc-row__icon {
+.ahc-entity-icon,
+.ahc-group-icon {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 22px;
+  block-size: 22px;
   color: var(--ahc-accent);
+  flex: 0 0 auto;
+}
+
+ha-icon.ahc-entity-icon,
+ha-icon.ahc-group-icon {
+  inline-size: 22px;
+  block-size: 22px;
+}
+
+.ahc-group-icon {
+  color: #7dd3fc;
 }
 
 .ahc-row__name {
@@ -748,7 +804,7 @@ export const activityHistoryCardStyles = css`
   direction: ltr;
   position: relative;
   min-inline-size: 0;
-  min-block-size: 40px;
+  min-block-size: 38px;
   background-image: linear-gradient(to right, var(--ahc-grid-line) 1px, transparent 1px);
   background-size: calc(100% / 8) 100%;
 }
@@ -762,8 +818,8 @@ export const activityHistoryCardStyles = css`
 }
 
 .ahc-row__svg-track {
-  stroke: var(--ahc-track);
-  stroke-width: 8;
+  stroke: rgba(148, 163, 184, 0.13);
+  stroke-width: 6;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
 }
@@ -776,30 +832,41 @@ export const activityHistoryCardStyles = css`
   filter: drop-shadow(0 3px 7px rgba(0,0,0,0.22));
 }
 
+.ahc-segment-svg--inactive {
+  cursor: pointer;
+  opacity: 0.52;
+  stroke: rgba(255,255,255,0.10);
+  filter: none;
+}
+
+.ahc-segment-svg[data-active="true"] {
+  opacity: 0.96;
+}
+
 .ahc-segment-svg:focus-visible {
   outline: 2px solid var(--ahc-focus);
   outline-offset: 3px;
 }
 
 .ahc-segment-svg[data-category="on"] { fill: var(--ahc-on); }
-.ahc-segment-svg[data-category="off"] { fill: var(--ahc-off); }
+.ahc-segment-svg[data-category="off"] { fill: color-mix(in srgb, var(--ahc-off) 72%, #dbeafe 28%); }
 .ahc-segment-svg[data-category="cooling"] { fill: var(--ahc-cooling); }
 .ahc-segment-svg[data-category="heating"] { fill: var(--ahc-heating); }
 .ahc-segment-svg[data-category="playing"] { fill: var(--ahc-playing); }
 .ahc-segment-svg[data-category="opening"] { fill: var(--ahc-opening); }
 .ahc-segment-svg[data-category="closing"] { fill: var(--ahc-closing); }
-.ahc-segment-svg[data-category="idle"] { fill: var(--ahc-idle); }
+.ahc-segment-svg[data-category="idle"] { fill: color-mix(in srgb, var(--ahc-idle) 62%, #64748b 38%); }
 .ahc-segment-svg[data-category="unknown"] { fill: var(--ahc-unknown); stroke-dasharray: 3 2; }
 
 .ahc-row__track::before {
   content: "";
   position: absolute;
-  inset-inline: 10px;
+  inset-inline: 14px;
   inset-block-start: 50%;
-  block-size: 8px;
+  block-size: 4px;
   transform: translateY(-50%);
   border-radius: 999px;
-  background: var(--ahc-track);
+  background: rgba(148, 163, 184, 0.10);
 }
 
 .ahc-segment {
@@ -1151,25 +1218,49 @@ export const activityHistoryCardStyles = css`
 }
 
 .ahc-debug {
-  display: grid;
+  display: block;
+  justify-self: start;
+  inline-size: fit-content;
+  max-inline-size: 100%;
   gap: var(--ahc-gap-sm);
-  padding: var(--ahc-gap-md);
-  border: 1px dashed rgba(56, 189, 248, 0.42);
-  border-radius: var(--ahc-radius-md);
-  background: rgba(2, 6, 23, 0.32);
+  padding: 0;
+  border: 1px solid rgba(56, 189, 248, 0.24);
+  border-radius: var(--ahc-radius-sm);
+  background: rgba(2, 6, 23, 0.18);
   color: var(--ahc-muted);
-  font-size: 0.82rem;
+  font-size: 0.78rem;
 }
 
 .ahc-debug summary {
   cursor: pointer;
+  list-style: none;
+}
+
+.ahc-debug summary::-webkit-details-marker {
+  display: none;
+}
+
+.ahc-debug[open] {
+  display: grid;
+  inline-size: 100%;
+  padding: var(--ahc-gap-md);
+  border-style: dashed;
+  background: rgba(2, 6, 23, 0.32);
 }
 
 .ahc-debug__header {
   display: flex;
   justify-content: space-between;
   gap: var(--ahc-gap-sm);
+  min-block-size: 32px;
+  align-items: center;
+  padding-block: 0;
+  padding-inline: 10px;
   color: var(--ahc-text);
+}
+
+.ahc-debug[open] .ahc-debug__header {
+  padding: 0;
 }
 
 .ahc-debug__grid {
@@ -1330,6 +1421,10 @@ export const activityHistoryCardStyles = css`
     overflow-x: auto;
     scroll-snap-type: x proximity;
     gap: var(--ahc-gap-sm);
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
     scrollbar-width: none;
   }
 
@@ -1343,6 +1438,9 @@ export const activityHistoryCardStyles = css`
     min-block-size: 104px;
     grid-template-columns: minmax(0, 1fr) auto;
     padding: var(--ahc-gap-sm);
+    border: 1px solid var(--ahc-border-soft);
+    border-radius: var(--ahc-radius-md);
+    background: linear-gradient(180deg, rgba(30, 41, 59, 0.54), rgba(15, 23, 42, 0.58));
   }
 
   .ahc__metric-icon {

@@ -33,16 +33,26 @@ export function groupRows(rows: TimelineRow[], groupBy: FilterState["groupBy"]):
     groups.set(key, current);
   }
 
-  return [...groups.entries()].map(([key, groupRowsValue]) => toGroup(key, groupBy === "domain" ? DOMAIN_LABELS_HE[key] ?? key : key, groupRowsValue));
+  return [...groups.entries()]
+    .map(([key, groupRowsValue]) => toGroup(key, groupBy === "domain" ? DOMAIN_LABELS_HE[key] ?? key : key, groupRowsValue))
+    .sort((a, b) => b.totalActiveMs - a.totalActiveMs || b.rows.length - a.rows.length || a.title.localeCompare(b.title, "he"));
 }
 
 function toGroup(id: string, title: string, rows: TimelineRow[]): TimelineGroup {
-  const totalActiveMs = rows.reduce((sum, row) => sum + row.totalActiveMs, 0);
+  const sortedRows = [...rows].sort(
+    (a, b) =>
+      b.totalActiveMs - a.totalActiveMs ||
+      b.eventCount - a.eventCount ||
+      Number(Boolean(b.currentCategory && b.currentCategory !== "off" && b.currentCategory !== "unknown")) -
+        Number(Boolean(a.currentCategory && a.currentCategory !== "off" && a.currentCategory !== "unknown")) ||
+      a.entity.name.localeCompare(b.entity.name, "he"),
+  );
+  const totalActiveMs = sortedRows.reduce((sum, row) => sum + row.totalActiveMs, 0);
   return {
     id,
     title,
-    subtitle: `${rows.length} רכיבים`,
-    rows,
+    subtitle: `${sortedRows.length} רכיבים`,
+    rows: sortedRows,
     totalActiveMs,
   };
 }
