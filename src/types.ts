@@ -2,6 +2,7 @@ export type DirectionOption = "auto" | "rtl" | "ltr" | boolean;
 export type DisplayMode = "card" | "panel" | "fullscreen";
 export type ViewMode =
   | "activity"
+  | "activity_legacy"
   | "swimlane"
   | "legacy_swimlane"
   | "heatmap"

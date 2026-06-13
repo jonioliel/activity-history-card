@@ -1,0 +1,195 @@
+import { describe, expect, it } from "vitest";
+import { curateRows } from "../src/activity-curation";
+import {
+  buildActivityDashboardModel,
+  selectActivityDashboardGroups,
+  summarizeDashboardModel,
+} from "../src/activity-dashboard-model";
+import { groupRows } from "../src/filters";
+import type {
+  ActivityHistoryCardConfig,
+  TimeRange,
+  TimelineGroup,
+  TimelineRow,
+} from "../src/types";
+
+const range: TimeRange = {
+  start: new Date("2026-01-01T00:00:00.000Z"),
+  end: new Date("2026-01-02T00:00:00.000Z"),
+};
+
+function row(
+  entityId: string,
+  options: {
+    name?: string;
+    area?: string;
+    domain?: string;
+    activeMs?: number;
+    technical?: boolean;
+  } = {},
+): TimelineRow {
+  const start = new Date("2026-01-01T01:00:00.000Z");
+  const activeMs = options.activeMs ?? 60 * 60 * 1000;
+  const active = activeMs > 0;
+  return {
+    entity: {
+      entity_id: entityId,
+      name: options.name ?? entityId,
+      domain: options.domain ?? "switch",
+      area: options.area ?? "סלון",
+      entity_category: options.technical ? "diagnostic" : undefined,
+    },
+    segments: active
+      ? [
+          {
+            entity_id: entityId,
+            state: "on",
+            category: "on",
+            active: true,
+            start,
+            end: new Date(start.getTime() + activeMs),
+            durationMs: activeMs,
+          },
+        ]
+      : [],
+    totalActiveMs: activeMs,
+    eventCount: active ? 1 : 0,
+  };
+}
+
+function group(id: string, rows: TimelineRow[]): TimelineGroup {
+  return {
+    id,
+    title: id,
+    rows,
+    totalActiveMs: rows.reduce((sum, item) => sum + item.totalActiveMs, 0),
+  };
+}
+
+function config(
+  overrides: Partial<ActivityHistoryCardConfig> = {},
+): ActivityHistoryCardConfig {
+  return {
+    type: "custom:activity-history-card",
+    smart_filter: true,
+    max_total_rows: 18,
+    max_rows_per_group: 4,
+    ...overrides,
+  };
+}
+
+describe("buildActivityDashboardModel", () => {
+  it("returns visible groups only and creates aggregate activity bands", () => {
+    const model = buildActivityDashboardModel(
+      [
+        group("סלון", [
+          row("switch.active"),
+          row("switch.empty", { activeMs: 0 }),
+        ]),
+        group("ריק", [row("switch.empty_only", { activeMs: 0 })]),
+      ],
+      range,
+      config(),
+    );
+
+    expect(model.groups.map((item) => item.title)).toEqual(["סלון"]);
+    expect(model.visibleRowsCount).toBe(1);
+    expect(model.groups[0]?.aggregateSegments.length).toBeGreaterThan(0);
+  });
+
+  it("has rendered segments whenever visible active time is positive", () => {
+    const model = buildActivityDashboardModel(
+      [group("סלון", [row("switch.active", { activeMs: 90 * 60 * 1000 })])],
+      range,
+      config(),
+    );
+    const renderedSegments = model.groups.flatMap((item) =>
+      item.rows.flatMap((dashboardRow) => dashboardRow.segments),
+    );
+
+    expect(model.totalVisibleActiveMs).toBeGreaterThan(0);
+    expect(renderedSegments.length).toBeGreaterThan(0);
+    expect(model.densityBuckets.some((bucket) => bucket.intensity > 0)).toBe(
+      true,
+    );
+  });
+
+  it("caps visible rows to the clean dashboard default and counts hidden rows", () => {
+    const rows = Array.from({ length: 24 }, (_, index) =>
+      row(`switch.${index}`, { activeMs: 60_000 + index }),
+    );
+    const model = buildActivityDashboardModel(
+      [group("סלון", rows)],
+      range,
+      config({ max_visible_rows: 18 }),
+    );
+
+    expect(model.visibleRowsCount).toBe(18);
+    expect(model.hiddenRowsCount).toBe(6);
+  });
+
+  it("builds summary and insights from the visible model rows", () => {
+    const model = buildActivityDashboardModel(
+      [
+        group("סלון", [
+          row("switch.visible", {
+            name: "תאורת סלון",
+            activeMs: 2 * 60 * 60 * 1000,
+          }),
+        ]),
+      ],
+      range,
+      config(),
+    );
+    const summary = summarizeDashboardModel(model);
+
+    expect(summary.activeEntityCount).toBe(1);
+    expect(summary.totalActiveMs).toBe(2 * 60 * 60 * 1000);
+    expect(model.insights.mostActiveEntity?.name).toBe("תאורת סלון");
+    expect(model.insights.mostActiveArea?.title).toBe("סלון");
+  });
+
+  it("keeps noisy diagnostic entities out of the default model", () => {
+    const curated = curateRows(
+      [
+        row("switch.good", { name: "תאורת סלון" }),
+        row("switch.router_lan", {
+          name: "Router LAN",
+          technical: true,
+        }),
+      ],
+      config(),
+      { groupBy: "area" },
+    );
+    const model = buildActivityDashboardModel(
+      groupRows(curated.rows, "area"),
+      range,
+      config(),
+      curated.diagnostics,
+    );
+
+    expect(
+      model.groups.flatMap((item) => item.rows).map((item) => item.name),
+    ).toEqual(["תאורת סלון"]);
+    expect(model.hiddenRowsCount).toBe(1);
+  });
+
+  it("respects explicitly configured technical entities", () => {
+    const explicit = row("switch.router_lan", {
+      name: "Router LAN",
+      technical: true,
+    });
+    explicit.entity.config = { entity: "switch.router_lan" };
+    const curated = curateRows(
+      [explicit],
+      config({ entities: ["switch.router_lan"] }),
+      { groupBy: "area" },
+    );
+    const selection = selectActivityDashboardGroups(
+      groupRows(curated.rows, "area"),
+      config(),
+    );
+
+    expect(selection.visibleRowCount).toBe(1);
+  });
+});

@@ -45,6 +45,7 @@ Implemented:
 - Graceful fallback and diagnostics when registries are unavailable
 - Conservative mock behavior: `mock_data: false` never generates mock entities
 - Default `activity` dashboard timeline grouped by area or domain
+- Previous activity renderer remains available through `view_mode: activity_legacy`
 - Legacy swimlane renderer remains available through `view_mode: legacy_swimlane`
 - RTL-friendly Hebrew UI
 - Chronological left-to-right timeline internals
@@ -106,7 +107,9 @@ Do not implement heatmap, entity drill-down, or correlation mode until the MVP i
 - `src/intervalize.ts` - pure history-to-segments logic
 - `src/filters.ts` - filtering and grouping logic
 - `src/summary.ts` - activity summary calculations
-- `src/renderers/activity-timeline-renderer.ts` - default activity dashboard renderer
+- `src/activity-dashboard-model.ts` - default activity dashboard data model
+- `src/renderers/activity-dashboard-renderer.ts` - default activity dashboard renderer
+- `src/renderers/activity-timeline-renderer.ts` - previous activity renderer, now `activity_legacy`
 - `src/renderers/swimlane-renderer.ts` - legacy/debug timeline renderer
 - `src/styles.ts` - visual baseline and responsive RTL styling
 - `activity-history-card.css` - original CSS baseline reference
@@ -131,7 +134,7 @@ npm run build
 Latest verified results:
 
 - `npm run typecheck` passed
-- `npm run test` passed, 58 tests
+- `npm run test` passed, 86 tests
 - `npm run build` passed
 
 The generated `dist/activity-history-card.js` is intentionally tracked for HACS. `dist/activity-history-card.js.map` remains ignored.
@@ -141,10 +144,11 @@ The generated `dist/activity-history-card.js` is intentionally tracked for HACS.
 The latest pass changed the default view from raw swimlane rows to a polished activity dashboard without adding heatmap/detail/correlation modes:
 
 - `view_mode: activity` is the recommended default.
+- `view_mode: activity_legacy` keeps the previous activity renderer for short-term comparison.
 - `view_mode: legacy_swimlane` keeps the old dense/raw renderer for debugging.
-- The activity renderer shows a top density strip, compact area cards, active rows only, and active segments only.
+- The activity dashboard shows a top density strip, compact area cards, aggregate group bands, active rows only, and active segments only.
 - Empty/off baselines are not rendered by default.
-- Default `max_visible_rows`/`max_total_rows` is `24`, with `max_rows_per_group: 5` and `min_row_active_seconds: 10`.
+- Default `max_visible_rows`/`max_total_rows` is `18`, with `max_rows_per_group: 4` and `min_row_active_seconds: 10`.
 - `show_activity_density: true` is enabled by default.
 
 ## HACS Install Path
@@ -168,8 +172,8 @@ hours_to_show: 24
 smart_filter: true
 activity_mode: meaningful
 show_inactive_baselines: false
-max_rows_per_group: 5
-max_total_rows: 24
+max_rows_per_group: 4
+max_total_rows: 18
 show_activity_density: true
 exclude_labels:
   - לא להצגה

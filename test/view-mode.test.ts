@@ -17,12 +17,30 @@ describe("resolveRendererMode", () => {
     ).toBe("legacy_swimlane");
   });
 
+  it("keeps the previous activity renderer available as activity_legacy", () => {
+    expect(
+      resolveRendererMode({
+        type: "custom:activity-history-card",
+        view_mode: "activity_legacy",
+      }),
+    ).toBe("activity_legacy");
+  });
+
   it("supports legacy timeline style for swimlane configs", () => {
     expect(
       resolveRendererMode({
         type: "custom:activity-history-card",
         view_mode: "swimlane",
         timeline_style: "legacy",
+      }),
+    ).toBe("legacy_swimlane");
+  });
+
+  it("maps old swimlane configs to the raw legacy renderer", () => {
+    expect(
+      resolveRendererMode({
+        type: "custom:activity-history-card",
+        view_mode: "swimlane",
       }),
     ).toBe("legacy_swimlane");
   });

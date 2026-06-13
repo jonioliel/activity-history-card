@@ -217,6 +217,7 @@ export class ActivityHistoryCardEditor extends LitElement {
                   this._setValue("view_mode", inputValue(event) as ViewMode)}
               >
                 <option value="activity">Activity dashboard</option>
+                <option value="activity_legacy">Activity legacy</option>
                 <option value="legacy_swimlane">Legacy swimlane / debug</option>
                 <option value="heatmap">Heatmap placeholder</option>
                 <option value="detail">Detail placeholder</option>

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Activity History Card Demo</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --primary-text-color: #f8fafc;
+        --secondary-text-color: #a8b3c7;
+        --divider-color: #2d3a55;
+        --primary-color: #6ab6ff;
+        --ha-card-background: #111827;
+        --card-background-color: #111827;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Segoe UI", Arial, sans-serif;
+        color: var(--primary-text-color);
+        background:
+          linear-gradient(180deg, rgba(19, 30, 49, 0.96), #050816 76%), #050816;
+      }
+
+      main {
+        display: grid;
+        gap: 24px;
+        width: min(1680px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 24px 0 48px;
+      }
+
+      h1,
+      p {
+        margin: 0;
+      }
+
+      header.demo-header {
+        display: grid;
+        gap: 8px;
+        padding-inline: 6px;
+      }
+
+      header.demo-header p {
+        color: var(--secondary-text-color);
+      }
+
+      .demo-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 24px;
+      }
+
+      activity-history-card {
+        display: block;
+      }
+
+      @media (max-width: 760px) {
+        main {
+          width: min(100vw - 16px, 760px);
+          padding-block: 12px 28px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header class="demo-header">
+        <h1>Activity History Card - local demo</h1>
+        <p>נתוני mock בלבד. ברירת המחדל הראשונה מציגה בית גדול ורועש.</p>
+      </header>
+      <section id="demo-root" class="demo-grid"></section>
+    </main>
+    <script type="module" src="/src/demo.ts"></script>
+  </body>
+</html>

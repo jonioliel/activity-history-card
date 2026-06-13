@@ -4,6 +4,11 @@ import {
   DEFAULT_CONFIG,
   DOMAIN_LABELS_HE,
 } from "./defaults";
+import {
+  buildActivityDashboardModel,
+  summarizeDashboardModel,
+  type ActivityDashboardModel,
+} from "./activity-dashboard-model";
 import { formatEntityLine, formatSegmentSummary } from "./display-text";
 import { resolveEntityMetasWithDiagnostics } from "./entity-resolver";
 import { filterRows, groupRows } from "./filters";
@@ -21,10 +26,8 @@ import {
 import { renderCorrelationPlaceholder } from "./renderers/correlation-renderer";
 import { renderDetailPlaceholder } from "./renderers/detail-renderer";
 import { renderHeatmapPlaceholder } from "./renderers/heatmap-renderer";
-import {
-  prepareActivityTimeline,
-  renderActivityTimeline,
-} from "./renderers/activity-timeline-renderer";
+import { renderActivityDashboard } from "./renderers/activity-dashboard-renderer";
+import { renderActivityTimeline } from "./renderers/activity-timeline-renderer";
 import { renderSwimlaneTimeline } from "./renderers/swimlane-renderer";
 import { curateRows, formatCurationSummary } from "./activity-curation";
 import { activityHistoryCardStyles } from "./styles";
@@ -88,6 +91,7 @@ export class ActivityHistoryCard extends LitElement {
   private _rows: TimelineRow[] = [];
   private _visibleRows: TimelineRow[] = [];
   private _groups: TimelineGroup[] = [];
+  private _dashboardModel?: ActivityDashboardModel;
   private _summary?: ActivitySummary;
   private _loading = false;
   private _error?: string;
@@ -277,6 +281,18 @@ export class ActivityHistoryCard extends LitElement {
     const subtitle = `${this._timePresetLabel(this._filter.timePreset)} · ${this._usingMockData ? "נתוני דוגמה" : "נתוני Home Assistant"}`;
     return html`
       <header class="ahc__topbar">
+        <div class="ahc__title-block">
+          <div class="ahc__title-row">
+            <span class="ahc__icon-badge" aria-hidden="true"
+              ><ha-icon icon="mdi:chart-timeline-variant"></ha-icon
+            ></span>
+            <h2 class="ahc__title">
+              ${this._config.title ?? DEFAULT_CONFIG.title}
+            </h2>
+          </div>
+          <p class="ahc__subtitle">${subtitle}</p>
+          ${this._renderLastEventPill()}
+        </div>
         <div class="ahc__toolbar">
           ${this._config.show_fullscreen_button === false
             ? nothing
@@ -306,18 +322,6 @@ export class ActivityHistoryCard extends LitElement {
                 >מעדכן...</span
               >`
             : nothing}
-        </div>
-        <div class="ahc__title-block">
-          <div class="ahc__title-row">
-            <span class="ahc__icon-badge" aria-hidden="true"
-              ><ha-icon icon="mdi:chart-timeline-variant"></ha-icon
-            ></span>
-            <h2 class="ahc__title">
-              ${this._config.title ?? DEFAULT_CONFIG.title}
-            </h2>
-          </div>
-          <p class="ahc__subtitle">${subtitle}</p>
-          ${this._renderLastEventPill()}
         </div>
       </header>
     `;
@@ -442,8 +446,15 @@ export class ActivityHistoryCard extends LitElement {
 
   private _renderSummary(): TemplateResult | typeof nothing {
     if (this._config.show_summary === false) return nothing;
+    if (this._dashboardModel && this._config.summary_scope !== "all") {
+      return this._renderDashboardSummary(this._dashboardModel);
+    }
     const summary = this._summary;
-    const visibleCount = this._visibleRows.length || this._rows.length;
+    const dashboard = this._dashboardModel;
+    const visibleCount =
+      dashboard?.visibleRowsCount ||
+      this._visibleRows.length ||
+      this._rows.length;
     const summaryScopeLabel =
       this._config.summary_scope === "all"
         ? "לפי כל הרכיבים שנמצאו"
@@ -489,6 +500,53 @@ export class ActivityHistoryCard extends LitElement {
             <span class="ahc__metric-subtitle">${summaryScopeLabel}</span>
           </div>
           <span class="ahc__metric-icon" aria-hidden="true">◴</span>
+        </article>
+      </section>
+    `;
+  }
+
+  private _renderDashboardSummary(
+    dashboard: ActivityDashboardModel,
+  ): TemplateResult {
+    return html`
+      <section class="ahc__summary-grid" aria-label="סיכום פעילות">
+        <article class="ahc__metric">
+          <div class="ahc__metric-copy">
+            <span class="ahc__metric-label">סה״כ שעות־רכיב</span>
+            <span class="ahc__metric-value ahc__metric-value--positive">
+              ${formatDuration(dashboard.totalVisibleActiveMs)}
+            </span>
+            <span class="ahc__metric-subtitle">לפי התצוגה הנוכחית</span>
+          </div>
+          <span class="ahc__metric-icon" aria-hidden="true">◴</span>
+        </article>
+        <article class="ahc__metric">
+          <div class="ahc__metric-copy">
+            <span class="ahc__metric-label">רכיבים שפעלו</span>
+            <span class="ahc__metric-value">${dashboard.visibleRowsCount}</span>
+            <span class="ahc__metric-subtitle">
+              מתוך ${dashboard.totalRowsBeforeCuration} רכיבים
+            </span>
+          </div>
+          <span class="ahc__metric-icon" aria-hidden="true">▣</span>
+        </article>
+        <article class="ahc__metric">
+          <div class="ahc__metric-copy">
+            <span class="ahc__metric-label">אירועים</span>
+            <span class="ahc__metric-value"
+              >${dashboard.visibleEventCount}</span
+            >
+            <span class="ahc__metric-subtitle">שינויי מצב פעילים</span>
+          </div>
+          <span class="ahc__metric-icon" aria-hidden="true">⌁</span>
+        </article>
+        <article class="ahc__metric">
+          <div class="ahc__metric-copy">
+            <span class="ahc__metric-label">פעילים עכשיו</span>
+            <span class="ahc__metric-value">${dashboard.activeNowCount}</span>
+            <span class="ahc__metric-subtitle">רכיבים שפועלים כרגע</span>
+          </div>
+          <span class="ahc__metric-icon" aria-hidden="true">●</span>
         </article>
       </section>
     `;
@@ -578,32 +636,53 @@ export class ActivityHistoryCard extends LitElement {
       case "correlation":
         return renderCorrelationPlaceholder();
       case "legacy_swimlane":
-        return renderSwimlaneTimeline({
-          groups: this._groups,
-          range,
-          config:
-            this._showAllRows && this._config.view_mode === "activity"
-              ? {
-                  ...this._config,
-                  show_inactive_baselines: true,
-                  max_visible_rows: Math.max(
-                    this._config.max_visible_rows ?? 0,
-                    80,
-                  ),
-                }
-              : this._config,
-          summary: this._summary ?? summarizeActivity(this._groups),
-          curation: this._curation,
-          onSegmentClick: this._openSegmentPopover,
-        });
-      case "activity":
-      default:
+        return html`
+          ${this._showAllRows && this._config.view_mode === "activity"
+            ? html`<div class="ahc-legacy-warning">
+                מצב הצגת הכל מיועד לבדיקה. התצוגה מציגה שורות גולמיות יותר
+                ועלולה לכלול רכיבים רועשים.
+              </div>`
+            : nothing}
+          ${renderSwimlaneTimeline({
+            groups: this._groups,
+            range,
+            config:
+              this._showAllRows && this._config.view_mode === "activity"
+                ? {
+                    ...this._config,
+                    show_inactive_baselines: true,
+                    max_visible_rows: Math.max(
+                      this._config.max_visible_rows ?? 0,
+                      80,
+                    ),
+                  }
+                : this._config,
+            summary: this._summary ?? summarizeActivity(this._groups),
+            curation: this._curation,
+            onSegmentClick: this._openSegmentPopover,
+          })}
+        `;
+      case "activity_legacy":
         return renderActivityTimeline({
           groups: this._groups,
           range,
           config: this._config,
           summary: this._summary ?? summarizeActivity(this._groups),
           curation: this._curation,
+          onSegmentClick: this._openSegmentPopover,
+        });
+      case "activity":
+      default:
+        return renderActivityDashboard({
+          model:
+            this._dashboardModel ??
+            buildActivityDashboardModel(
+              this._groups,
+              range,
+              this._config,
+              this._curation,
+            ),
+          config: this._config,
           onSegmentClick: this._openSegmentPopover,
         });
     }
@@ -924,6 +1003,9 @@ export class ActivityHistoryCard extends LitElement {
   }
 
   private _renderInsights(): TemplateResult {
+    if (this._dashboardModel && this._config.summary_scope !== "all") {
+      return this._renderDashboardInsights(this._dashboardModel);
+    }
     const summary = this._summary;
     const mostActive = summary?.mostActiveEntity;
     const mostActiveArea = summary?.mostActiveArea;
@@ -982,6 +1064,77 @@ export class ActivityHistoryCard extends LitElement {
               ? `נרשמו ${summary?.eventCount ?? 0} אירועים בטווח הנוכחי`
               : "נסה טווח זמן ארוך יותר או ודא שה-Recorder פעיל"}</span
           >
+        </article>
+      </aside>
+    `;
+  }
+
+  private _renderDashboardInsights(
+    dashboard: ActivityDashboardModel,
+  ): TemplateResult {
+    const insights = dashboard.insights;
+    const hasData = dashboard.visibleEventCount > 0;
+    return html`
+      <aside
+        class="ahc__insights ahc__insights-panel"
+        aria-label="תובנות חכמות"
+      >
+        <h3 class="ahc__insights-title">
+          <span>תובנות חכמות</span><span aria-hidden="true">✦</span>
+        </h3>
+        <article class="ahc__insight-card">
+          <span class="ahc__insight-kicker">הרכיב הפעיל ביותר</span>
+          <span class="ahc__insight-value">
+            ${insights.mostActiveEntity?.name ?? "אין מספיק נתונים משמעותיים"}
+          </span>
+          <span class="ahc__insight-subtitle">
+            ${insights.mostActiveEntity
+              ? `${formatDuration(
+                  insights.mostActiveEntity.totalActiveMs,
+                )} · ${insights.mostActiveEntity.secondary ?? ""}`
+              : "רק רכיבים משמעותיים מוצגים כברירת מחדל"}
+          </span>
+        </article>
+        <article class="ahc__insight-card">
+          <span class="ahc__insight-kicker">האזור הפעיל ביותר</span>
+          <span class="ahc__insight-value">
+            ${insights.mostActiveArea?.title ?? "אין מספיק נתונים משמעותיים"}
+          </span>
+          <span class="ahc__insight-subtitle">
+            ${insights.mostActiveArea
+              ? `${formatDuration(insights.mostActiveArea.totalActiveMs)} · ${
+                  insights.mostActiveArea.rowCount
+                } רכיבים`
+              : "אין אזור עם פעילות משמעותית"}
+          </span>
+        </article>
+        <article class="ahc__insight-card">
+          <span class="ahc__insight-kicker">שעות שיא</span>
+          <span class="ahc__insight-value">
+            ${insights.peakBucketLabel ?? "אין מספיק נתונים משמעותיים"}
+          </span>
+          <span class="ahc__insight-subtitle">לפי צפיפות הפעילות המוצגת</span>
+          <span class="ahc__spark" aria-hidden="true">
+            ${dashboard.densityBuckets
+              .slice(0, 12)
+              .map(
+                (bucket) =>
+                  html`<i
+                    style=${`--bar:${hasData ? Math.max(12, bucket.intensity * 100) : 12}%`}
+                  ></i>`,
+              )}
+          </span>
+        </article>
+        <article class="ahc__insight-card">
+          <span class="ahc__insight-kicker">דפוס שימוש קצר</span>
+          <span class="ahc__insight-value">
+            ${insights.shortUsePattern ?? "אין מספיק נתונים משמעותיים"}
+          </span>
+          <span class="ahc__insight-subtitle">
+            ${dashboard.hiddenRowsCount
+              ? `${dashboard.hiddenRowsCount} רכיבים הוסתרו כדי לשמור על תצוגה נקייה`
+              : "כל הפעילות המשמעותית מוצגת"}
+          </span>
         </article>
       </aside>
     `;
@@ -1324,6 +1477,7 @@ export class ActivityHistoryCard extends LitElement {
       this._rows = [];
       this._visibleRows = [];
       this._groups = [];
+      this._dashboardModel = undefined;
       this._summary = summarizeActivity([]);
       this._curation = curateRows([], this._config).diagnostics;
       this._emptyReason =
@@ -1415,6 +1569,7 @@ export class ActivityHistoryCard extends LitElement {
       if (!this._rows.length) {
         this._visibleRows = [];
         this._groups = [];
+        this._dashboardModel = undefined;
         this._summary = summarizeActivity([]);
         this._curation = curateRows([], this._config).diagnostics;
         this._emptyReason = undefined;
@@ -1442,17 +1597,25 @@ export class ActivityHistoryCard extends LitElement {
         this._config.hide_empty_groups === false || group.rows.length > 0,
     );
     const rendererMode = resolveRendererMode(this._config, this._showAllRows);
-    const summaryGroups =
-      this._config.summary_scope === "all"
-        ? groupRows(filtered, this._filter.groupBy)
-        : rendererMode === "activity"
-          ? prepareActivityTimeline(
-              this._groups,
-              this._resolveRange(),
-              this._config,
-            ).groups
-          : this._groups;
-    this._summary = summarizeActivity(summaryGroups);
+    this._dashboardModel =
+      rendererMode === "activity"
+        ? buildActivityDashboardModel(
+            this._groups,
+            this._resolveRange(),
+            this._config,
+            curated.diagnostics,
+          )
+        : undefined;
+    this._summary =
+      rendererMode === "activity" &&
+      this._dashboardModel &&
+      this._config.summary_scope !== "all"
+        ? summarizeDashboardModel(this._dashboardModel)
+        : summarizeActivity(
+            this._config.summary_scope === "all"
+              ? groupRows(filtered, this._filter.groupBy)
+              : this._groups,
+          );
     if (this._rows.length && !filtered.length) {
       this._emptyReason = "all_entities_filtered";
     } else if (filtered.length && !curated.rows.length) {

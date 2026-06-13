@@ -45,9 +45,9 @@ activity_mode: meaningful
 hide_empty_rows: true
 show_inactive_baselines: false
 min_row_active_seconds: 10
-max_rows_per_group: 5
-max_total_rows: 24
-max_visible_rows: 24
+max_rows_per_group: 4
+max_total_rows: 18
+max_visible_rows: 18
 show_activity_density: true
 timeline_height: min(62svh, 680px)
 collapse_groups: false
@@ -77,13 +77,13 @@ hide_empty_rows: true
 hide_empty_groups: true
 show_inactive_baselines: false
 min_row_active_seconds: 10
-max_rows_per_group: 5
-max_total_rows: 24
+max_rows_per_group: 4
+max_total_rows: 18
 show_technical_entities: false
 show_config_entities: false
 show_diagnostic_entities: false
 summary_scope: visible
-max_visible_rows: 24
+max_visible_rows: 18
 show_activity_density: true
 show_summary: true
 show_insights: true
@@ -213,8 +213,8 @@ smart_filter: true
 activity_mode: meaningful
 show_inactive_baselines: false
 min_row_active_seconds: 10
-max_rows_per_group: 5
-max_total_rows: 24
+max_rows_per_group: 4
+max_total_rows: 18
 show_technical_entities: false
 show_config_entities: false
 show_diagnostic_entities: false
@@ -222,7 +222,9 @@ show_diagnostic_entities: false
 
 ## מצבי תצוגה
 
-`view_mode: activity` הוא מצב ברירת המחדל והמומלץ. הוא לא מציג טבלת registry גולמית, אלא dashboard שמראה איפה ומתי הייתה פעילות משמעותית: פס צפיפות פעילות עליון, ציר זמן נקי משמאל לימין, וכרטיסי אזורים עם שורות פעילות בלבד.
+`view_mode: activity` הוא מצב ברירת המחדל והמומלץ. הוא לא מציג טבלת registry גולמית, אלא dashboard נקי שמראה איפה ומתי הייתה פעילות משמעותית: פס צפיפות פעילות עליון, ציר זמן נקי משמאל לימין, וכרטיסי אזורים עם שורות פעילות בלבד.
+
+`view_mode: activity_legacy` שומר את רנדרר ה-activity הקודם לצורך השוואה זמנית.
 
 `view_mode: legacy_swimlane` שומר את רנדרר ה-swimlane הישן. הוא שימושי לדיבוג, לבדיקת רכיבים שהוסתרו, או כאשר מפעילים “הצג הכל”.
 
@@ -279,37 +281,37 @@ debug: true
 
 ## אפשרויות עיקריות
 
-| Option                     | Default                 | Description                                                |
-| -------------------------- | ----------------------- | ---------------------------------------------------------- |
-| `mock_data`                | `false`                 | מציג נתוני דוגמה רק כאשר מוגדר `true` במפורש               |
-| `mock_profile`             | `default`               | פרופיל דוגמה; למשל `large_noisy_home` לבדיקות עומס/רעש     |
-| `view_mode`                | `activity`              | `activity` מומלץ; `legacy_swimlane` לדיבוג/בדיקה גולמית    |
-| `auto_discover`            | `true`                  | מגלה רכיבים שמשויכים לאזורים                               |
-| `areas`                    | all                     | רשימת אזורים להצגה                                         |
-| `domains`                  | useful activity domains | סוגי רכיבים להצגה                                          |
-| `include_labels`           | none                    | מציג רק רכיבים עם labels אלה                               |
-| `exclude_labels`           | none                    | מסתיר רכיבים עם labels אלה                                 |
-| `hours_to_show`            | `24`                    | טווח זמן להצגה                                             |
-| `refresh_interval_seconds` | `300`                   | תדירות רענון רקע כאשר `live: true`                         |
-| `smart_filter`             | `true`                  | מסתיר כברירת מחדל שורות ריקות, טכניות או קצרות מאוד        |
-| `activity_mode`            | `meaningful`            | `meaningful` מציג פעילות אמיתית; `all` מציג הכל לבדיקה     |
-| `hide_empty_rows`          | `true`                  | מסתיר רכיבים ללא פעילות משמעותית בטווח הנוכחי              |
-| `show_inactive_baselines`  | `false`                 | מציג קווי baseline כבויים רק כאשר מוגדר `true`             |
-| `min_row_active_seconds`   | `10`                    | פעילות קצרה יותר תוסתר כאשר `smart_filter` פעיל            |
-| `max_rows_per_group`       | `5`                     | מגביל כמה שורות אוטומטיות יוצגו בכל אזור/קבוצה             |
-| `max_total_rows`           | `24`                    | מגביל את כלל השורות האוטומטיות בתצוגה                      |
-| `show_activity_density`    | `true`                  | מציג פס צפיפות פעילות עליון בתצוגת `activity`              |
-| `show_technical_entities`  | `false`                 | מאפשר להציג נתבים, הגדרות תוכנית ורעש טכני                 |
-| `show_config_entities`     | `false`                 | מאפשר להציג ישויות registry מסוג `config`                  |
-| `show_diagnostic_entities` | `false`                 | מאפשר להציג ישויות registry מסוג `diagnostic`              |
-| `summary_scope`            | `visible`               | מחשב סיכום לפי השורות המוצגות או לפי כל השורות המסוננות    |
-| `max_visible_rows`         | `24`                    | מגביל את מספר השורות הגלויות כדי לשמור על ביצועים וקריאות  |
-| `timeline_height`          | `min(62svh, 680px)`     | גובה פנימי של אזור הטיימליין לפני גלילה                    |
-| `collapse_groups`          | `false`                 | מאפשר קיפול קבוצות; קבוצות ללא פעילות יכולות להתחיל סגורות |
-| `default_collapsed_groups` | `[]`                    | רשימת שמות/IDs של קבוצות שייפתחו סגורות                    |
-| `group_by`                 | `area`                  | `area`, `domain`, `entity`, `none`                         |
-| `display_mode`             | `panel`                 | `card`, `panel`, `fullscreen`                              |
-| `debug`                    | `false`                 | מציג דיאגנוסטיקה בכרטיס                                    |
+| Option                     | Default                 | Description                                                                 |
+| -------------------------- | ----------------------- | --------------------------------------------------------------------------- |
+| `mock_data`                | `false`                 | מציג נתוני דוגמה רק כאשר מוגדר `true` במפורש                                |
+| `mock_profile`             | `default`               | פרופיל דוגמה; למשל `large_noisy_home` לבדיקות עומס/רעש                      |
+| `view_mode`                | `activity`              | `activity` מומלץ; `activity_legacy` להשוואה; `legacy_swimlane` לדיבוג גולמי |
+| `auto_discover`            | `true`                  | מגלה רכיבים שמשויכים לאזורים                                                |
+| `areas`                    | all                     | רשימת אזורים להצגה                                                          |
+| `domains`                  | useful activity domains | סוגי רכיבים להצגה                                                           |
+| `include_labels`           | none                    | מציג רק רכיבים עם labels אלה                                                |
+| `exclude_labels`           | none                    | מסתיר רכיבים עם labels אלה                                                  |
+| `hours_to_show`            | `24`                    | טווח זמן להצגה                                                              |
+| `refresh_interval_seconds` | `300`                   | תדירות רענון רקע כאשר `live: true`                                          |
+| `smart_filter`             | `true`                  | מסתיר כברירת מחדל שורות ריקות, טכניות או קצרות מאוד                         |
+| `activity_mode`            | `meaningful`            | `meaningful` מציג פעילות אמיתית; `all` מציג הכל לבדיקה                      |
+| `hide_empty_rows`          | `true`                  | מסתיר רכיבים ללא פעילות משמעותית בטווח הנוכחי                               |
+| `show_inactive_baselines`  | `false`                 | מציג קווי baseline כבויים רק כאשר מוגדר `true`                              |
+| `min_row_active_seconds`   | `10`                    | פעילות קצרה יותר תוסתר כאשר `smart_filter` פעיל                             |
+| `max_rows_per_group`       | `4`                     | מגביל כמה שורות אוטומטיות יוצגו בכל אזור/קבוצה                              |
+| `max_total_rows`           | `18`                    | מגביל את כלל השורות האוטומטיות בתצוגה                                       |
+| `show_activity_density`    | `true`                  | מציג פס צפיפות פעילות עליון בתצוגת `activity`                               |
+| `show_technical_entities`  | `false`                 | מאפשר להציג נתבים, הגדרות תוכנית ורעש טכני                                  |
+| `show_config_entities`     | `false`                 | מאפשר להציג ישויות registry מסוג `config`                                   |
+| `show_diagnostic_entities` | `false`                 | מאפשר להציג ישויות registry מסוג `diagnostic`                               |
+| `summary_scope`            | `visible`               | מחשב סיכום לפי השורות המוצגות או לפי כל השורות המסוננות                     |
+| `max_visible_rows`         | `18`                    | מגביל את מספר השורות הגלויות כדי לשמור על ביצועים וקריאות                   |
+| `timeline_height`          | `min(62svh, 680px)`     | גובה פנימי של אזור הטיימליין לפני גלילה                                     |
+| `collapse_groups`          | `false`                 | מאפשר קיפול קבוצות; קבוצות ללא פעילות יכולות להתחיל סגורות                  |
+| `default_collapsed_groups` | `[]`                    | רשימת שמות/IDs של קבוצות שייפתחו סגורות                                     |
+| `group_by`                 | `area`                  | `area`, `domain`, `entity`, `none`                                          |
+| `display_mode`             | `panel`                 | `card`, `panel`, `fullscreen`                                               |
+| `debug`                    | `false`                 | מציג דיאגנוסטיקה בכרטיס                                                     |
 
 ראו דוגמה מלאה ב-[sample-config.yaml](sample-config.yaml).
 
@@ -317,10 +319,13 @@ debug: true
 
 ```bash
 npm install
+npm run demo
 npm run typecheck
 npm run test
 npm run build
 ```
+
+`npm run demo` פותח דמו מקומי עם נתוני mock ומציג את ברירת המחדל החדשה, דוגמה קטנה, ותצוגת legacy להשוואה.
 
 הקובץ ש-HACS מתקין הוא:
 
@@ -343,6 +348,7 @@ dist/activity-history-card.js
 ## מגבלות MVP
 
 - מצב `activity` הוא המצב הפעיל והמומלץ של ה-MVP.
+- `activity_legacy` נשאר זמין להשוואה מול רנדרר ה-activity הקודם.
 - `legacy_swimlane` נשאר זמין לדיבוג ולבדיקה גולמית של שורות.
 - Heatmap, drill-down ו-correlation נשארים placeholders בלבד בשלב הזה.
 - Timeline נשאר כרונולוגי משמאל לימין, בזמן שכל הטקסטים והפקדים מותאמים ל-RTL.

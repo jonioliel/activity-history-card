@@ -97,6 +97,12 @@ export const activityHistoryCardStyles = css`
     --ahc-activity-segment-height: 9px;
     --ahc-activity-segment-min-width: 4px;
     --ahc-activity-group-gap: 12px;
+    --ahc-dashboard-row-height: 38px;
+    --ahc-dashboard-label-width: 230px;
+    --ahc-dashboard-segment-height: 10px;
+    --ahc-dashboard-segment-min-width: 5px;
+    --ahc-dashboard-group-gap: 14px;
+    --ahc-insights-width: 340px;
 
     --ahc-chip-height: 40px;
     --ahc-touch-target: 44px;
@@ -185,10 +191,11 @@ export const activityHistoryCardStyles = css`
 
   /* Top bar */
   .ahc__topbar {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    display: flex;
+    flex-wrap: nowrap;
     gap: var(--ahc-gap-md);
     align-items: start;
+    justify-content: space-between;
     padding: 12px 14px;
     border: 1px solid rgba(148, 163, 184, 0.16);
     border-radius: var(--ahc-radius-md);
@@ -201,13 +208,14 @@ export const activityHistoryCardStyles = css`
     display: grid;
     grid-auto-flow: row;
     gap: var(--ahc-gap-xs);
-    justify-items: end;
-    text-align: end;
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    justify-items: start;
+    text-align: start;
   }
 
   .ahc__title-row {
     display: inline-flex;
-    flex-direction: row-reverse;
     align-items: center;
     gap: var(--ahc-gap-sm);
   }
@@ -274,6 +282,7 @@ export const activityHistoryCardStyles = css`
 
   .ahc__toolbar {
     display: flex;
+    flex: 0 0 auto;
     flex-wrap: nowrap;
     align-items: center;
     justify-content: flex-start;
@@ -590,7 +599,10 @@ export const activityHistoryCardStyles = css`
   /* Layout body */
   .ahc__body {
     display: grid;
-    grid-template-columns: minmax(0, 4fr) minmax(260px, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(
+        320px,
+        var(--ahc-insights-width)
+      );
     gap: var(--ahc-gap-md);
     align-items: start;
     max-inline-size: 1920px;
@@ -623,7 +635,7 @@ export const activityHistoryCardStyles = css`
 
   .ahc__insights-panel {
     inline-size: 100%;
-    max-inline-size: 340px;
+    max-inline-size: var(--ahc-insights-width);
   }
 
   .ahc__insights-title {
@@ -961,6 +973,401 @@ export const activityHistoryCardStyles = css`
     max-inline-size: 520px;
     margin: var(--ahc-gap-xs) 0 0;
     color: var(--ahc-muted);
+  }
+
+  /* Product activity dashboard */
+  .ahc-dashboard {
+    direction: rtl;
+    display: grid;
+    gap: var(--ahc-gap-md);
+    min-inline-size: 0;
+    min-block-size: 420px;
+    padding: var(--ahc-gap-md);
+    border: 1px solid var(--ahc-border-soft);
+    border-radius: var(--ahc-radius-md);
+    background: linear-gradient(
+      180deg,
+      rgba(15, 23, 42, 0.68),
+      rgba(2, 6, 23, 0.36)
+    );
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+  }
+
+  .ahc-dashboard__header {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: var(--ahc-gap-md);
+    min-inline-size: 0;
+    padding-block-end: var(--ahc-gap-xs);
+    border-block-end: 1px solid rgba(148, 163, 184, 0.12);
+  }
+
+  .ahc-dashboard__title-block {
+    display: grid;
+    gap: 4px;
+    min-inline-size: 0;
+    text-align: start;
+  }
+
+  .ahc-dashboard__title-block h3 {
+    margin: 0;
+    color: var(--ahc-text);
+    font-size: 1.08rem;
+    font-weight: 850;
+  }
+
+  .ahc-dashboard__title-block p,
+  .ahc-dashboard__hidden-note {
+    margin: 0;
+    color: var(--ahc-muted);
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  .ahc-dashboard__range-pill {
+    flex: 0 0 auto;
+    min-block-size: 36px;
+    display: inline-flex;
+    align-items: center;
+    padding-inline: 12px;
+    border: 1px solid rgba(56, 189, 248, 0.32);
+    border-radius: 999px;
+    background: rgba(14, 165, 233, 0.12);
+    color: #bae6fd;
+    font-size: 0.82rem;
+    font-weight: 800;
+  }
+
+  .ahc-dashboard__overview {
+    display: grid;
+    gap: var(--ahc-gap-xs);
+    padding: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: var(--ahc-radius-sm);
+    background: rgba(2, 6, 23, 0.26);
+  }
+
+  .ahc-dashboard__density {
+    direction: ltr;
+    display: flex;
+    align-items: end;
+    gap: 3px;
+    min-block-size: 40px;
+    padding: 5px 2px;
+  }
+
+  .ahc-dashboard-density-bucket {
+    flex: 1 1 0;
+    min-inline-size: 3px;
+    block-size: 32px;
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    border-radius: 6px;
+    background: rgba(148, 163, 184, 0.06);
+  }
+
+  .ahc-dashboard-density-fill {
+    inline-size: 100%;
+    block-size: 0;
+    min-block-size: 0;
+    max-block-size: 28px;
+    border-radius: 999px 999px 3px 3px;
+    background: linear-gradient(180deg, #7dd3fc, #22c55e);
+    opacity: 0.22;
+    transition:
+      block-size 180ms ease,
+      opacity 180ms ease;
+  }
+
+  .ahc-dashboard-density-bucket[data-active="true"]
+    .ahc-dashboard-density-fill {
+    block-size: max(4px, calc(var(--intensity, 0) * 28px));
+    opacity: max(0.38, calc(var(--intensity, 0) * 0.96));
+  }
+
+  .ahc-dashboard__axis {
+    direction: ltr;
+    position: relative;
+    min-block-size: 24px;
+    margin-inline-start: calc(var(--ahc-dashboard-label-width) + 8px);
+    margin-inline-end: 72px;
+  }
+
+  .ahc-dashboard__tick {
+    position: absolute;
+    inset-block: 0;
+    transform: translateX(-50%);
+    min-inline-size: 44px;
+    display: grid;
+    place-items: center;
+    color: var(--ahc-muted);
+    font-size: 0.74rem;
+  }
+
+  .ahc-dashboard__tick::after {
+    content: "";
+    position: absolute;
+    inset-block-end: 0;
+    inline-size: 1px;
+    block-size: 7px;
+    background: rgba(148, 163, 184, 0.18);
+  }
+
+  .ahc-dashboard__groups {
+    display: grid;
+    gap: var(--ahc-dashboard-group-gap);
+    min-inline-size: 0;
+  }
+
+  .ahc-dashboard-group {
+    display: grid;
+    gap: var(--ahc-gap-sm);
+    padding: var(--ahc-gap-sm);
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    border-radius: var(--ahc-radius-md);
+    background: rgba(15, 23, 42, 0.52);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .ahc-dashboard-group__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ahc-gap-sm);
+    min-inline-size: 0;
+  }
+
+  .ahc-dashboard-group__title {
+    display: inline-grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--ahc-gap-xs);
+    min-inline-size: 0;
+  }
+
+  .ahc-dashboard-group__title strong,
+  .ahc-dashboard-row__label strong {
+    color: var(--ahc-text);
+    font-weight: 850;
+  }
+
+  .ahc-dashboard-group__title span,
+  .ahc-dashboard-group__meta,
+  .ahc-dashboard-row__label span,
+  .ahc-dashboard-row__meta span {
+    color: var(--ahc-muted);
+    font-size: 0.76rem;
+  }
+
+  .ahc-dashboard-group__meta {
+    white-space: nowrap;
+  }
+
+  .ahc-dashboard-icon {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 30px;
+    block-size: 30px;
+    border-radius: 10px;
+    background: rgba(56, 189, 248, 0.1);
+    color: #bae6fd;
+  }
+
+  .ahc-dashboard-icon ha-icon {
+    inline-size: 19px;
+    block-size: 19px;
+  }
+
+  .ahc-dashboard-group__aggregate {
+    direction: ltr;
+    position: relative;
+    min-block-size: 28px;
+    border-radius: 999px;
+    background:
+      linear-gradient(to right, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+      rgba(2, 6, 23, 0.2);
+    background-size: calc(100% / 8) 100%;
+    overflow: hidden;
+  }
+
+  .ahc-dashboard-group__rows {
+    display: grid;
+    gap: 5px;
+  }
+
+  .ahc-dashboard-row {
+    direction: rtl;
+    display: grid;
+    grid-template-columns:
+      var(--ahc-dashboard-label-width) minmax(0, 1fr)
+      minmax(64px, 78px);
+    align-items: center;
+    gap: var(--ahc-gap-xs);
+    min-block-size: var(--ahc-dashboard-row-height);
+    padding-block: 2px;
+    padding-inline: 6px;
+    border-radius: var(--ahc-radius-sm);
+  }
+
+  .ahc-dashboard-row:hover {
+    background: rgba(56, 189, 248, 0.06);
+  }
+
+  .ahc-dashboard-row__label {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--ahc-gap-xs);
+    min-inline-size: 0;
+  }
+
+  .ahc-dashboard-row__label div {
+    min-inline-size: 0;
+    display: grid;
+    gap: 1px;
+  }
+
+  .ahc-dashboard-row__label strong,
+  .ahc-dashboard-row__label span {
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ahc-dashboard-row__label strong {
+    font-size: 0.84rem;
+  }
+
+  .ahc-dashboard-row__plot {
+    direction: ltr;
+    position: relative;
+    min-inline-size: 0;
+    min-block-size: var(--ahc-dashboard-row-height);
+    border-radius: 999px;
+    background:
+      linear-gradient(to right, rgba(148, 163, 184, 0.07) 1px, transparent 1px),
+      rgba(2, 6, 23, 0.14);
+    background-size: calc(100% / 8) 100%;
+    overflow: visible;
+  }
+
+  .ahc-dashboard-row__meta {
+    display: grid;
+    justify-items: end;
+    gap: 1px;
+    min-inline-size: 0;
+    color: var(--ahc-muted);
+    font-size: 0.72rem;
+    text-align: end;
+  }
+
+  .ahc-dashboard-row__meta strong {
+    color: #bbf7d0;
+    font-size: 0.82rem;
+  }
+
+  .ahc-dashboard-segment {
+    box-sizing: border-box;
+    position: absolute;
+    inset-block-start: 50%;
+    min-inline-size: 0;
+    block-size: var(--ahc-dashboard-segment-height);
+    transform: translateY(-50%);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    background: var(--segment-color, var(--ahc-on));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.16),
+      0 6px 14px rgba(0, 0, 0, 0.18);
+  }
+
+  .ahc-dashboard-segment--min {
+    min-inline-size: var(--ahc-dashboard-segment-min-width);
+  }
+
+  .ahc-dashboard-segment--aggregate {
+    block-size: 14px;
+    opacity: 0.86;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      0 8px 20px rgba(34, 197, 94, 0.18);
+  }
+
+  button.ahc-dashboard-segment {
+    appearance: none;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .ahc-dashboard-segment span {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .ahc-dashboard-segment:focus-visible {
+    outline: 2px solid var(--ahc-focus);
+    outline-offset: 3px;
+  }
+
+  .ahc-dashboard-segment[data-category="cooling"] {
+    background: linear-gradient(90deg, var(--ahc-cooling), #7dd3fc);
+  }
+
+  .ahc-dashboard-segment[data-category="heating"] {
+    background: linear-gradient(90deg, var(--ahc-heating), #fdba74);
+  }
+
+  .ahc-dashboard-segment[data-category="drying"],
+  .ahc-dashboard-segment[data-category="fan"] {
+    background: linear-gradient(90deg, var(--ahc-idle), #5eead4);
+  }
+
+  .ahc-dashboard-segment[data-category="playing"] {
+    background: linear-gradient(90deg, var(--ahc-playing), #c4b5fd);
+  }
+
+  .ahc-dashboard-segment[data-category="opening"] {
+    background: linear-gradient(90deg, var(--ahc-opening), #fde68a);
+  }
+
+  .ahc-dashboard-segment[data-category="closing"] {
+    background: linear-gradient(90deg, var(--ahc-closing), #e2e8f0);
+  }
+
+  .ahc-dashboard-empty {
+    place-items: center;
+    min-block-size: 260px;
+    text-align: center;
+  }
+
+  .ahc-dashboard-empty h3 {
+    margin: 0;
+    color: var(--ahc-text);
+    font-size: 1.18rem;
+    font-weight: 850;
+  }
+
+  .ahc-dashboard-empty p {
+    max-inline-size: 520px;
+    margin: 0;
+    color: var(--ahc-muted);
+  }
+
+  .ahc-legacy-warning {
+    padding: 10px 12px;
+    border: 1px solid rgba(251, 191, 36, 0.28);
+    border-radius: var(--ahc-radius-sm);
+    background: rgba(251, 191, 36, 0.1);
+    color: #fde68a;
+    font-size: 0.82rem;
+    line-height: 1.45;
   }
 
   /* Timeline */
@@ -1871,6 +2278,8 @@ export const activityHistoryCardStyles = css`
     :host {
       --ahc-label-width: 180px;
       --ahc-activity-label-width: 190px;
+      --ahc-dashboard-label-width: 200px;
+      --ahc-insights-width: 320px;
     }
 
     .ahc__body {
@@ -1894,6 +2303,7 @@ export const activityHistoryCardStyles = css`
     :host {
       --ahc-label-width: 180px;
       --ahc-activity-label-width: 180px;
+      --ahc-dashboard-label-width: 180px;
     }
   }
 
@@ -1902,6 +2312,8 @@ export const activityHistoryCardStyles = css`
       --ahc-chip-height: 44px;
       --ahc-label-width: 180px;
       --ahc-activity-label-width: 160px;
+      --ahc-dashboard-label-width: 160px;
+      --ahc-dashboard-row-height: 36px;
     }
 
     .ahc {
@@ -1922,7 +2334,8 @@ export const activityHistoryCardStyles = css`
     }
 
     .ahc__topbar {
-      grid-template-columns: 1fr;
+      flex-direction: column;
+      align-items: stretch;
       text-align: center;
     }
 
@@ -2067,6 +2480,38 @@ export const activityHistoryCardStyles = css`
       overflow-x: auto;
     }
 
+    .ahc-dashboard {
+      padding: var(--ahc-gap-sm);
+    }
+
+    .ahc-dashboard__header,
+    .ahc-dashboard-group__header {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .ahc-dashboard__range-pill,
+    .ahc-dashboard-group__meta {
+      align-self: start;
+    }
+
+    .ahc-dashboard__axis {
+      margin-inline-start: calc(var(--ahc-dashboard-label-width) + 8px);
+      margin-inline-end: 56px;
+    }
+
+    .ahc-dashboard-row {
+      grid-template-columns:
+        var(--ahc-dashboard-label-width) minmax(180px, 1fr)
+        54px;
+      gap: 6px;
+      padding-inline: 0;
+    }
+
+    .ahc-dashboard-row__meta span {
+      display: none;
+    }
+
     .ahc-timeline-card {
       border-radius: var(--ahc-radius-md);
       background: transparent;
@@ -2170,6 +2615,8 @@ export const activityHistoryCardStyles = css`
     :host {
       --ahc-label-width: 150px;
       --ahc-activity-label-width: 145px;
+      --ahc-dashboard-label-width: 150px;
+      --ahc-dashboard-row-height: 34px;
     }
   }
 
@@ -2177,6 +2624,7 @@ export const activityHistoryCardStyles = css`
     :host {
       --ahc-label-width: 130px;
       --ahc-activity-label-width: 132px;
+      --ahc-dashboard-label-width: 130px;
     }
 
     .ahc__summary-grid {
@@ -2207,6 +2655,20 @@ export const activityHistoryCardStyles = css`
     .ahc-activity__density-strip {
       grid-auto-columns: minmax(4px, 1fr);
       gap: 2px;
+    }
+
+    .ahc-dashboard-row {
+      grid-template-columns:
+        var(--ahc-dashboard-label-width) minmax(150px, 1fr)
+        44px;
+    }
+
+    .ahc-dashboard-row__label span {
+      display: none;
+    }
+
+    .ahc-dashboard-row__meta strong {
+      font-size: 0.74rem;
     }
   }
 
