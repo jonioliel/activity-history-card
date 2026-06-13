@@ -70,7 +70,9 @@ export interface AreaInventoryItem {
   area?: string;
   icon?: string;
   currentState?: string;
+  currentCategory?: StateCategory;
   currentStateLabel?: string;
+  stateTone?: "active" | "had_activity" | "inactive" | "unavailable";
   activeNow: boolean;
   hadActivityInRange: boolean;
   totalActiveMs?: number;
@@ -489,7 +491,9 @@ function toInventoryItem(row: TimelineRow): AreaInventoryItem {
     area: row.entity.area,
     icon: row.entity.icon,
     currentState: row.currentState,
+    currentCategory: row.currentCategory,
     currentStateLabel: currentStateLabel(row),
+    stateTone: inventoryStateTone(row),
     activeNow: isActiveNow(row),
     hadActivityInRange: row.totalActiveMs > 0,
     totalActiveMs: row.totalActiveMs,
@@ -663,6 +667,21 @@ function currentStateLabel(row: TimelineRow): string | undefined {
   if (row.currentState) return row.currentState;
   if (row.totalActiveMs > 0) return "היתה פעילות";
   return "לא פעיל";
+}
+
+function inventoryStateTone(row: TimelineRow): AreaInventoryItem["stateTone"] {
+  if (isUnavailableInventoryState(row)) return "unavailable";
+  if (isActiveNow(row)) return "active";
+  if (row.totalActiveMs > 0) return "had_activity";
+  return "inactive";
+}
+
+function isUnavailableInventoryState(row: TimelineRow): boolean {
+  return (
+    row.currentState === "unavailable" ||
+    row.currentState === "unknown" ||
+    (row.currentCategory === "unknown" && row.totalActiveMs <= 0)
+  );
 }
 
 function domainLabel(domain: string): string {

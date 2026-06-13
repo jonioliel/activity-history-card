@@ -33,7 +33,7 @@ import { renderSwimlaneTimeline } from "./renderers/swimlane-renderer";
 import { curateRows, formatCurationSummary } from "./activity-curation";
 import { activityHistoryCardStyles } from "./styles";
 import { summarizeActivity } from "./summary";
-import { resolveRendererMode } from "./view-mode";
+import { resolveRendererMode, type RendererMode } from "./view-mode";
 import "./activity-history-card-editor";
 import type {
   ActivityHistoryCardConfig,
@@ -103,6 +103,7 @@ export class ActivityHistoryCard extends LitElement {
   private _filterSheetOpen = false;
   private _usingMockData = false;
   private _showAllRows = false;
+  private _debugLegacyView = false;
   private _expandedInventoryGroups = new Set<string>();
   private _collapsedInventoryGroups = new Set<string>();
   private _curation?: RowCurationDiagnostics;
@@ -167,6 +168,7 @@ export class ActivityHistoryCard extends LitElement {
     this._lastFetchKey = "";
     this._lastResolvedEntityKey = "";
     this._showAllRows = false;
+    this._debugLegacyView = false;
     this._expandedInventoryGroups.clear();
     this._collapsedInventoryGroups.clear();
     this._historyCache.clear();
@@ -277,7 +279,11 @@ export class ActivityHistoryCard extends LitElement {
         class=${showInsights ? "ahc__body" : "ahc__body ahc__body--no-insights"}
       >
         <main class="ahc__main">${this._renderMainContent()}</main>
-        ${showInsights ? this._renderInsights() : nothing}
+        ${showInsights
+          ? html`<aside class="ahc__insights-panel" aria-label="תובנות חכמות">
+              ${this._renderInsights()}
+            </aside>`
+          : nothing}
       </section>
     `;
   }
@@ -352,7 +358,7 @@ export class ActivityHistoryCard extends LitElement {
   private _renderFilters(): TemplateResult | typeof nothing {
     if (this._config.filters?.show === false) return nothing;
     const curationSummary = formatCurationSummary(this._curation);
-    const rendererMode = resolveRendererMode(this._config, this._showAllRows);
+    const rendererMode = this._currentRendererMode();
     const activityDashboard = rendererMode === "activity";
     const canToggleSmartFilter = Boolean(
       activityDashboard
@@ -435,6 +441,16 @@ export class ActivityHistoryCard extends LitElement {
                 @click=${this._toggleShowAllRows}
               >
                 ${showAllLabel}
+              </button>`
+            : nothing}
+          ${this._config.debug
+            ? html`<button
+                class="ahc__button ahc__button--ghost ahc__button--debug"
+                type="button"
+                aria-pressed=${this._debugLegacyView ? "true" : "false"}
+                @click=${this._toggleDebugLegacyView}
+              >
+                תצוגת legacy
               </button>`
             : nothing}
           ${curationSummary
@@ -655,7 +671,7 @@ export class ActivityHistoryCard extends LitElement {
     }
 
     const range = this._resolveRange();
-    switch (resolveRendererMode(this._config, this._showAllRows)) {
+    switch (this._currentRendererMode()) {
       case "heatmap":
         return renderHeatmapPlaceholder();
       case "detail":
@@ -1048,10 +1064,7 @@ export class ActivityHistoryCard extends LitElement {
     const mostActiveArea = summary?.mostActiveArea;
     const hasData = Boolean(summary && summary.eventCount > 0);
     return html`
-      <aside
-        class="ahc__insights ahc__insights-panel"
-        aria-label="תובנות חכמות"
-      >
+      <section class="ahc__insights" aria-label="תובנות חכמות">
         <h3 class="ahc__insights-title">
           <span>תובנות חכמות</span><span aria-hidden="true">✦</span>
         </h3>
@@ -1102,7 +1115,7 @@ export class ActivityHistoryCard extends LitElement {
               : "נסה טווח זמן ארוך יותר או ודא שה-Recorder פעיל"}</span
           >
         </article>
-      </aside>
+      </section>
     `;
   }
 
@@ -1112,10 +1125,7 @@ export class ActivityHistoryCard extends LitElement {
     const insights = dashboard.insights;
     const hasData = dashboard.visibleEventCount > 0;
     return html`
-      <aside
-        class="ahc__insights ahc__insights-panel"
-        aria-label="תובנות חכמות"
-      >
+      <section class="ahc__insights" aria-label="תובנות חכמות">
         <h3 class="ahc__insights-title">
           <span>תובנות חכמות</span><span aria-hidden="true">✦</span>
         </h3>
@@ -1174,7 +1184,7 @@ export class ActivityHistoryCard extends LitElement {
               : "כל הפעילות המשמעותית מוצגת")}
           </span>
         </article>
-      </aside>
+      </section>
     `;
   }
 
@@ -1304,8 +1314,7 @@ export class ActivityHistoryCard extends LitElement {
             @click=${this._toggleShowAllRows}
           >
             <span>
-              ${resolveRendererMode(this._config, this._showAllRows) ===
-              "activity"
+              ${this._currentRendererMode() === "activity"
                 ? this._showAllRows
                   ? "פעילות בלבד"
                   : "כל האביזרים"
@@ -1633,7 +1642,7 @@ export class ActivityHistoryCard extends LitElement {
 
   private _rebuildGroups(): void {
     const filtered = filterRows(this._rows, this._filter);
-    const rendererMode = resolveRendererMode(this._config, this._showAllRows);
+    const rendererMode = this._currentRendererMode();
     const showAllForCuration = rendererMode !== "activity" && this._showAllRows;
     const curated = curateRows(filtered, this._config, {
       showAll: showAllForCuration,
@@ -1893,6 +1902,19 @@ export class ActivityHistoryCard extends LitElement {
     this._collapsedInventoryGroups.clear();
     this._rebuildGroups();
   };
+
+  private _toggleDebugLegacyView = (): void => {
+    if (!this._config.debug) return;
+    this._debugLegacyView = !this._debugLegacyView;
+    this._rebuildGroups();
+  };
+
+  private _currentRendererMode(): RendererMode {
+    if (this._config.debug && this._debugLegacyView) {
+      return "legacy_swimlane";
+    }
+    return resolveRendererMode(this._config, this._showAllRows);
+  }
 
   private _toggleInventoryGroup = (groupId: string): void => {
     const defaultExpanded = this._isInventoryGroupDefaultExpanded();

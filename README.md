@@ -52,7 +52,7 @@ show_activity_density: true
 show_area_inventory: true
 area_inventory_mode: compact
 area_inventory_include_inactive: true
-area_inventory_max_items: 16
+area_inventory_max_items: 12
 area_inventory_group_by_domain: true
 area_inventory_show_state: true
 area_inventory_show_last_activity: true
@@ -97,7 +97,7 @@ show_insights: true
 show_area_inventory: true
 area_inventory_mode: compact
 area_inventory_include_inactive: true
-area_inventory_max_items: 16
+area_inventory_max_items: 12
 area_inventory_group_by_domain: true
 area_inventory_show_state: true
 area_inventory_show_last_activity: true
@@ -172,7 +172,7 @@ areas:
 show_area_inventory: true
 area_inventory_mode: compact
 area_inventory_include_inactive: true
-area_inventory_max_items: 16
+area_inventory_max_items: 12
 ```
 
 אם לא מגדירים `domains`, הכרטיס משתמש בדומיינים שימושיים כברירת מחדל כדי להימנע מרעש של חיישנים כלליים.
@@ -239,7 +239,7 @@ view_mode: activity
 show_area_inventory: true
 area_inventory_mode: compact # compact | expanded | off
 area_inventory_include_inactive: true
-area_inventory_max_items: 16
+area_inventory_max_items: 12
 area_inventory_group_by_domain: true
 area_inventory_show_state: true
 area_inventory_show_last_activity: true
@@ -328,44 +328,44 @@ debug: true
 
 ## אפשרויות עיקריות
 
-| Option                              | Default                 | Description                                                                 |
-| ----------------------------------- | ----------------------- | --------------------------------------------------------------------------- |
-| `mock_data`                         | `false`                 | מציג נתוני דוגמה רק כאשר מוגדר `true` במפורש                                |
-| `mock_profile`                      | `default`               | פרופיל דוגמה; למשל `large_noisy_home` לבדיקות עומס/רעש                      |
-| `view_mode`                         | `activity`              | `activity` מומלץ; `activity_legacy` להשוואה; `legacy_swimlane` לדיבוג גולמי |
-| `auto_discover`                     | `true`                  | מגלה רכיבים שמשויכים לאזורים                                                |
-| `areas`                             | all                     | רשימת אזורים להצגה                                                          |
-| `domains`                           | useful activity domains | סוגי רכיבים להצגה                                                           |
-| `include_labels`                    | none                    | מציג רק רכיבים עם labels אלה                                                |
-| `exclude_labels`                    | none                    | מסתיר רכיבים עם labels אלה                                                  |
-| `hours_to_show`                     | `24`                    | טווח זמן להצגה                                                              |
-| `refresh_interval_seconds`          | `300`                   | תדירות רענון רקע כאשר `live: true`                                          |
-| `smart_filter`                      | `true`                  | מסתיר כברירת מחדל שורות ריקות, טכניות או קצרות מאוד                         |
-| `activity_mode`                     | `meaningful`            | `meaningful` מציג פעילות אמיתית; `all` מציג הכל לבדיקה                      |
-| `hide_empty_rows`                   | `true`                  | מסתיר רכיבים ללא פעילות משמעותית בטווח הנוכחי                               |
-| `show_inactive_baselines`           | `false`                 | מציג קווי baseline כבויים רק כאשר מוגדר `true`                              |
-| `min_row_active_seconds`            | `10`                    | פעילות קצרה יותר תוסתר כאשר `smart_filter` פעיל                             |
-| `max_rows_per_group`                | `4`                     | מגביל כמה שורות אוטומטיות יוצגו בכל אזור/קבוצה                              |
-| `max_total_rows`                    | `18`                    | מגביל את כלל השורות האוטומטיות בתצוגה                                       |
-| `show_activity_density`             | `true`                  | מציג פס צפיפות פעילות עליון בתצוגת `activity`                               |
-| `show_area_inventory`               | `true`                  | מציג מלאי אביזרים קומפקטי מתחת לכל אזור בתצוגת `activity`                   |
-| `area_inventory_mode`               | `compact`               | `compact`, `expanded`, או `off`                                             |
-| `area_inventory_include_inactive`   | `true`                  | כולל אביזרים שלא פעלו בטווח הזמן במלאי האזורי                               |
-| `area_inventory_max_items`          | `16`                    | מספר אביזרים שיוצגו לפני “עוד X אביזרים”                                    |
-| `area_inventory_group_by_domain`    | `true`                  | מקבץ את אביזרי האזור לפי סוג רכיב                                           |
-| `area_inventory_show_state`         | `true`                  | מציג מצב נוכחי/ידוע של האביזר במלאי                                         |
-| `area_inventory_show_last_activity` | `true`                  | מציג משך פעילות אחרון/מצטבר כאשר יש פעילות בטווח                            |
-| `show_technical_entities`           | `false`                 | מאפשר להציג נתבים, הגדרות תוכנית ורעש טכני                                  |
-| `show_config_entities`              | `false`                 | מאפשר להציג ישויות registry מסוג `config`                                   |
-| `show_diagnostic_entities`          | `false`                 | מאפשר להציג ישויות registry מסוג `diagnostic`                               |
-| `summary_scope`                     | `visible`               | מחשב סיכום לפי השורות המוצגות או לפי כל השורות המסוננות                     |
-| `max_visible_rows`                  | `18`                    | מגביל את מספר השורות הגלויות כדי לשמור על ביצועים וקריאות                   |
-| `timeline_height`                   | `min(62svh, 680px)`     | גובה פנימי של אזור הטיימליין לפני גלילה                                     |
-| `collapse_groups`                   | `false`                 | מאפשר קיפול קבוצות; קבוצות ללא פעילות יכולות להתחיל סגורות                  |
-| `default_collapsed_groups`          | `[]`                    | רשימת שמות/IDs של קבוצות שייפתחו סגורות                                     |
-| `group_by`                          | `area`                  | `area`, `domain`, `entity`, `none`                                          |
-| `display_mode`                      | `panel`                 | `card`, `panel`, `fullscreen`                                               |
-| `debug`                             | `false`                 | מציג דיאגנוסטיקה בכרטיס                                                     |
+| Option                              | Default                 | Description                                                                       |
+| ----------------------------------- | ----------------------- | --------------------------------------------------------------------------------- |
+| `mock_data`                         | `false`                 | מציג נתוני דוגמה רק כאשר מוגדר `true` במפורש                                      |
+| `mock_profile`                      | `default`               | פרופיל דוגמה: `clean_activity_dashboard`, `area_inventory`, או `large_noisy_home` |
+| `view_mode`                         | `activity`              | `activity` מומלץ; `activity_legacy` להשוואה; `legacy_swimlane` לדיבוג גולמי       |
+| `auto_discover`                     | `true`                  | מגלה רכיבים שמשויכים לאזורים                                                      |
+| `areas`                             | all                     | רשימת אזורים להצגה                                                                |
+| `domains`                           | useful activity domains | סוגי רכיבים להצגה                                                                 |
+| `include_labels`                    | none                    | מציג רק רכיבים עם labels אלה                                                      |
+| `exclude_labels`                    | none                    | מסתיר רכיבים עם labels אלה                                                        |
+| `hours_to_show`                     | `24`                    | טווח זמן להצגה                                                                    |
+| `refresh_interval_seconds`          | `300`                   | תדירות רענון רקע כאשר `live: true`                                                |
+| `smart_filter`                      | `true`                  | מסתיר כברירת מחדל שורות ריקות, טכניות או קצרות מאוד                               |
+| `activity_mode`                     | `meaningful`            | `meaningful` מציג פעילות אמיתית; `all` מציג הכל לבדיקה                            |
+| `hide_empty_rows`                   | `true`                  | מסתיר רכיבים ללא פעילות משמעותית בטווח הנוכחי                                     |
+| `show_inactive_baselines`           | `false`                 | מציג קווי baseline כבויים רק כאשר מוגדר `true`                                    |
+| `min_row_active_seconds`            | `10`                    | פעילות קצרה יותר תוסתר כאשר `smart_filter` פעיל                                   |
+| `max_rows_per_group`                | `4`                     | מגביל כמה שורות אוטומטיות יוצגו בכל אזור/קבוצה                                    |
+| `max_total_rows`                    | `18`                    | מגביל את כלל השורות האוטומטיות בתצוגה                                             |
+| `show_activity_density`             | `true`                  | מציג פס צפיפות פעילות עליון בתצוגת `activity`                                     |
+| `show_area_inventory`               | `true`                  | מציג מלאי אביזרים קומפקטי מתחת לכל אזור בתצוגת `activity`                         |
+| `area_inventory_mode`               | `compact`               | `compact`, `expanded`, או `off`                                                   |
+| `area_inventory_include_inactive`   | `true`                  | כולל אביזרים שלא פעלו בטווח הזמן במלאי האזורי                                     |
+| `area_inventory_max_items`          | `12`                    | מספר אביזרים שיוצגו לפני “עוד X אביזרים”                                          |
+| `area_inventory_group_by_domain`    | `true`                  | מקבץ את אביזרי האזור לפי סוג רכיב                                                 |
+| `area_inventory_show_state`         | `true`                  | מציג מצב נוכחי/ידוע של האביזר במלאי                                               |
+| `area_inventory_show_last_activity` | `true`                  | מציג משך פעילות אחרון/מצטבר כאשר יש פעילות בטווח                                  |
+| `show_technical_entities`           | `false`                 | מאפשר להציג נתבים, הגדרות תוכנית ורעש טכני                                        |
+| `show_config_entities`              | `false`                 | מאפשר להציג ישויות registry מסוג `config`                                         |
+| `show_diagnostic_entities`          | `false`                 | מאפשר להציג ישויות registry מסוג `diagnostic`                                     |
+| `summary_scope`                     | `visible`               | מחשב סיכום לפי השורות המוצגות או לפי כל השורות המסוננות                           |
+| `max_visible_rows`                  | `18`                    | מגביל את מספר השורות הגלויות כדי לשמור על ביצועים וקריאות                         |
+| `timeline_height`                   | `min(62svh, 680px)`     | גובה פנימי של אזור הטיימליין לפני גלילה                                           |
+| `collapse_groups`                   | `false`                 | מאפשר קיפול קבוצות; קבוצות ללא פעילות יכולות להתחיל סגורות                        |
+| `default_collapsed_groups`          | `[]`                    | רשימת שמות/IDs של קבוצות שייפתחו סגורות                                           |
+| `group_by`                          | `area`                  | `area`, `domain`, `entity`, `none`                                                |
+| `display_mode`                      | `panel`                 | `card`, `panel`, `fullscreen`                                                     |
+| `debug`                             | `false`                 | מציג דיאגנוסטיקה בכרטיס                                                           |
 
 ראו דוגמה מלאה ב-[sample-config.yaml](sample-config.yaml).
 

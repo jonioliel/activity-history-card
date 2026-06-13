@@ -242,7 +242,131 @@ function mockSeedsForProfile(profile?: string): MockEntitySeed[] {
   if (profile === "large_noisy_home") {
     return [...MOCK_ENTITIES, ...buildLargeNoisyHome()];
   }
+  if (profile === "area_inventory") {
+    return buildAreaInventoryProfile();
+  }
+  if (profile === "clean_activity_dashboard") {
+    return buildCleanActivityDashboardProfile();
+  }
   return MOCK_ENTITIES;
+}
+
+function buildAreaInventoryProfile(): MockEntitySeed[] {
+  return [
+    ...MOCK_ENTITIES.slice(0, 6),
+    {
+      entity_id: "switch.kitchen_dishwasher_main",
+      name: "מדיח כלים",
+      area: "מטבח",
+      domain: "switch",
+      icon: "mdi:dishwasher",
+      pattern: [],
+    },
+    {
+      entity_id: "switch.kitchen_socket",
+      name: "שקע שירות",
+      area: "מטבח",
+      domain: "switch",
+      icon: "mdi:power-socket-eu",
+      pattern: [],
+    },
+    {
+      entity_id: "fan.kitchen_ceiling",
+      name: "מאוורר תקרה",
+      area: "מטבח",
+      domain: "fan",
+      icon: "mdi:fan",
+      pattern: [{ startHour: -3.2, endHour: -2.1, state: "on" }],
+    },
+    {
+      entity_id: "light.balcony_string",
+      name: "גרילנדה מרפסת",
+      area: "מרפסת",
+      domain: "light",
+      icon: "mdi:string-lights",
+      pattern: [],
+    },
+    {
+      entity_id: "cover.balcony_shade",
+      name: "סוכך מרפסת",
+      area: "מרפסת",
+      domain: "cover",
+      icon: "mdi:awning",
+      pattern: [{ startHour: -7.1, endHour: -7, state: "opening" }],
+    },
+  ];
+}
+
+function buildCleanActivityDashboardProfile(): MockEntitySeed[] {
+  return [
+    {
+      entity_id: "light.kitchen_counter_clean",
+      name: "תאורת שיש",
+      area: "מטבח",
+      domain: "light",
+      icon: "mdi:led-strip-variant",
+      pattern: [
+        { startHour: -22, endHour: -20.5, state: "on" },
+        { startHour: -6, endHour: -3.8, state: "on" },
+      ],
+    },
+    {
+      entity_id: "switch.kitchen_coffee_clean",
+      name: "מכונת קפה",
+      area: "מטבח",
+      domain: "switch",
+      icon: "mdi:coffee-maker",
+      pattern: [
+        { startHour: -20.2, endHour: -20, state: "on" },
+        { startHour: -2.2, endHour: -2, state: "on" },
+      ],
+    },
+    {
+      entity_id: "climate.living_room_clean",
+      name: "מזגן סלון",
+      area: "סלון",
+      domain: "climate",
+      icon: "mdi:air-conditioner",
+      pattern: [
+        {
+          startHour: -12,
+          endHour: -9.5,
+          state: "cool",
+          attributes: { hvac_action: "cooling" },
+        },
+        {
+          startHour: -4.4,
+          endHour: -1.2,
+          state: "cool",
+          attributes: { hvac_action: "cooling" },
+        },
+      ],
+    },
+    {
+      entity_id: "media_player.living_room_clean",
+      name: "מוזיקה סלון",
+      area: "סלון",
+      domain: "media_player",
+      icon: "mdi:speaker",
+      pattern: [{ startHour: -5.8, endHour: -4.1, state: "playing" }],
+    },
+    {
+      entity_id: "fan.bedroom_clean",
+      name: "מאוורר חדר שינה",
+      area: "חדר שינה",
+      domain: "fan",
+      icon: "mdi:fan",
+      pattern: [{ startHour: -8, endHour: -1.5, state: "on" }],
+    },
+    {
+      entity_id: "cover.bedroom_shutter_clean",
+      name: "תריס חדר שינה",
+      area: "חדר שינה",
+      domain: "cover",
+      icon: "mdi:window-shutter",
+      pattern: [{ startHour: -7.4, endHour: -7.2, state: "closing" }],
+    },
+  ];
 }
 
 function buildLargeNoisyHome(): MockEntitySeed[] {

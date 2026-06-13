@@ -26,6 +26,7 @@ function row(
     domain?: string;
     activeMs?: number;
     technical?: boolean;
+    currentState?: string;
   } = {},
 ): TimelineRow {
   const start = new Date("2026-01-01T01:00:00.000Z");
@@ -54,6 +55,9 @@ function row(
       : [],
     totalActiveMs: activeMs,
     eventCount: active ? 1 : 0,
+    currentState: options.currentState,
+    currentCategory:
+      options.currentState === "unavailable" ? "unknown" : undefined,
   };
 }
 
@@ -252,6 +256,23 @@ describe("buildActivityDashboardModel", () => {
     expect(model.groups[0]?.inventoryItems.map((item) => item.name)).toEqual([
       "תאורה",
     ]);
+  });
+
+  it("marks unavailable inventory accessories for muted rendering", () => {
+    const unavailable = row("switch.unavailable", {
+      name: "שקע לא זמין",
+      activeMs: 0,
+      currentState: "unavailable",
+    });
+    const model = buildActivityDashboardModel(
+      groupRows([], "area"),
+      range,
+      config(),
+      undefined,
+      { inventoryRows: [unavailable], groupBy: "area" },
+    );
+
+    expect(model.groups[0]?.inventoryItems[0]?.stateTone).toBe("unavailable");
   });
 
   it("respects explicitly configured technical entities", () => {

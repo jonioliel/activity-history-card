@@ -135,10 +135,16 @@ describe("renderActivityDashboard", () => {
 
     expect(html).toContain("ahc-dashboard__overview");
     expect(html).toContain("ahc-area-card");
+    expect(html).toContain("ahc-area-card__title");
+    expect(html).toContain("ahc-area-card__aggregate");
+    expect(html).toContain("ahc-area-card__content");
+    expect(html).toContain("ahc-area-card__activity");
     expect(html).toContain("ahc-dashboard-group__aggregate");
     expect(html).toContain("ahc-dashboard-row__plot");
+    expect(html).toContain("ahc-dashboard-row__inline-meta");
     expect(html).toContain("ahc-dashboard-segment--row");
     expect(html).toContain("ahc-area-inventory");
+    expect(html).toContain("data-state-tone=");
     expect(html).toContain("מנורת צד");
   });
 

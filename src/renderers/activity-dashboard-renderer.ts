@@ -107,11 +107,14 @@ function renderGroup(
         options.expandedInventoryGroups?.has(group.id) === true;
 
   return html`
-    <article class="ahc-area-card ahc-dashboard-group">
+    <article
+      class="ahc-area-card ahc-dashboard-group"
+      data-has-activity=${group.activityRows.length ? "true" : "false"}
+    >
       <header class="ahc-area-card__header ahc-dashboard-group__header">
-        <div class="ahc-dashboard-group__title">
+        <div class="ahc-area-card__title ahc-dashboard-group__title">
           ${renderIcon(group.icon, "mdi:home-outline")}
-          <div>
+          <div class="ahc-area-card__title-copy">
             <strong>${group.title}</strong>
             <span>
               ${group.visibleActivityRowCount} פעילים בטווח ·
@@ -120,7 +123,7 @@ function renderGroup(
           </div>
         </div>
         <div class="ahc-area-card__actions">
-          <div class="ahc-dashboard-group__meta">
+          <div class="ahc-area-card__meta ahc-dashboard-group__meta">
             ${formatDuration(group.totalActiveMs)} · ${group.eventCount} אירועים
           </div>
           ${inventoryEnabled && group.inventoryItemCount
@@ -137,7 +140,7 @@ function renderGroup(
       </header>
 
       <div
-        class="ahc-dashboard-group__aggregate"
+        class="ahc-area-card__aggregate ahc-dashboard-group__aggregate"
         dir="ltr"
         aria-label=${`פעילות מצטברת עבור ${group.title}`}
       >
@@ -146,16 +149,20 @@ function renderGroup(
         )}
       </div>
 
-      ${group.activityRows.length
-        ? html`<div class="ahc-dashboard-group__rows">
-            ${group.activityRows.map((row) => renderRow(row, options))}
-          </div>`
-        : html`<div class="ahc-area-card__quiet">
-            אין פעילות משמעותית בטווח הנוכחי
-          </div>`}
-      ${inventoryEnabled && group.inventoryItems.length
-        ? renderInventory(group, options, inventoryExpanded)
-        : nothing}
+      <div class="ahc-area-card__content">
+        <section class="ahc-area-card__activity" aria-label="פעילות באזור">
+          ${group.activityRows.length
+            ? html`<div class="ahc-dashboard-group__rows">
+                ${group.activityRows.map((row) => renderRow(row, options))}
+              </div>`
+            : html`<div class="ahc-area-card__quiet">
+                אין פעילות משמעותית בטווח הנוכחי
+              </div>`}
+        </section>
+        ${inventoryEnabled && group.inventoryItems.length
+          ? renderInventory(group, options, inventoryExpanded)
+          : nothing}
+      </div>
     </article>
   `;
 }
@@ -173,6 +180,10 @@ function renderRow(
           ${row.secondary
             ? html`<span title=${row.secondary}>${row.secondary}</span>`
             : nothing}
+          <span class="ahc-dashboard-row__inline-meta">
+            <strong>${formatDuration(row.totalActiveMs)}</strong>
+            <span>${row.eventCount} אירועים</span>
+          </span>
         </div>
       </div>
 
@@ -270,6 +281,13 @@ function renderInventoryItem(
   const showLastActivity =
     config.area_inventory_show_last_activity ??
     DEFAULT_CONFIG.area_inventory_show_last_activity;
+  const stateTone =
+    item.stateTone ??
+    (item.activeNow
+      ? "active"
+      : item.hadActivityInRange
+        ? "had_activity"
+        : "inactive");
   const title = `${item.name} · ${domainLabel(item.domain)}${
     item.currentStateLabel ? ` · ${item.currentStateLabel}` : ""
   }`;
@@ -280,6 +298,8 @@ function renderInventoryItem(
       type="button"
       data-active-now=${item.activeNow ? "true" : "false"}
       data-had-activity=${item.hadActivityInRange ? "true" : "false"}
+      data-state-tone=${stateTone}
+      data-state-category=${item.currentCategory ?? "none"}
       title=${title}
       aria-label=${title}
       @click=${(event: Event) =>
@@ -287,6 +307,7 @@ function renderInventoryItem(
     >
       ${renderIcon(item.icon, fallbackIcon(item.domain))}
       <span class="ahc-inventory-chip__copy">
+        <span class="ahc-inventory-chip__status" aria-hidden="true"></span>
         <strong>${item.name}</strong>
         <small>
           ${showState && item.currentStateLabel

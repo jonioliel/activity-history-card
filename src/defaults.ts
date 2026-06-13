@@ -125,7 +125,7 @@ export const DEFAULT_CONFIG: Required<
   show_area_inventory: true,
   area_inventory_mode: "compact",
   area_inventory_include_inactive: true,
-  area_inventory_max_items: 16,
+  area_inventory_max_items: 12,
   area_inventory_group_by_domain: true,
   area_inventory_show_state: true,
   area_inventory_show_last_activity: true,
