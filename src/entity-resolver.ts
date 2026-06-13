@@ -1,39 +1,206 @@
-import type { ActivityHistoryCardConfig, EntityConfig, EntityMeta, HomeAssistant } from "./types";
+import { DEFAULT_DISCOVERY_DOMAINS } from "./defaults";
 import { getDomain, humanizeEntityId } from "./format";
+import type { ActivityHistoryCardConfig, EntityConfig, EntityMeta, HassEntity, HomeAssistant } from "./types";
 
-export function resolveEntityMetas(config: ActivityHistoryCardConfig, hass?: HomeAssistant): EntityMeta[] {
+interface AreaRegistryEntry {
+  area_id: string;
+  name: string;
+  labels?: string[];
+}
+
+interface DeviceRegistryEntry {
+  id: string;
+  area_id?: string | null;
+  name?: string | null;
+  name_by_user?: string | null;
+  labels?: string[];
+  disabled_by?: string | null;
+}
+
+interface EntityRegistryEntry {
+  entity_id: string;
+  name?: string | null;
+  original_name?: string | null;
+  area_id?: string | null;
+  device_id?: string | null;
+  labels?: string[];
+  hidden_by?: string | null;
+  disabled_by?: string | null;
+}
+
+interface LabelRegistryEntry {
+  label_id: string;
+  name: string;
+}
+
+interface RegistrySnapshot {
+  areas: AreaRegistryEntry[];
+  devices: DeviceRegistryEntry[];
+  entities: EntityRegistryEntry[];
+  labels: LabelRegistryEntry[];
+}
+
+let registrySnapshotPromise: Promise<RegistrySnapshot> | undefined;
+
+export async function resolveEntityMetas(config: ActivityHistoryCardConfig, hass?: HomeAssistant): Promise<EntityMeta[]> {
   const configured = config.entities ?? [];
+  const registry = hass ? await loadRegistrySnapshot(hass) : emptyRegistry();
   const entities: EntityConfig[] = configured.map((item) => (typeof item === "string" ? { entity: item } : item));
 
-  // Conservative auto-discovery: only use configured domains/areas, never load every entity by default.
-  if (!entities.length && hass && (config.domains?.length || config.areas?.length)) {
-    for (const entityId of Object.keys(hass.states)) {
-      const stateObj = hass.states[entityId];
-      const domain = getDomain(entityId);
-      const area = stringAttr(stateObj?.attributes?.area) ?? stringAttr(stateObj?.attributes?.area_id);
-      if (config.domains?.length && !config.domains.includes(domain)) continue;
-      if (config.areas?.length && (!area || !config.areas.includes(area))) continue;
-      entities.push({ entity: entityId, area });
-    }
+  if (!entities.length && hass && config.auto_discover !== false) {
+    entities.push(...discoverAreaEntities(config, hass, registry));
   }
 
   return entities
     .filter((entry) => entry.entity && !entry.hidden && !isExcluded(entry.entity, config.exclude_entities ?? []))
-    .map((entry) => {
-      const stateObj = hass?.states[entry.entity];
-      const domain = entry.domain ?? getDomain(entry.entity);
-      const friendly = stateObj ? hass?.formatEntityName?.(stateObj) : undefined;
-      const attrName = stateObj?.attributes?.friendly_name;
-      const area = entry.area ?? stringAttr(stateObj?.attributes?.area) ?? stringAttr(stateObj?.attributes?.area_id);
-      return {
-        entity_id: entry.entity,
-        name: entry.name ?? friendly ?? (typeof attrName === "string" ? attrName : humanizeEntityId(entry.entity)),
-        area,
+    .map((entry) => toEntityMeta(entry, config, hass, registry))
+    .filter((entity): entity is EntityMeta => Boolean(entity))
+    .filter((entity) => labelConfigAllows(entity.labels ?? [], config, registry.labels));
+}
+
+function discoverAreaEntities(config: ActivityHistoryCardConfig, hass: HomeAssistant, registry: RegistrySnapshot): EntityConfig[] {
+  const allowedDomains = config.domains?.length ? config.domains : DEFAULT_DISCOVERY_DOMAINS;
+  const areaFilters = normalizedSet(config.areas ?? []);
+  const entities: EntityConfig[] = [];
+
+  if (registry.entities.length) {
+    const areaById = mapBy(registry.areas, "area_id");
+    const deviceById = mapBy(registry.devices, "id");
+
+    for (const entry of registry.entities) {
+      if (entry.disabled_by || entry.hidden_by || !hass.states[entry.entity_id]) continue;
+      const domain = getDomain(entry.entity_id);
+      if (allowedDomains.length && !allowedDomains.includes(domain)) continue;
+
+      const device = entry.device_id ? deviceById.get(entry.device_id) : undefined;
+      if (device?.disabled_by) continue;
+      const areaId = entry.area_id || device?.area_id || undefined;
+      if (!areaId) continue;
+      const area = areaById.get(areaId);
+      const areaName = area?.name ?? areaId;
+      if (areaFilters.size && !areaFilters.has(normalizeToken(areaId)) && !areaFilters.has(normalizeToken(areaName))) continue;
+
+      const labels = mergeLabels(entry.labels, device?.labels, area?.labels);
+      if (!labelConfigAllows(labels, config, registry.labels)) continue;
+
+      entities.push({
+        entity: entry.entity_id,
+        name: entry.name ?? entry.original_name ?? undefined,
+        area: areaName,
         domain,
-        icon: entry.icon ?? stringAttr(stateObj?.attributes?.icon),
-        config: entry,
-      } satisfies EntityMeta;
-    });
+      });
+    }
+
+    return entities;
+  }
+
+  for (const [entityId, stateObj] of Object.entries(hass.states)) {
+    const domain = getDomain(entityId);
+    if (allowedDomains.length && !allowedDomains.includes(domain)) continue;
+    const area = stringAttr(stateObj.attributes.area) ?? stringAttr(stateObj.attributes.area_id);
+    if (!area) continue;
+    if (areaFilters.size && !areaFilters.has(normalizeToken(area))) continue;
+    entities.push({ entity: entityId, area, domain });
+  }
+
+  return entities;
+}
+
+function toEntityMeta(
+  entry: EntityConfig,
+  config: ActivityHistoryCardConfig,
+  hass: HomeAssistant | undefined,
+  registry: RegistrySnapshot,
+): EntityMeta | undefined {
+  const stateObj = hass?.states[entry.entity];
+  const registryEntity = registry.entities.find((item) => item.entity_id === entry.entity);
+  if (registryEntity?.disabled_by || registryEntity?.hidden_by) return undefined;
+
+  const device = registryEntity?.device_id ? registry.devices.find((item) => item.id === registryEntity.device_id) : undefined;
+  if (device?.disabled_by) return undefined;
+
+  const areaId = entry.area ? undefined : registryEntity?.area_id || device?.area_id || undefined;
+  const area = entry.area ?? resolveAreaName(areaId, registry) ?? stringAttr(stateObj?.attributes?.area) ?? stringAttr(stateObj?.attributes?.area_id);
+  if (config.areas?.length && (!area || !matchesConfiguredArea(area, areaId, config.areas))) return undefined;
+
+  const domain = entry.domain ?? getDomain(entry.entity);
+  const labels = mergeLabels(
+    registryEntity?.labels,
+    device?.labels,
+    areaId ? registry.areas.find((item) => item.area_id === areaId)?.labels : undefined,
+  );
+  const friendly = stateObj ? hass?.formatEntityName?.(stateObj) : undefined;
+  const attrName = stateObj?.attributes?.friendly_name;
+
+  return {
+    entity_id: entry.entity,
+    name: entry.name ?? registryEntity?.name ?? friendly ?? (typeof attrName === "string" ? attrName : humanizeEntityId(entry.entity)),
+    area,
+    area_id: areaId,
+    domain,
+    icon: entry.icon ?? stringAttr(stateObj?.attributes?.icon),
+    labels,
+    config: entry,
+  };
+}
+
+function labelConfigAllows(entityLabels: string[], config: ActivityHistoryCardConfig, labelRegistry: LabelRegistryEntry[]): boolean {
+  const labels = expandedLabelSet(entityLabels, labelRegistry);
+  const includeLabels = normalizedSet(config.include_labels ?? []);
+  const excludeLabels = normalizedSet(config.exclude_labels ?? []);
+
+  if (excludeLabels.size && [...excludeLabels].some((label) => labels.has(label))) return false;
+  if (includeLabels.size && ![...includeLabels].some((label) => labels.has(label))) return false;
+  return true;
+}
+
+async function loadRegistrySnapshot(hass: HomeAssistant): Promise<RegistrySnapshot> {
+  registrySnapshotPromise ??= Promise.all([
+    safeRegistryCall<AreaRegistryEntry>(hass, "config/area_registry/list"),
+    safeRegistryCall<DeviceRegistryEntry>(hass, "config/device_registry/list"),
+    safeRegistryCall<EntityRegistryEntry>(hass, "config/entity_registry/list"),
+    safeRegistryCall<LabelRegistryEntry>(hass, "config/label_registry/list"),
+  ]).then(([areas, devices, entities, labels]) => ({ areas, devices, entities, labels }));
+
+  return registrySnapshotPromise;
+}
+
+async function safeRegistryCall<T>(hass: HomeAssistant, type: string): Promise<T[]> {
+  try {
+    const value = await hass.callWS<unknown>({ type });
+    return Array.isArray(value) ? (value as T[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function emptyRegistry(): RegistrySnapshot {
+  return { areas: [], devices: [], entities: [], labels: [] };
+}
+
+function resolveAreaName(areaId: string | undefined, registry: RegistrySnapshot): string | undefined {
+  if (!areaId) return undefined;
+  return registry.areas.find((area) => area.area_id === areaId)?.name ?? areaId;
+}
+
+function matchesConfiguredArea(areaName: string, areaId: string | undefined, configuredAreas: string[]): boolean {
+  const filters = normalizedSet(configuredAreas);
+  return filters.has(normalizeToken(areaName)) || Boolean(areaId && filters.has(normalizeToken(areaId)));
+}
+
+function expandedLabelSet(labelIds: string[], labelRegistry: LabelRegistryEntry[]): Set<string> {
+  const namesById = new Map(labelRegistry.map((label) => [label.label_id, label.name]));
+  const values = new Set<string>();
+  for (const labelId of labelIds) {
+    values.add(normalizeToken(labelId));
+    const name = namesById.get(labelId);
+    if (name) values.add(normalizeToken(name));
+  }
+  return values;
+}
+
+function mergeLabels(...items: Array<string[] | undefined>): string[] {
+  return [...new Set(items.flatMap((labels) => labels ?? []))];
 }
 
 function isExcluded(entityId: string, patterns: string[]): boolean {
@@ -43,6 +210,18 @@ function isExcluded(entityId: string, patterns: string[]): boolean {
 function wildcardToRegExp(pattern: string): RegExp {
   const escaped = pattern.replace(/[|\\{}()[\]^$+?.]/g, "\\$&").replace(/\*/g, ".*");
   return new RegExp(`^${escaped}$`);
+}
+
+function mapBy<T extends Record<K, string>, K extends keyof T>(items: T[], key: K): Map<string, T> {
+  return new Map(items.map((item) => [item[key], item]));
+}
+
+function normalizedSet(values: string[]): Set<string> {
+  return new Set(values.map(normalizeToken).filter(Boolean));
+}
+
+function normalizeToken(value: string): string {
+  return value.trim().toLowerCase();
 }
 
 function stringAttr(value: unknown): string | undefined {

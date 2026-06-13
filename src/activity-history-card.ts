@@ -12,6 +12,7 @@ import { renderHeatmapPlaceholder } from "./renderers/heatmap-renderer";
 import { renderSwimlaneTimeline } from "./renderers/swimlane-renderer";
 import { activityHistoryCardStyles } from "./styles";
 import { summarizeActivity } from "./summary";
+import "./activity-history-card-editor";
 import type {
   ActivityHistoryCardConfig,
   ActivitySummary,
@@ -29,6 +30,21 @@ const CARD_VERSION = "0.1.0";
 
 export class ActivityHistoryCard extends LitElement {
   static override styles = activityHistoryCardStyles;
+
+  static getConfigElement(): HTMLElement {
+    return document.createElement("activity-history-card-editor");
+  }
+
+  static getStubConfig(): ActivityHistoryCardConfig {
+    return {
+      type: "custom:activity-history-card",
+      title: DEFAULT_CONFIG.title,
+      auto_discover: true,
+      display_mode: "panel",
+      hours_to_show: 24,
+      group_by: "area",
+    };
+  }
 
   private _config!: ActivityHistoryCardConfig;
   private _hass?: HomeAssistant;
@@ -148,7 +164,7 @@ export class ActivityHistoryCard extends LitElement {
   }
 
   private _renderHeader(): TemplateResult {
-    const subtitle = `${this._timePresetLabel(this._filter.timePreset)} · ${this._usingMockData ? "נתוני דוגמה" : "עודכן עכשיו"}`;
+    const subtitle = `${this._timePresetLabel(this._filter.timePreset)} · ${this._usingMockData ? "נתוני דוגמה" : "נתוני Home Assistant"}`;
     return html`
       <header class="ahc__topbar">
         <div class="ahc__toolbar">
@@ -297,7 +313,7 @@ export class ActivityHistoryCard extends LitElement {
         <div class="ahc-state-card">
           <div>
             <h3 class="ahc-state-card__title">אין נתונים להצגה</h3>
-            <p>בחר רכיבים, הגדר domains/areas, או הפעל mock_data כדי לצפות בתצוגת דוגמה.</p>
+            <p>לא נמצאו ישויות פעילות באזורים שנבחרו. בדוק שהרכיבים משויכים לאזורים, או שנה דומיינים/לייבלים בעורך הכרטיס.</p>
           </div>
         </div>
       `;
@@ -448,13 +464,15 @@ export class ActivityHistoryCard extends LitElement {
       return;
     }
 
-    const entities = useMockData ? getMockEntities() : resolveEntityMetas(this._config, this._hass);
+    const entities = useMockData ? getMockEntities() : await resolveEntityMetas(this._config, this._hass);
     const range = this._resolveRange();
     const key = JSON.stringify({
       mock: useMockData,
       start: range.start.toISOString(),
       end: range.end.toISOString(),
       entities: entities.map((entity) => entity.entity_id),
+      includeLabels: this._config.include_labels ?? [],
+      excludeLabels: this._config.exclude_labels ?? [],
       significant: this._config.significant_changes_only,
       minimal: this._config.minimal_response,
     });

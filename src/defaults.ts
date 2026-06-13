@@ -5,11 +5,13 @@ export const DEFAULT_ACTIVE_STATES: Record<string, string[]> = {
   switch: ["on"],
   fan: ["on"],
   input_boolean: ["on"],
+  binary_sensor: ["on"],
   media_player: ["playing"],
   climate: ["cool", "heat", "heat_cool", "dry", "fan_only"],
   humidifier: ["on"],
   vacuum: ["cleaning", "returning"],
   cover: ["opening", "closing", "open"],
+  lock: ["unlocked", "locking", "unlocking"],
 };
 
 export const DEFAULT_ACTIVE_ATTRIBUTES: Record<string, Record<string, string[]>> = {
@@ -34,6 +36,7 @@ export const DEFAULT_CONFIG: Required<
   Pick<
     ActivityHistoryCardConfig,
     | "title"
+    | "auto_discover"
     | "hours_to_show"
     | "live"
     | "display_mode"
@@ -51,6 +54,7 @@ export const DEFAULT_CONFIG: Required<
   >
 > = {
   title: "היסטוריית פעילות חכמה",
+  auto_discover: true,
   hours_to_show: 24,
   live: true,
   display_mode: "card",
@@ -70,12 +74,30 @@ export const DEFAULT_CONFIG: Required<
 export const DOMAIN_LABELS_HE: Record<string, string> = {
   light: "תאורה",
   switch: "מתגים",
+  binary_sensor: "חיישנים",
+  input_boolean: "מתגים וירטואליים",
   climate: "מזגנים",
   media_player: "מוזיקה",
   cover: "תריסים",
   fan: "מאווררים",
+  humidifier: "לחות",
   vacuum: "שואבים",
+  lock: "מנעולים",
 };
+
+export const DEFAULT_DISCOVERY_DOMAINS = [
+  "light",
+  "switch",
+  "binary_sensor",
+  "input_boolean",
+  "climate",
+  "media_player",
+  "cover",
+  "fan",
+  "humidifier",
+  "vacuum",
+  "lock",
+];
 
 export const CATEGORY_LABELS_HE: Record<StateCategory, string> = {
   on: "דלוק",

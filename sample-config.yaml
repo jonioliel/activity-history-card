@@ -1,5 +1,6 @@
 type: custom:activity-history-card
 title: היסטוריית פעילות חכמה
+auto_discover: true
 hours_to_show: 24
 live: true
 rtl: auto
@@ -61,6 +62,10 @@ entities:
     active_states: ["opening", "closing", "open"]
 exclude_entities:
   - sensor.*
+exclude_labels:
+  - לא להצגה
+  - רכיבים מוגנים
+include_labels: []
 colors:
   on: "var(--success-color)"
   off: "var(--disabled-text-color)"

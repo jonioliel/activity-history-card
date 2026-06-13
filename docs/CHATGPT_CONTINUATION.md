@@ -38,6 +38,8 @@ Implemented:
   - `getGridOptions()`
   - `disconnectedCallback()`
 - Mock data mode with `mock_data: true`; mock data must not be used unless explicitly configured
+- Automatic discovery with `auto_discover: true` for entities assigned to Home Assistant areas
+- Label filtering with `include_labels` and `exclude_labels`
 - Home Assistant history fetching via `history/history_during_period`
 - Conservative entity auto-discovery only when `domains` or `areas` are configured
 - Swimlane timeline grouped by area or domain
@@ -107,20 +109,17 @@ Use HACS as a custom repository:
 3. Repository: `https://github.com/jonioliel/activity-history-card`
 4. Category: Dashboard.
 5. Download the card.
-6. Add a Lovelace card with real Home Assistant entities:
+6. Add a Lovelace card with automatic area discovery:
 
 ```yaml
 type: custom:activity-history-card
 mock_data: false
+auto_discover: true
 display_mode: panel
 hours_to_show: 24
-entities:
-  - entity: light.living_room_main
-    name: תאורת סלון
-    area: סלון
-  - entity: climate.living_room_ac
-    name: מזגן סלון
-    area: סלון
+exclude_labels:
+  - לא להצגה
+  - רכיבים מוגנים
 ```
 
 For preview without Home Assistant Recorder data, explicitly use:
@@ -149,6 +148,7 @@ Do not implement heatmap, drill-down, or correlation until the swimlane MVP is s
 Before changing code, inspect git status, package.json, src/activity-history-card.ts, src/styles.ts, and the relevant mockups.
 After changes, run npm run typecheck, npm run test, and npm run build.
 Keep dist/activity-history-card.js updated because HACS installs it.
+Preserve auto_discover and label filtering behavior unless the user asks to change it.
 Summarize changed files and Home Assistant testing steps.
 ```
 

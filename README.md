@@ -61,22 +61,44 @@ docs/legacy-mockups-gallery.html# גלריית ההדמיות המקורית
    `https://github.com/jonioliel/activity-history-card`
 3. בחר Category: `Dashboard`.
 4. התקן את הכרטיס.
-5. הוסף כרטיס Lovelace עם ישויות אמיתיות מהבית שלך:
+5. הוסף כרטיס Lovelace. ברירת המחדל מושכת אוטומטית רכיבים שמשויכים לאזורים ב-Home Assistant:
 
 ```yaml
 type: custom:activity-history-card
 mock_data: false
+auto_discover: true
 display_mode: panel
 hours_to_show: 24
+exclude_labels:
+  - לא להצגה
+  - רכיבים מוגנים
+```
+
+אפשר להגביל לאזורים או לדומיינים מסוימים:
+
+```yaml
+type: custom:activity-history-card
+auto_discover: true
+areas:
+  - סלון
+  - מטבח
+domains:
+  - light
+  - switch
+  - climate
+  - media_player
+  - cover
+  - fan
+```
+
+אפשר גם לעבוד ידנית עם רשימת entities:
+
+```yaml
+type: custom:activity-history-card
+auto_discover: false
 entities:
   - entity: light.living_room_main
     name: תאורת סלון
-    area: סלון
-  - entity: climate.living_room_ac
-    name: מזגן סלון
-    area: סלון
-  - entity: media_player.living_room_spotify
-    name: Spotify סלון
     area: סלון
 ```
 

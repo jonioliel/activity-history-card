@@ -62,6 +62,7 @@ export interface FilterConfig {
 export interface ActivityHistoryCardConfig {
   type: string;
   title?: string;
+  auto_discover?: boolean;
   hours_to_show?: number;
   start_time?: string;
   end_time?: string;
@@ -86,6 +87,8 @@ export interface ActivityHistoryCardConfig {
   filters?: FilterConfig;
   entities?: Array<string | EntityConfig>;
   exclude_entities?: string[];
+  include_labels?: string[];
+  exclude_labels?: string[];
   domains?: string[];
   areas?: string[];
   colors?: Partial<Record<StateCategory, string>>;
@@ -125,8 +128,10 @@ export interface EntityMeta {
   entity_id: string;
   name: string;
   area?: string;
+  area_id?: string;
   domain: string;
   icon?: string;
+  labels?: string[];
   config?: EntityConfig;
 }
 
