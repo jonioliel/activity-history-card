@@ -4,6 +4,7 @@ auto_discover: true
 debug: false
 hours_to_show: 24
 live: true
+refresh_interval_seconds: 300
 rtl: auto
 display_mode: panel # card | panel | fullscreen
 default_view: swimlane # swimlane | heatmap | detail | correlation
@@ -30,8 +31,11 @@ filters:
     - switch
     - climate
     - media_player
-    - cover
-    - fan
+  - cover
+  - fan
+exclude_domains: []
+include_entity_globs: []
+exclude_entity_globs: []
   default_areas: []
   active_only: false
 entities:
@@ -60,7 +64,7 @@ entities:
   - entity: cover.kitchen_blinds
     name: תריס מטבח
     area: מטבח
-    active_states: ["opening", "closing", "open"]
+    active_states: ["opening", "closing"]
 exclude_entities:
   - sensor.*
 exclude_labels:

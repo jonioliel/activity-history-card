@@ -10,8 +10,8 @@ export const DEFAULT_ACTIVE_STATES: Record<string, string[]> = {
   climate: ["cool", "heat", "heat_cool", "dry", "fan_only"],
   humidifier: ["on"],
   vacuum: ["cleaning", "returning"],
-  cover: ["opening", "closing", "open"],
-  lock: ["unlocked", "locking", "unlocking"],
+  cover: ["opening", "closing"],
+  lock: ["locking", "unlocking"],
 };
 
 export const DEFAULT_ACTIVE_ATTRIBUTES: Record<string, Record<string, string[]>> = {
@@ -49,6 +49,7 @@ export const DEFAULT_CONFIG: Required<
     | "show_fullscreen_button"
     | "significant_changes_only"
     | "minimal_response"
+    | "refresh_interval_seconds"
     | "min_duration_seconds"
     | "merge_gap_seconds"
     | "mobile_breakpoint"
@@ -68,6 +69,7 @@ export const DEFAULT_CONFIG: Required<
   show_fullscreen_button: true,
   significant_changes_only: true,
   minimal_response: true,
+  refresh_interval_seconds: 300,
   min_duration_seconds: 20,
   merge_gap_seconds: 15,
   mobile_breakpoint: 760,
@@ -90,15 +92,10 @@ export const DOMAIN_LABELS_HE: Record<string, string> = {
 export const DEFAULT_DISCOVERY_DOMAINS = [
   "light",
   "switch",
-  "binary_sensor",
-  "input_boolean",
   "climate",
   "media_player",
   "cover",
   "fan",
-  "humidifier",
-  "vacuum",
-  "lock",
 ];
 
 export const CATEGORY_LABELS_HE: Record<StateCategory, string> = {

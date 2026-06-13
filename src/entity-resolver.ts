@@ -26,6 +26,7 @@ interface EntityRegistryEntry {
   labels?: string[];
   hidden_by?: string | null;
   disabled_by?: string | null;
+  entity_category?: string | null;
 }
 
 interface LabelRegistryEntry {
@@ -66,7 +67,7 @@ export async function resolveEntityMetasWithDiagnostics(
   }
 
   const resolved = entities
-    .filter((entry) => entry.entity && !entry.hidden && !isExcluded(entry.entity, config.exclude_entities ?? []))
+    .filter((entry) => entry.entity && !entry.hidden)
     .map((entry) => toEntityMeta(entry, config, hass, registry))
     .filter((entity): entity is EntityMeta => Boolean(entity))
     .filter((entity) => labelConfigAllows(entity.labels ?? [], config, registry.labels));
@@ -83,6 +84,7 @@ function discoverAreaEntities(
   registry: RegistrySnapshot,
 ): { entities: EntityConfig[]; fallbackUsed: boolean } {
   const allowedDomains = config.domains?.length ? config.domains : DEFAULT_DISCOVERY_DOMAINS;
+  const excludedDomains = normalizedSet(config.exclude_domains ?? []);
   const areaFilters = normalizedSet(config.areas ?? []);
   const entities: EntityConfig[] = [];
 
@@ -92,8 +94,11 @@ function discoverAreaEntities(
 
     for (const entry of registry.entities) {
       if (entry.disabled_by || entry.hidden_by || !hass.states[entry.entity_id]) continue;
+      if (isInternalEntity(entry)) continue;
       const domain = getDomain(entry.entity_id);
+      if (excludedDomains.has(normalizeToken(domain))) continue;
       if (allowedDomains.length && !allowedDomains.includes(domain)) continue;
+      if (!globConfigAllows(entry.entity_id, config)) continue;
 
       const device = entry.device_id ? deviceById.get(entry.device_id) : undefined;
       if (device?.disabled_by) continue;
@@ -119,7 +124,9 @@ function discoverAreaEntities(
 
   for (const [entityId, stateObj] of Object.entries(hass.states)) {
     const domain = getDomain(entityId);
+    if (excludedDomains.has(normalizeToken(domain))) continue;
     if (allowedDomains.length && !allowedDomains.includes(domain)) continue;
+    if (!globConfigAllows(entityId, config)) continue;
     const area = stringAttr(stateObj.attributes.area) ?? stringAttr(stateObj.attributes.area_id);
     if (!area) continue;
     if (areaFilters.size && !areaFilters.has(normalizeToken(area))) continue;
@@ -138,6 +145,7 @@ function toEntityMeta(
   const stateObj = hass?.states[entry.entity];
   const registryEntity = registry.entities.find((item) => item.entity_id === entry.entity);
   if (registryEntity?.disabled_by || registryEntity?.hidden_by) return undefined;
+  if (registryEntity && isInternalEntity(registryEntity)) return undefined;
 
   const device = registryEntity?.device_id ? registry.devices.find((item) => item.id === registryEntity.device_id) : undefined;
   if (device?.disabled_by) return undefined;
@@ -147,6 +155,7 @@ function toEntityMeta(
   if (config.areas?.length && (!area || !matchesConfiguredArea(area, areaId, config.areas))) return undefined;
 
   const domain = entry.domain ?? getDomain(entry.entity);
+  if (!domainConfigAllows(entry.entity, domain, config)) return undefined;
   const labels = mergeLabels(
     registryEntity?.labels,
     device?.labels,
@@ -155,9 +164,13 @@ function toEntityMeta(
   const friendly = stateObj ? hass?.formatEntityName?.(stateObj) : undefined;
   const attrName = stateObj?.attributes?.friendly_name;
 
+  const registryName = registryEntity?.name ?? registryEntity?.original_name ?? undefined;
+  const friendlyName = typeof friendly === "string" && friendly.trim() ? friendly : undefined;
+  const attributeName = typeof attrName === "string" && attrName.trim() ? attrName : undefined;
+
   return {
     entity_id: entry.entity,
-    name: entry.name ?? registryEntity?.name ?? friendly ?? (typeof attrName === "string" ? attrName : humanizeEntityId(entry.entity)),
+    name: entry.name ?? friendlyName ?? attributeName ?? registryName ?? humanizeEntityId(entry.entity),
     area,
     area_id: areaId,
     domain,
@@ -165,6 +178,24 @@ function toEntityMeta(
     labels,
     config: entry,
   };
+}
+
+function domainConfigAllows(entityId: string, domain: string, config: ActivityHistoryCardConfig): boolean {
+  if (config.domains?.length && !normalizedSet(config.domains).has(normalizeToken(domain))) return false;
+  if (normalizedSet(config.exclude_domains ?? []).has(normalizeToken(domain))) return false;
+  return globConfigAllows(entityId, config);
+}
+
+function globConfigAllows(entityId: string, config: ActivityHistoryCardConfig): boolean {
+  const includeGlobs = config.include_entity_globs ?? [];
+  const excludeGlobs = [...(config.exclude_entities ?? []), ...(config.exclude_entity_globs ?? [])];
+  if (includeGlobs.length && !includeGlobs.some((pattern) => wildcardToRegExp(pattern).test(entityId))) return false;
+  if (excludeGlobs.length && excludeGlobs.some((pattern) => wildcardToRegExp(pattern).test(entityId))) return false;
+  return true;
+}
+
+function isInternalEntity(entry: EntityRegistryEntry): boolean {
+  return entry.entity_category === "config" || entry.entity_category === "diagnostic";
 }
 
 function labelConfigAllows(entityLabels: string[], config: ActivityHistoryCardConfig, labelRegistry: LabelRegistryEntry[]): boolean {

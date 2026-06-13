@@ -37,6 +37,7 @@ mock_data: false
 auto_discover: true
 display_mode: panel
 hours_to_show: 24
+refresh_interval_seconds: 300
 group_by: area
 exclude_labels:
   - לא להצגה
@@ -64,6 +65,21 @@ domains:
 ```
 
 אם לא מגדירים `domains`, הכרטיס משתמש בדומיינים שימושיים כברירת מחדל כדי להימנע מרעש של חיישנים כלליים.
+ברירת המחדל השמרנית כוללת רק: `light`, `switch`, `climate`, `media_player`, `cover`, `fan`.
+
+אפשר גם להשתמש ב-globs:
+
+```yaml
+type: custom:activity-history-card
+auto_discover: true
+include_entity_globs:
+  - light.*
+  - switch.kitchen_*
+exclude_entity_globs:
+  - switch.router*
+exclude_domains:
+  - sensor
+```
 
 ## רשימת entities ידנית
 
@@ -122,6 +138,10 @@ debug: true
 - טווח בקשת ההיסטוריה
 - האם נדרשו attributes
 - זמינות area/entity/device/label registries
+- סיבת הרענון האחרונה
+- משך fetch אחרון
+- cache hit/miss
+- refresh interval פעיל
 
 כאשר `debug: false`, הכרטיס לא אמור להציף את ה-console.
 
@@ -148,6 +168,7 @@ display_mode: panel
 | `include_labels` | none | מציג רק רכיבים עם labels אלה |
 | `exclude_labels` | none | מסתיר רכיבים עם labels אלה |
 | `hours_to_show` | `24` | טווח זמן להצגה |
+| `refresh_interval_seconds` | `300` | תדירות רענון רקע כאשר `live: true` |
 | `group_by` | `area` | `area`, `domain`, `entity`, `none` |
 | `display_mode` | `panel` | `card`, `panel`, `fullscreen` |
 | `debug` | `false` | מציג דיאגנוסטיקה בכרטיס |

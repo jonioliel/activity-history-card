@@ -1,11 +1,13 @@
 import { LitElement, html, nothing, type TemplateResult } from "lit";
-import { DEFAULT_CONFIG, DOMAIN_LABELS_HE } from "./defaults";
+import { CATEGORY_LABELS_HE, DEFAULT_CONFIG, DOMAIN_LABELS_HE } from "./defaults";
 import { resolveEntityMetasWithDiagnostics } from "./entity-resolver";
 import { filterRows, groupRows } from "./filters";
+import { buildHistoryCacheKey } from "./history-key";
 import { fetchHistory, getHistoryRequestPlan } from "./history-client";
 import { formatDuration, formatTime, isRtl, resolveTimeRange } from "./format";
 import { intervalizeHistory } from "./intervalize";
 import { getMockEntities, getMockHistory } from "./mock-data";
+import { normalizeRefreshIntervalSeconds, shouldRefreshFromHassSetter, type HistoryRefreshReason } from "./refresh-policy";
 import { renderCorrelationPlaceholder } from "./renderers/correlation-renderer";
 import { renderDetailPlaceholder } from "./renderers/detail-renderer";
 import { renderHeatmapPlaceholder } from "./renderers/heatmap-renderer";
@@ -67,7 +69,13 @@ export class ActivityHistoryCard extends LitElement {
   private _usingMockData = false;
   private _fetchToken = 0;
   private _lastFetchKey = "";
-  private _fetchDebounce?: number;
+  private _hasFetchedOnce = false;
+  private _initialLoad = false;
+  private _backgroundLoading = false;
+  private _lastResolvedEntityKey = "";
+  private _lastHistoryFetchAt = 0;
+  private _refreshTimer?: number;
+  private _inFlightHistoryRequest?: Promise<void>;
   private _historyCache = new Map<string, Record<string, HistoryStateRecord[]>>();
   private _unsubscribeHistory?: () => void;
 
@@ -112,20 +120,36 @@ export class ActivityHistoryCard extends LitElement {
     };
 
     this._lastFetchKey = "";
+    this._lastResolvedEntityKey = "";
     this._historyCache.clear();
-    this._scheduleFetch();
+    this._syncRefreshTimer();
+    this._requestHistoryRefresh(this._hasFetchedOnce ? "config" : "initial", { force: true });
   }
 
   set hass(hass: HomeAssistant) {
     this._hass = hass;
-    this._scheduleFetch();
+    const shouldRefresh = shouldRefreshFromHassSetter({
+      hasFetchedOnce: this._hasFetchedOnce,
+      live: this._config?.live !== false,
+      lastHistoryFetchAt: this._lastHistoryFetchAt,
+      now: Date.now(),
+      refreshIntervalSeconds: this._refreshIntervalSeconds(),
+    });
+    if (shouldRefresh) {
+      this._requestHistoryRefresh(this._hasFetchedOnce ? "interval" : "initial");
+    } else {
+      this.requestUpdate();
+    }
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this._unsubscribeHistory?.();
     this._unsubscribeHistory = undefined;
-    if (this._fetchDebounce) window.clearTimeout(this._fetchDebounce);
+    this._fetchToken += 1;
+    if (this._refreshTimer) window.clearTimeout(this._refreshTimer);
+    this._refreshTimer = undefined;
+    this._inFlightHistoryRequest = undefined;
     document.removeEventListener("keydown", this._onDocumentKeyDown);
     document.removeEventListener("fullscreenchange", this._onFullscreenChange);
   }
@@ -155,13 +179,14 @@ export class ActivityHistoryCard extends LitElement {
       this._fullscreen || this._config.display_mode === "fullscreen" ? "ahc--fullscreen" : "",
       this._filterSheetOpen ? "ahc--sheet-open" : "",
       this._usingMockData ? "ahc--mock" : "",
+      this._backgroundLoading ? "ahc--background-loading" : "",
       this._rows.length > 40 ? "ahc--dense" : "",
     ]
       .filter(Boolean)
       .join(" ");
 
     return html`
-      <ha-card class=${classes} dir=${rtl ? "rtl" : "ltr"} tabindex=${this._fullscreen ? "0" : "-1"}>
+      <ha-card class=${classes} dir=${rtl ? "rtl" : "ltr"} tabindex=${this._fullscreen ? "0" : "-1"} aria-busy=${this._initialLoad ? "true" : "false"}>
         ${this._renderHeader()} ${this._renderFilters()} ${this._renderSummary()}
         ${this._config.debug ? this._renderDiagnostics() : nothing}
         <div class=${this._config.show_insights === false ? "ahc__body ahc__body--no-insights" : "ahc__body"}>
@@ -191,10 +216,10 @@ export class ActivityHistoryCard extends LitElement {
                   <span>${this._fullscreen ? "צא ממסך מלא" : "מסך מלא"}</span>
                 </button>
               `}
-          <div class="ahc__segmented" aria-label="קיבוץ לפי">
-            <button class="ahc__segmented-button" type="button" aria-pressed=${this._filter.groupBy === "area"} @click=${() => this._setGroupBy("area")}>אזור</button>
-            <button class="ahc__segmented-button" type="button" aria-pressed=${this._filter.groupBy === "domain"} @click=${() => this._setGroupBy("domain")}>סוג</button>
-          </div>
+          <button class="ahc__button ahc__button--ghost" type="button" @click=${this._manualRefresh} ?disabled=${this._initialLoad || this._backgroundLoading}>
+            <span aria-hidden="true">↻</span><span>רענן</span>
+          </button>
+          ${this._backgroundLoading ? html`<span class="ahc__refresh-indicator" role="status">מעדכן...</span>` : nothing}
           <div class="ahc__search">
             <span class="ahc__search-icon" aria-hidden="true">⌕</span>
             <input
@@ -224,28 +249,38 @@ export class ActivityHistoryCard extends LitElement {
     if (this._config.filters?.show === false) return nothing;
     const domains = this._availableDomains();
     const areas = this._availableAreas();
+    const visibleAreas = areas.slice(0, 5);
+    const hiddenAreaCount = Math.max(0, areas.length - visibleAreas.length);
 
     return html`
       <section class="ahc__filters" aria-label="מסננים">
-        <div class="ahc__filter-row">
+        <div class="ahc__filter-row ahc__filter-row--primary">
           <span class="ahc__filter-label">טווח זמן</span>
           ${this._renderChip("24 שעות", this._filter.timePreset === "24h", () => this._setTimePreset("24h"))}
           ${this._renderChip("7 ימים", this._filter.timePreset === "7d", () => this._setTimePreset("7d"))}
           ${this._renderChip("מותאם", this._filter.timePreset === "custom", () => this._setTimePreset("custom"))}
+          <span class="ahc__filter-label">קבץ לפי</span>
+          <div class="ahc__segmented" aria-label="קיבוץ לפי">
+            <button class="ahc__segmented-button" type="button" aria-pressed=${this._filter.groupBy === "area"} @click=${() => this._setGroupBy("area")}>אזור</button>
+            <button class="ahc__segmented-button" type="button" aria-pressed=${this._filter.groupBy === "domain"} @click=${() => this._setGroupBy("domain")}>סוג</button>
+          </div>
         </div>
         ${this._config.filters?.show_area_chips === false
           ? nothing
           : html`
-              <div class="ahc__filter-row">
+              <div class="ahc__filter-row ahc__filter-row--compact">
                 <span class="ahc__filter-label">אזור</span>
                 ${this._renderChip("הכל", !this._filter.areas.length, () => this._setAreas([]))}
-                ${areas.map((area) => this._renderChip(area, this._filter.areas.includes(area), () => this._toggleArea(area)))}
+                ${visibleAreas.map((area) => this._renderChip(area, this._filter.areas.includes(area), () => this._toggleArea(area)))}
+                ${hiddenAreaCount
+                  ? html`<button class="ahc__chip ahc__chip--more" type="button" @click=${this._openFilterSheet}>עוד ${hiddenAreaCount}...</button>`
+                  : nothing}
               </div>
             `}
         ${this._config.filters?.show_domain_chips === false
           ? nothing
           : html`
-              <div class="ahc__filter-row">
+              <div class="ahc__filter-row ahc__filter-row--compact">
                 <span class="ahc__filter-label">סוג ישות</span>
                 ${this._renderChip("הכל", !this._filter.domains.length, () => this._setDomains([]))}
                 ${domains.map((domain) => this._renderChip(DOMAIN_LABELS_HE[domain] ?? domain, this._filter.domains.includes(domain), () => this._toggleDomain(domain)))}
@@ -272,19 +307,32 @@ export class ActivityHistoryCard extends LitElement {
   private _renderSummary(): TemplateResult | typeof nothing {
     if (this._config.show_summary === false) return nothing;
     const summary = this._summary;
+    const lastEventRow = summary?.lastEventRow;
+    const lastEventState = summary?.lastEvent ? CATEGORY_LABELS_HE[summary.lastEvent.category] : undefined;
+    const lastEventSubtitle = lastEventRow
+      ? [lastEventRow.entity.area, lastEventState, this._config.debug ? lastEventRow.entity.entity_id : undefined].filter(Boolean).join(" · ")
+      : "לא נמצאו אירועים";
     return html`
       <section class="ahc__summary-grid" aria-label="סיכום פעילות">
         <article class="ahc__metric">
           <div class="ahc__metric-copy">
-            <span class="ahc__metric-label">זמן פעילות</span>
+            <span class="ahc__metric-label">סה״כ שעות־רכיב</span>
             <span class="ahc__metric-value ahc__metric-value--positive">${formatDuration(summary?.totalActiveMs ?? 0)}</span>
-            <span class="ahc__metric-subtitle">בטווח הנבחר</span>
+            <span class="ahc__metric-subtitle">סכום פעילות על פני כל הרכיבים</span>
           </div>
           <span class="ahc__metric-icon" aria-hidden="true">◷</span>
         </article>
         <article class="ahc__metric">
           <div class="ahc__metric-copy">
-            <span class="ahc__metric-label">מספר אירועים</span>
+            <span class="ahc__metric-label">רכיבים שפעלו</span>
+            <span class="ahc__metric-value">${summary?.activeEntityCount ?? 0}</span>
+            <span class="ahc__metric-subtitle">מתוך ${this._rows.length} רכיבים שנבחרו</span>
+          </div>
+          <span class="ahc__metric-icon" aria-hidden="true">▣</span>
+        </article>
+        <article class="ahc__metric">
+          <div class="ahc__metric-copy">
+            <span class="ahc__metric-label">אירועים</span>
             <span class="ahc__metric-value">${summary?.eventCount ?? 0}</span>
             <span class="ahc__metric-subtitle">שינויי מצב פעילים</span>
           </div>
@@ -302,7 +350,8 @@ export class ActivityHistoryCard extends LitElement {
           <div class="ahc__metric-copy">
             <span class="ahc__metric-label">אירוע אחרון</span>
             <span class="ahc__metric-value">${summary?.lastEvent ? formatTime(summary.lastEvent.start) : "אין"}</span>
-            <span class="ahc__metric-subtitle">${summary?.lastEvent?.entity_id ?? "לא נמצאו אירועים"}</span>
+            <span class="ahc__metric-subtitle">${lastEventRow?.entity.name ?? lastEventSubtitle}</span>
+            ${lastEventRow ? html`<span class="ahc__metric-subtitle">${lastEventSubtitle}</span>` : nothing}
           </div>
           <span class="ahc__metric-icon" aria-hidden="true">♫</span>
         </article>
@@ -311,11 +360,10 @@ export class ActivityHistoryCard extends LitElement {
   }
 
   private _renderMainContent(): TemplateResult {
-    if (this._loading) {
-      const message = !this._hass && !this._usingMockData ? "ממתין לחיבור Home Assistant." : "מושך נתוני פעילות מ-Home Assistant.";
-      return html`<div class="ahc-state-card"><div><h3 class="ahc-state-card__title">טוען היסטוריה...</h3><p>${message}</p></div></div>`;
+    if (this._initialLoad && !this._rows.length) {
+      return this._renderInitialLoading();
     }
-    if (this._error) {
+    if (this._error && !this._rows.length) {
       return html`<div class="ahc-state-card"><div><h3 class="ahc-state-card__title">שגיאה בטעינת ההיסטוריה</h3><p>${this._error}</p></div></div>`;
     }
     if (this._emptyReason || !this._groups.length) {
@@ -339,6 +387,28 @@ export class ActivityHistoryCard extends LitElement {
           summary: this._summary ?? summarizeActivity(this._groups),
         });
     }
+  }
+
+  private _renderInitialLoading(): TemplateResult {
+    const message = !this._hass && !this._usingMockData ? "ממתין לחיבור Home Assistant." : "מושך היסטוריה מה-Recorder.";
+    return html`
+      <section class="ahc-loading" aria-label="טעינת היסטוריה" aria-busy="true">
+        <div class="ahc-loading__copy">
+          <h3>טוען ציר זמן...</h3>
+          <p>${message}</p>
+        </div>
+        <div class="ahc-loading__timeline" aria-hidden="true">
+          ${Array.from({ length: 4 }).map(
+            (_, groupIndex) => html`
+              <div class="ahc-loading__group">
+                <span></span>
+                ${Array.from({ length: 5 }).map((__, rowIndex) => html`<i style="--delay:${groupIndex + rowIndex}; --width:${42 + ((groupIndex + rowIndex) % 4) * 12}%"></i>`)}
+              </div>
+            `,
+          )}
+        </div>
+      </section>
+    `;
   }
 
   private _renderEmptyState(reason: EmptyStateReason): TemplateResult {
@@ -389,15 +459,15 @@ export class ActivityHistoryCard extends LitElement {
   private _renderDiagnostics(): TemplateResult {
     const diagnostics = this._diagnostics;
     if (!diagnostics) {
-      return html`<section class="ahc-debug" aria-label="אבחון"><strong>Debug</strong><span>ממתין לטעינת נתונים...</span></section>`;
+      return html`<details class="ahc-debug" aria-label="אבחון"><summary>Debug · ממתין לטעינת נתונים...</summary></details>`;
     }
 
     return html`
-      <section class="ahc-debug" aria-label="אבחון">
-        <div class="ahc-debug__header">
+      <details class="ahc-debug" aria-label="אבחון">
+        <summary class="ahc-debug__header">
           <strong>Debug</strong>
-          <span>${diagnostics.cacheHit ? "cache hit" : "loaded"}</span>
-        </div>
+          <span>${diagnostics.fetchReason ?? "loaded"} · ${diagnostics.cacheHit ? "cache hit" : "cache miss"}</span>
+        </summary>
         <dl class="ahc-debug__grid">
           <div><dt>רכיבים</dt><dd>${diagnostics.resolvedEntityCount}</dd></div>
           <div><dt>רשומות</dt><dd>${diagnostics.historyRecordCount}</dd></div>
@@ -407,15 +477,20 @@ export class ActivityHistoryCard extends LitElement {
           <div><dt>קבוצות</dt><dd>${diagnostics.renderedGroupCount}</dd></div>
           <div><dt>attributes</dt><dd>${diagnostics.attributesRequested.withAttributes}/${diagnostics.attributesRequested.withoutAttributes}</dd></div>
           <div><dt>registry</dt><dd>${diagnostics.discovery?.registryAvailable ? "זמין" : "fallback"}</dd></div>
+          <div><dt>refresh</dt><dd>${diagnostics.refreshIntervalSeconds ?? this._refreshIntervalSeconds()}s</dd></div>
+          <div><dt>duration</dt><dd>${diagnostics.fetchDurationMs ?? 0}ms</dd></div>
+          <div><dt>mode</dt><dd>${diagnostics.initialLoad ? "initial" : diagnostics.backgroundLoading ? "background" : "idle"}</dd></div>
         </dl>
         <p class="ahc-debug__meta" dir="ltr">
           ${diagnostics.historyRange ? `${diagnostics.historyRange.start.toISOString()} → ${diagnostics.historyRange.end.toISOString()}` : "no range"}
         </p>
+        <p class="ahc-debug__meta" dir="ltr">last fetch: ${diagnostics.lastFetchTime?.toISOString() ?? "never"}</p>
+        <p class="ahc-debug__meta" dir="ltr">history key: ${diagnostics.currentHistoryKey ?? "none"}</p>
         <p class="ahc-debug__meta">מסננים: ${JSON.stringify(diagnostics.activeFilters)}</p>
         ${diagnostics.discovery?.unavailableReasons.length
           ? html`<p class="ahc-debug__meta">Registry warnings: ${diagnostics.discovery.unavailableReasons.join(", ")}</p>`
           : nothing}
-      </section>
+      </details>
     `;
   }
 
@@ -446,6 +521,7 @@ export class ActivityHistoryCard extends LitElement {
   private _renderFilterSheet(): TemplateResult {
     const areas = this._availableAreas();
     const domains = this._availableDomains();
+    const selectedRows = filterRows(this._rows, this._filter);
 
     return html`
       <div class="ahc-filter-sheet-backdrop" @click=${this._closeFilterSheet}></div>
@@ -507,6 +583,21 @@ export class ActivityHistoryCard extends LitElement {
           </div>
         </div>
 
+        <div class="ahc-filter-section">
+          <div class="ahc-filter-section__title"><span>רכיבים נבחרים</span><span>${selectedRows.length}</span></div>
+          <div class="ahc-entity-list">
+            ${selectedRows.slice(0, 32).map(
+              (row) => html`
+                <span class="ahc-entity-list__item">
+                  <span>${row.entity.name}</span>
+                  <small>${[row.entity.area, DOMAIN_LABELS_HE[row.entity.domain] ?? row.entity.domain].filter(Boolean).join(" · ")}</small>
+                </span>
+              `,
+            )}
+            ${selectedRows.length > 32 ? html`<span class="ahc-entity-list__more">ועוד ${selectedRows.length - 32} רכיבים</span>` : nothing}
+          </div>
+        </div>
+
         <footer class="ahc-filter-sheet__footer">
           <button class="ahc__button ahc__button--ghost" type="button" @click=${this._clearFilters}>נקה סינון</button>
           <button class="ahc__button ahc__button--primary" type="button" @click=${this._closeFilterSheet}>החל סינון</button>
@@ -529,21 +620,29 @@ export class ActivityHistoryCard extends LitElement {
     this.requestUpdate();
   };
 
-  private _scheduleFetch(): void {
-    if (this._fetchDebounce) window.clearTimeout(this._fetchDebounce);
-    this._fetchDebounce = window.setTimeout(() => {
-      this._fetchDebounce = undefined;
-      void this._fetchAndRender();
-    }, 120);
+  private _requestHistoryRefresh(reason: HistoryRefreshReason, options: { force?: boolean } = {}): void {
+    if (!this._config) return;
+    if (this._inFlightHistoryRequest && !options.force) return;
+
+    const request = this._fetchAndRender(reason, options.force === true);
+    this._inFlightHistoryRequest = request;
+    void request.finally(() => {
+      if (this._inFlightHistoryRequest === request) {
+        this._inFlightHistoryRequest = undefined;
+      }
+    });
   }
 
-  private async _fetchAndRender(): Promise<void> {
+  private async _fetchAndRender(reason: HistoryRefreshReason, force: boolean): Promise<void> {
     if (!this._config) return;
 
+    const startedAt = Date.now();
     const useMockData = this._config.mock_data === true;
     if (!this._hass && !useMockData) {
       this._usingMockData = false;
-      this._loading = true;
+      this._initialLoad = !this._rows.length;
+      this._loading = this._initialLoad;
+      this._backgroundLoading = false;
       this._error = undefined;
       this._emptyReason = undefined;
       this.requestUpdate();
@@ -551,9 +650,12 @@ export class ActivityHistoryCard extends LitElement {
     }
 
     const token = ++this._fetchToken;
-    this._loading = !useMockData;
+    const initialLoad = !this._hasFetchedOnce && !this._rows.length;
+    this._initialLoad = initialLoad;
+    this._loading = initialLoad;
+    this._backgroundLoading = !initialLoad;
     this._error = undefined;
-    this._emptyReason = undefined;
+    if (!this._rows.length) this._emptyReason = undefined;
     this._usingMockData = useMockData;
     this.requestUpdate();
 
@@ -563,13 +665,14 @@ export class ActivityHistoryCard extends LitElement {
     if (token !== this._fetchToken) return;
 
     const entities = resolved.entities;
+    const entityKey = buildEntityKey(entities);
     const range = this._resolveRange();
     const requestPlan = getHistoryRequestPlan(entities);
-    const key = JSON.stringify({
+    const key = buildHistoryCacheKey({
       mock: useMockData,
       start: range.start.toISOString(),
       end: range.end.toISOString(),
-      entities: entities.map((entity) => entity.entity_id),
+      entityIds: entities.map((entity) => entity.entity_id),
       withAttributes: requestPlan.withAttributes.map((entity) => entity.entity_id),
       withoutAttributes: requestPlan.withoutAttributes.map((entity) => entity.entity_id),
       includeLabels: this._config.include_labels ?? [],
@@ -577,6 +680,20 @@ export class ActivityHistoryCard extends LitElement {
       significant: this._config.significant_changes_only,
       minimal: this._config.minimal_response,
     });
+    const bypassCache = force && ["manual", "timer", "interval", "config"].includes(reason);
+    const entitySetChanged = Boolean(this._lastResolvedEntityKey && this._lastResolvedEntityKey !== entityKey);
+    const fetchReason = entitySetChanged && reason === "interval" ? "entities" : reason;
+    const finishDiagnostics = (cacheHit: boolean, historyRecordCount: number, discovery = resolved.diagnostics): void => {
+      this._lastResolvedEntityKey = entityKey;
+      this._lastHistoryFetchAt = Date.now();
+      this._hasFetchedOnce = true;
+      this._setPostLoadState(historyRecordCount, range, requestPlan, cacheHit, useMockData, discovery, {
+        reason: fetchReason,
+        key,
+        durationMs: Date.now() - startedAt,
+      });
+      this._syncRefreshTimer();
+    };
 
     if (!entities.length) {
       this._usingMockData = false;
@@ -597,20 +714,35 @@ export class ActivityHistoryCard extends LitElement {
         cacheHit: false,
         mockData: useMockData,
         discovery: resolved.diagnostics,
+        lastFetchTime: new Date(),
+        fetchDurationMs: Date.now() - startedAt,
+        fetchReason,
+        currentHistoryKey: key,
+        refreshIntervalSeconds: this._refreshIntervalSeconds(),
+        initialLoad,
+        backgroundLoading: false,
       });
+      this._hasFetchedOnce = true;
+      this._lastResolvedEntityKey = entityKey;
+      this._lastHistoryFetchAt = Date.now();
+      this._initialLoad = false;
       this._loading = false;
+      this._backgroundLoading = false;
       this._error = undefined;
+      this._syncRefreshTimer();
       this.requestUpdate();
       return;
     }
 
-    if (key === this._lastFetchKey) {
+    if (!bypassCache && key === this._lastFetchKey) {
       const cached = this._historyCache.get(key);
       if (cached) {
         const historyRecordCount = countHistoryRecords(cached);
         this._rows = intervalizeHistory(cached, entities, range, this._config, this._hass?.states ?? {});
-        this._setPostLoadState(historyRecordCount, range, requestPlan, true, useMockData, resolved.diagnostics);
+        finishDiagnostics(true, historyRecordCount);
+        this._initialLoad = false;
         this._loading = false;
+        this._backgroundLoading = false;
         this._error = undefined;
         this._rebuildGroups();
         return;
@@ -618,7 +750,7 @@ export class ActivityHistoryCard extends LitElement {
     }
 
     try {
-      let history = this._historyCache.get(key);
+      let history = bypassCache ? undefined : this._historyCache.get(key);
       if (!history) {
         history = useMockData ? getMockHistory(range) : await fetchHistory(this._hass as HomeAssistant, entities, range, this._config);
         this._historyCache.set(key, history);
@@ -626,18 +758,21 @@ export class ActivityHistoryCard extends LitElement {
       if (token !== this._fetchToken) return;
       const historyRecordCount = countHistoryRecords(history);
       this._rows = intervalizeHistory(history, entities, range, this._config, this._hass?.states ?? {});
-      this._setPostLoadState(historyRecordCount, range, requestPlan, false, useMockData, resolved.diagnostics);
+      finishDiagnostics(false, historyRecordCount);
       this._lastFetchKey = key;
       this._rebuildGroups();
     } catch (error) {
       this._error = error instanceof Error ? error.message : String(error);
-      this._rows = [];
-      this._groups = [];
-      this._summary = summarizeActivity([]);
-      this._emptyReason = undefined;
+      if (!this._rows.length) {
+        this._groups = [];
+        this._summary = summarizeActivity([]);
+        this._emptyReason = undefined;
+      }
     } finally {
       if (token === this._fetchToken) {
+        this._initialLoad = false;
         this._loading = false;
+        this._backgroundLoading = false;
         this.requestUpdate();
       }
     }
@@ -670,6 +805,7 @@ export class ActivityHistoryCard extends LitElement {
     cacheHit: boolean,
     mockData: boolean,
     discovery: ActivityDiagnostics["discovery"],
+    fetchMeta: { reason: string; key: string; durationMs: number },
   ): void {
     const timelineSegmentCount = this._rows.reduce((sum, row) => sum + row.segments.length, 0);
     const activeTimelineSegmentCount = this._rows.reduce((sum, row) => sum + row.segments.filter((segment) => segment.active).length, 0);
@@ -698,11 +834,34 @@ export class ActivityHistoryCard extends LitElement {
       cacheHit,
       mockData,
       discovery,
+      lastFetchTime: new Date(this._lastHistoryFetchAt || Date.now()),
+      fetchDurationMs: fetchMeta.durationMs,
+      fetchReason: fetchMeta.reason,
+      currentHistoryKey: fetchMeta.key,
+      refreshIntervalSeconds: this._refreshIntervalSeconds(),
+      initialLoad: this._initialLoad,
+      backgroundLoading: this._backgroundLoading,
     });
   }
 
   private _setDiagnostics(diagnostics: ActivityDiagnostics): void {
     this._diagnostics = diagnostics;
+  }
+
+  private _syncRefreshTimer(): void {
+    if (this._refreshTimer) window.clearTimeout(this._refreshTimer);
+    this._refreshTimer = undefined;
+    if (!this._config || this._config.live === false) return;
+
+    const intervalSeconds = this._refreshIntervalSeconds();
+    this._refreshTimer = window.setTimeout(() => {
+      this._refreshTimer = undefined;
+      this._requestHistoryRefresh("timer", { force: true });
+    }, intervalSeconds * 1000);
+  }
+
+  private _refreshIntervalSeconds(): number {
+    return normalizeRefreshIntervalSeconds(this._config?.refresh_interval_seconds);
   }
 
   private _resolveRange(): TimeRange {
@@ -769,20 +928,31 @@ export class ActivityHistoryCard extends LitElement {
     if (this._filter.timePreset === timePreset) return;
     this._filter = { ...this._filter, timePreset };
     this._lastFetchKey = "";
-    this._scheduleFetch();
+    this._requestHistoryRefresh("range", { force: true });
   }
 
   private _clearFilters = (): void => {
+    const previousTimePreset = this._filter.timePreset;
+    const nextTimePreset = this._initialTimePreset(this._config);
     this._filter = {
       search: "",
       areas: [],
       domains: [],
       stateMode: "all",
       groupBy: this._config.group_by ?? "area",
-      timePreset: this._initialTimePreset(this._config),
+      timePreset: nextTimePreset,
     };
+    this._rebuildGroups();
+    if (previousTimePreset !== nextTimePreset) {
+      this._lastFetchKey = "";
+      this._requestHistoryRefresh("range", { force: true });
+    }
+  };
+
+  private _manualRefresh = (): void => {
+    this._historyCache.clear();
     this._lastFetchKey = "";
-    this._scheduleFetch();
+    this._requestHistoryRefresh("manual", { force: true });
   };
 
   private _toggleFullscreen = async (): Promise<void> => {
@@ -848,6 +1018,13 @@ function countHistoryRecords(history: Record<string, HistoryStateRecord[]>): num
   return Object.values(history).reduce((sum, records) => sum + records.length, 0);
 }
 
+function buildEntityKey(rows: TimelineRow[] | Array<{ entity_id: string }>): string {
+  return rows
+    .map((row) => ("entity" in row ? row.entity.entity_id : row.entity_id))
+    .sort()
+    .join("|");
+}
+
 if (!customElements.get("activity-history-card")) {
   customElements.define("activity-history-card", ActivityHistoryCard);
 }
@@ -869,5 +1046,4 @@ if (!window.customCards.some((card) => card.type === "activity-history-card")) {
   });
 }
 
-// eslint-disable-next-line no-console
-console.info(`%c ACTIVITY-HISTORY-CARD %c ${CARD_VERSION} `, "color:#38bdf8;font-weight:700", "color:#94a3b8");
+void CARD_VERSION;

@@ -26,6 +26,20 @@ function makeHass(): HomeAssistant {
         last_changed: "2026-01-01T00:00:00.000Z",
         last_updated: "2026-01-01T00:00:00.000Z",
       },
+      "binary_sensor.motion": {
+        entity_id: "binary_sensor.motion",
+        state: "on",
+        attributes: { friendly_name: "תנועה" },
+        last_changed: "2026-01-01T00:00:00.000Z",
+        last_updated: "2026-01-01T00:00:00.000Z",
+      },
+      "lock.front_door": {
+        entity_id: "lock.front_door",
+        state: "unlocked",
+        attributes: { friendly_name: "דלת כניסה" },
+        last_changed: "2026-01-01T00:00:00.000Z",
+        last_updated: "2026-01-01T00:00:00.000Z",
+      },
     },
     callWS: async <T = unknown>({ type }: Record<string, unknown>): Promise<T> => {
       let result: unknown = [];
@@ -37,6 +51,8 @@ function makeHass(): HomeAssistant {
           { id: "device-light", area_id: "kitchen", labels: [] },
           { id: "device-safe", area_id: "kitchen", labels: ["protected"] },
           { id: "device-sensor", area_id: "kitchen", labels: [] },
+          { id: "device-motion", area_id: "kitchen", labels: [] },
+          { id: "device-lock", area_id: "kitchen", labels: [] },
         ];
       }
       if (type === "config/entity_registry/list") {
@@ -44,6 +60,8 @@ function makeHass(): HomeAssistant {
           { entity_id: "light.kitchen", device_id: "device-light", labels: ["show"] },
           { entity_id: "switch.safe", device_id: "device-safe", labels: [] },
           { entity_id: "sensor.temperature", device_id: "device-sensor", labels: [] },
+          { entity_id: "binary_sensor.motion", device_id: "device-motion", labels: [] },
+          { entity_id: "lock.front_door", device_id: "device-lock", labels: [] },
         ];
       }
       if (type === "config/label_registry/list") {
@@ -77,6 +95,29 @@ describe("resolveEntityMetas", () => {
     const rows = await resolveEntityMetas({ type: "custom:activity-history-card", auto_discover: true }, makeHass());
     expect(rows.map((row) => row.entity_id)).toEqual(["light.kitchen", "switch.safe"]);
     expect(rows[0]?.area).toBe("מטבח");
+  });
+
+  it("allows noisy domains only when domains are explicitly configured", async () => {
+    const rows = await resolveEntityMetas(
+      { type: "custom:activity-history-card", auto_discover: true, domains: ["binary_sensor", "lock"] },
+      makeHass(),
+    );
+
+    expect(rows.map((row) => row.entity_id)).toEqual(["binary_sensor.motion", "lock.front_door"]);
+  });
+
+  it("supports include and exclude entity globs", async () => {
+    const rows = await resolveEntityMetas(
+      {
+        type: "custom:activity-history-card",
+        auto_discover: true,
+        include_entity_globs: ["*.kitchen", "switch.*"],
+        exclude_entity_globs: ["switch.safe"],
+      },
+      makeHass(),
+    );
+
+    expect(rows.map((row) => row.entity_id)).toEqual(["light.kitchen"]);
   });
 
   it("excludes entities by label display name or id", async () => {

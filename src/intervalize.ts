@@ -79,6 +79,14 @@ export function classifyState(
   const activeStates = configActiveStates ?? DEFAULT_ACTIVE_STATES[domain] ?? ["on"];
   const activeAttributes = entity.config?.active_attributes ?? DEFAULT_ACTIVE_ATTRIBUTES[domain] ?? {};
 
+  if (domain === "climate" && !entity.config?.active_states) {
+    const hvacAction = attributes?.hvac_action;
+    if (typeof hvacAction === "string" && hvacAction.trim()) {
+      const values = activeAttributes.hvac_action ?? [];
+      return { category: categoryFromState(domain, hvacAction), active: values.includes(hvacAction) };
+    }
+  }
+
   for (const [attribute, values] of Object.entries(activeAttributes)) {
     const value = attributes?.[attribute];
     if (typeof value === "string" && values.includes(value)) {

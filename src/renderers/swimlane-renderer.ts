@@ -49,7 +49,7 @@ export function renderSwimlaneTimeline(options: SwimlaneRendererOptions): Templa
                       <div class="ahc-row">
                         <div class="ahc-row__label">
                           <span class="ahc-row__icon" aria-hidden="true">${row.entity.icon ?? "●"}</span>
-                          <span class="ahc-row__name" title=${row.entity.entity_id}>${row.entity.name}</span>
+                          <span class="ahc-row__name" title=${options.config.debug ? row.entity.entity_id : row.entity.name}>${row.entity.name}</span>
                           ${row.currentCategory
                             ? html`<span class="ahc-row__state-chip" data-state=${row.currentCategory}>${CATEGORY_LABELS_HE[row.currentCategory]}</span>`
                             : null}

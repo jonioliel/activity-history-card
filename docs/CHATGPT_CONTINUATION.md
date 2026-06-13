@@ -67,6 +67,16 @@ Implemented:
 - `debug: true` diagnostics panel with entity, history, timeline, filter, cache, range, attribute-request, and registry information
 - Debounced history reloads, stale request protection, and range/entity/options cache
 - Split history requests for entities that need attributes and entities that can use minimal history
+- Controlled refresh lifecycle that avoids fetching on every `hass` setter call
+- `refresh_interval_seconds` with quiet default of 300 seconds
+- Background refresh indicator that keeps the existing timeline visible
+- Manual refresh button
+- Conservative auto-discovery defaults: `light`, `switch`, `climate`, `media_player`, `cover`, `fan`
+- `include_entity_globs`, `exclude_entity_globs`, and `exclude_domains`
+- Cover `open` is not counted as active by default; `opening` and `closing` are active
+- Summary distinguishes summed entity-hours from active entity count
+- Last-event summary and insights prefer friendly names
+- Desktop filters are compact; mobile keeps the advanced filter bottom sheet
 - Placeholder renderers only for heatmap, detail, and correlation
 - HACS custom repository metadata via `hacs.json`
 - HACS-installable bundle at `dist/activity-history-card.js`
@@ -106,7 +116,7 @@ npm run build
 Latest verified results:
 
 - `npm run typecheck` passed
-- `npm run test` passed, 18 tests
+- `npm run test` passed, 30 tests
 - `npm run build` passed
 
 The generated `dist/activity-history-card.js` is intentionally tracked for HACS. `dist/activity-history-card.js.map` remains ignored.
@@ -169,6 +179,7 @@ Summarize changed files and Home Assistant testing steps.
 2. Verify the card loads as a resource and renders with `mock_data: true`.
 3. Test real `entities` from `sample-config.yaml`.
 4. Test `debug: true` against a real Home Assistant instance when no data appears.
-5. Improve tooltip/popover behavior for touch.
-6. Add more tests for RTL chronological x positions and complex filter combinations.
-7. Only after the MVP works in a real dashboard, plan drill-down/detail mode.
+5. Test that repeated Home Assistant state updates do not flicker the card.
+6. Improve tooltip/popover behavior for touch.
+7. Add more tests for RTL chronological x positions and complex filter combinations.
+8. Only after the MVP works in a real dashboard, plan drill-down/detail mode.

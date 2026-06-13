@@ -125,6 +125,65 @@ describe("intervalizeHistory", () => {
     expect(row?.totalActiveMs).toBe(60 * 60 * 1000);
   });
 
+  it("does not count cover open as active by default", () => {
+    const coverEntity: EntityMeta = {
+      entity_id: "cover.test",
+      name: "תריס",
+      domain: "cover",
+      area: "סלון",
+      config: { entity: "cover.test" },
+    };
+    const history: Record<string, HistoryStateRecord[]> = {
+      "cover.test": [
+        { entity_id: "cover.test", state: "open", last_changed: "2026-01-01T00:00:00.000Z" },
+        { entity_id: "cover.test", state: "closing", last_changed: "2026-01-01T01:00:00.000Z" },
+      ],
+    };
+
+    const [row] = intervalizeHistory(history, [coverEntity], range, { type: "custom:activity-history-card" });
+
+    expect(row?.segments.find((segment) => segment.state === "open")?.active).toBe(false);
+    expect(row?.segments.find((segment) => segment.state === "closing")?.active).toBe(true);
+  });
+
+  it("allows cover open as active when overridden per entity", () => {
+    const coverEntity: EntityMeta = {
+      entity_id: "cover.test",
+      name: "תריס",
+      domain: "cover",
+      area: "סלון",
+      config: { entity: "cover.test", active_states: ["open"] },
+    };
+    const history: Record<string, HistoryStateRecord[]> = {
+      "cover.test": [{ entity_id: "cover.test", state: "open", last_changed: "2026-01-01T00:00:00.000Z" }],
+    };
+
+    const [row] = intervalizeHistory(history, [coverEntity], range, { type: "custom:activity-history-card" });
+
+    expect(row?.segments[0]?.active).toBe(true);
+  });
+
+  it("uses climate hvac_action before falling back to climate state", () => {
+    const climateEntity: EntityMeta = {
+      entity_id: "climate.test",
+      name: "מזגן",
+      domain: "climate",
+      area: "סלון",
+      config: { entity: "climate.test" },
+    };
+    const history: Record<string, HistoryStateRecord[]> = {
+      "climate.test": [
+        { entity_id: "climate.test", state: "cool", attributes: { hvac_action: "idle" }, last_changed: "2026-01-01T00:00:00.000Z" },
+        { entity_id: "climate.test", state: "cool", attributes: { hvac_action: "cooling" }, last_changed: "2026-01-01T01:00:00.000Z" },
+      ],
+    };
+
+    const [row] = intervalizeHistory(history, [climateEntity], range, { type: "custom:activity-history-card" });
+
+    expect(row?.segments[0]?.active).toBe(false);
+    expect(row?.segments[1]?.active).toBe(true);
+  });
+
   it("filters rows by area, domain, search and active-only mode", () => {
     const history: Record<string, HistoryStateRecord[]> = {
       "switch.test": [

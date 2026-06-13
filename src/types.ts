@@ -82,15 +82,19 @@ export interface ActivityHistoryCardConfig {
   significant_changes_only?: boolean;
   minimal_response?: boolean;
   mock_data?: boolean;
+  refresh_interval_seconds?: number;
   min_duration_seconds?: number;
   merge_gap_seconds?: number;
   mobile_breakpoint?: number;
   filters?: FilterConfig;
   entities?: Array<string | EntityConfig>;
   exclude_entities?: string[];
+  include_entity_globs?: string[];
+  exclude_entity_globs?: string[];
   include_labels?: string[];
   exclude_labels?: string[];
   domains?: string[];
+  exclude_domains?: string[];
   areas?: string[];
   colors?: Partial<Record<StateCategory, string>>;
 }
@@ -170,9 +174,11 @@ export interface FilterState {
 
 export interface ActivitySummary {
   totalActiveMs: number;
+  activeEntityCount: number;
   eventCount: number;
   activeNowCount: number;
   lastEvent?: TimelineSegment;
+  lastEventRow?: TimelineRow;
   mostActiveEntity?: TimelineRow;
   mostActiveArea?: TimelineGroup;
   peakBucketLabel?: string;
@@ -207,4 +213,11 @@ export interface ActivityDiagnostics {
   cacheHit: boolean;
   mockData: boolean;
   discovery?: DiscoveryDiagnostics;
+  lastFetchTime?: Date;
+  fetchDurationMs?: number;
+  fetchReason?: string;
+  currentHistoryKey?: string;
+  refreshIntervalSeconds?: number;
+  initialLoad?: boolean;
+  backgroundLoading?: boolean;
 }
