@@ -10,6 +10,7 @@ import type {
   ActivityHistoryCardConfig,
   DisplayMode,
   HomeAssistant,
+  ViewMode,
 } from "./types";
 
 interface EditorArea {
@@ -135,6 +136,7 @@ export class ActivityHistoryCardEditor extends LitElement {
       auto_discover: config.auto_discover ?? true,
       hours_to_show: config.hours_to_show ?? DEFAULT_CONFIG.hours_to_show,
       display_mode: config.display_mode ?? DEFAULT_CONFIG.display_mode,
+      view_mode: config.view_mode ?? DEFAULT_CONFIG.view_mode,
       group_by: config.group_by ?? DEFAULT_CONFIG.group_by,
     };
     this.requestUpdate();
@@ -204,6 +206,31 @@ export class ActivityHistoryCardEditor extends LitElement {
                   this._setChecked("mock_data", event)}
               />
               נתוני דוגמה
+            </label>
+          </div>
+          <div class="row">
+            <label>
+              תצוגת ציר זמן
+              <select
+                .value=${config.view_mode ?? DEFAULT_CONFIG.view_mode}
+                @change=${(event: Event) =>
+                  this._setValue("view_mode", inputValue(event) as ViewMode)}
+              >
+                <option value="activity">Activity dashboard</option>
+                <option value="legacy_swimlane">Legacy swimlane / debug</option>
+                <option value="heatmap">Heatmap placeholder</option>
+                <option value="detail">Detail placeholder</option>
+                <option value="correlation">Correlation placeholder</option>
+              </select>
+            </label>
+            <label class="check">
+              <input
+                type="checkbox"
+                .checked=${config.show_activity_density !== false}
+                @change=${(event: Event) =>
+                  this._setChecked("show_activity_density", event)}
+              />
+              הצג פס צפיפות פעילות
             </label>
           </div>
           <label class="check">
@@ -519,7 +546,8 @@ export class ActivityHistoryCardEditor extends LitElement {
       | "show_technical_entities"
       | "show_config_entities"
       | "show_diagnostic_entities"
-      | "show_inactive_baselines",
+      | "show_inactive_baselines"
+      | "show_activity_density",
     event: Event,
   ): void {
     const checked = (event.target as HTMLInputElement).checked;

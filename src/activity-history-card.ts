@@ -21,10 +21,15 @@ import {
 import { renderCorrelationPlaceholder } from "./renderers/correlation-renderer";
 import { renderDetailPlaceholder } from "./renderers/detail-renderer";
 import { renderHeatmapPlaceholder } from "./renderers/heatmap-renderer";
+import {
+  prepareActivityTimeline,
+  renderActivityTimeline,
+} from "./renderers/activity-timeline-renderer";
 import { renderSwimlaneTimeline } from "./renderers/swimlane-renderer";
 import { curateRows, formatCurationSummary } from "./activity-curation";
 import { activityHistoryCardStyles } from "./styles";
 import { summarizeActivity } from "./summary";
+import { resolveRendererMode } from "./view-mode";
 import "./activity-history-card-editor";
 import type {
   ActivityHistoryCardConfig,
@@ -72,6 +77,7 @@ export class ActivityHistoryCard extends LitElement {
       title: DEFAULT_CONFIG.title,
       auto_discover: true,
       display_mode: "panel",
+      view_mode: "activity",
       hours_to_show: 24,
       group_by: "area",
     };
@@ -128,14 +134,15 @@ export class ActivityHistoryCard extends LitElement {
     this._config = {
       ...DEFAULT_CONFIG,
       ...config,
-      view_mode: config.view_mode ?? config.default_view ?? "swimlane",
+      view_mode:
+        config.view_mode ?? config.default_view ?? DEFAULT_CONFIG.view_mode,
       group_by: config.group_by ?? DEFAULT_CONFIG.group_by,
       filters: {
         show: true,
         show_search: true,
-        show_area_chips: true,
-        show_domain_chips: true,
-        show_state_mode: true,
+        show_area_chips: false,
+        show_domain_chips: false,
+        show_state_mode: false,
         active_only: false,
         ...(config.filters ?? {}),
       },
@@ -260,7 +267,7 @@ export class ActivityHistoryCard extends LitElement {
       <section
         class=${showInsights ? "ahc__body" : "ahc__body ahc__body--no-insights"}
       >
-        <main class="ahc__timeline-panel">${this._renderMainContent()}</main>
+        <main class="ahc__main">${this._renderMainContent()}</main>
         ${showInsights ? this._renderInsights() : nothing}
       </section>
     `;
@@ -563,16 +570,35 @@ export class ActivityHistoryCard extends LitElement {
     }
 
     const range = this._resolveRange();
-    switch (this._config.view_mode ?? this._config.default_view ?? "swimlane") {
+    switch (resolveRendererMode(this._config, this._showAllRows)) {
       case "heatmap":
         return renderHeatmapPlaceholder();
       case "detail":
         return renderDetailPlaceholder();
       case "correlation":
         return renderCorrelationPlaceholder();
-      case "swimlane":
-      default:
+      case "legacy_swimlane":
         return renderSwimlaneTimeline({
+          groups: this._groups,
+          range,
+          config:
+            this._showAllRows && this._config.view_mode === "activity"
+              ? {
+                  ...this._config,
+                  show_inactive_baselines: true,
+                  max_visible_rows: Math.max(
+                    this._config.max_visible_rows ?? 0,
+                    80,
+                  ),
+                }
+              : this._config,
+          summary: this._summary ?? summarizeActivity(this._groups),
+          curation: this._curation,
+          onSegmentClick: this._openSegmentPopover,
+        });
+      case "activity":
+      default:
+        return renderActivityTimeline({
           groups: this._groups,
           range,
           config: this._config,
@@ -1415,10 +1441,17 @@ export class ActivityHistoryCard extends LitElement {
       (group) =>
         this._config.hide_empty_groups === false || group.rows.length > 0,
     );
+    const rendererMode = resolveRendererMode(this._config, this._showAllRows);
     const summaryGroups =
       this._config.summary_scope === "all"
         ? groupRows(filtered, this._filter.groupBy)
-        : this._groups;
+        : rendererMode === "activity"
+          ? prepareActivityTimeline(
+              this._groups,
+              this._resolveRange(),
+              this._config,
+            ).groups
+          : this._groups;
     this._summary = summarizeActivity(summaryGroups);
     if (this._rows.length && !filtered.length) {
       this._emptyReason = "all_entities_filtered";

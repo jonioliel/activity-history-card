@@ -44,7 +44,8 @@ Implemented:
 - Real Home Assistant discovery through area, device, entity, and label registries when available
 - Graceful fallback and diagnostics when registries are unavailable
 - Conservative mock behavior: `mock_data: false` never generates mock entities
-- Swimlane timeline grouped by area or domain
+- Default `activity` dashboard timeline grouped by area or domain
+- Legacy swimlane renderer remains available through `view_mode: legacy_swimlane`
 - RTL-friendly Hebrew UI
 - Chronological left-to-right timeline internals
 - Filters:
@@ -82,7 +83,7 @@ Implemented:
 - Manual `entities:` are protected from smart filtering unless explicitly excluded
 - A session-level "הצג הכל" / "סינון חכם" toggle exposes hidden rows without changing YAML
 - `debug: true` includes smart curation counts and hidden-reason diagnostics
-- UI polish pass for the stable swimlane MVP:
+- UI polish pass for the stable activity MVP:
   - body grid is rendered through a dedicated structure
   - desktop summary is limited to four cleaner cards
   - last event appears as a compact header pill
@@ -105,7 +106,8 @@ Do not implement heatmap, entity drill-down, or correlation mode until the MVP i
 - `src/intervalize.ts` - pure history-to-segments logic
 - `src/filters.ts` - filtering and grouping logic
 - `src/summary.ts` - activity summary calculations
-- `src/renderers/swimlane-renderer.ts` - MVP timeline renderer
+- `src/renderers/activity-timeline-renderer.ts` - default activity dashboard renderer
+- `src/renderers/swimlane-renderer.ts` - legacy/debug timeline renderer
 - `src/styles.ts` - visual baseline and responsive RTL styling
 - `activity-history-card.css` - original CSS baseline reference
 - `mockups/` - visual targets
@@ -134,18 +136,16 @@ Latest verified results:
 
 The generated `dist/activity-history-card.js` is intentionally tracked for HACS. `dist/activity-history-card.js.map` remains ignored.
 
-## Latest UI Polish Pass
+## Latest Activity Renderer Pass
 
-The latest pass focused on making the swimlane MVP closer to the desktop/mobile mockups without adding new feature modes:
+The latest pass changed the default view from raw swimlane rows to a polished activity dashboard without adding heatmap/detail/correlation modes:
 
-- Home Assistant `mdi:` entity icons now render through `<ha-icon>` instead of appearing as raw text.
-- Timeline groups and rows are ordered by real activity first, so active rows are visible before inactive discovery noise.
-- Inactive/off/idle timeline segments are hidden by default; `show_inactive_baselines: true` shows very subtle baselines for debugging.
-- The desktop summary strip is more compact; last event is a compact header pill.
-- `debug: true` diagnostics are visually compact when collapsed.
-- Default `max_visible_rows`/`max_total_rows` changed to `40`, with `max_rows_per_group: 8` and smart curation limiting automatic rows before the renderer.
-- Generic or blank switch names from Home Assistant registry now fall back safely and are prefixed with the device name when useful, for example `מדיח כלים - Power`.
-- Noisy rows like router LAN/WLAN, update/firmware, program options, half load, extra dry, remote start, child lock, and diagnostic/config entities are hidden by default unless explicitly configured.
+- `view_mode: activity` is the recommended default.
+- `view_mode: legacy_swimlane` keeps the old dense/raw renderer for debugging.
+- The activity renderer shows a top density strip, compact area cards, active rows only, and active segments only.
+- Empty/off baselines are not rendered by default.
+- Default `max_visible_rows`/`max_total_rows` is `24`, with `max_rows_per_group: 5` and `min_row_active_seconds: 10`.
+- `show_activity_density: true` is enabled by default.
 
 ## HACS Install Path
 
@@ -160,6 +160,7 @@ Use HACS as a custom repository:
 
 ```yaml
 type: custom:activity-history-card
+view_mode: activity
 mock_data: false
 auto_discover: true
 display_mode: panel
@@ -167,8 +168,9 @@ hours_to_show: 24
 smart_filter: true
 activity_mode: meaningful
 show_inactive_baselines: false
-max_rows_per_group: 8
-max_total_rows: 40
+max_rows_per_group: 5
+max_total_rows: 24
+show_activity_density: true
 exclude_labels:
   - לא להצגה
   - רכיבים מוגנים
@@ -195,7 +197,7 @@ Repository root is the project root. Do not work inside nested handoff folders.
 
 Continue the Home Assistant Lovelace custom card custom:activity-history-card.
 Preserve first-class RTL support and HACS compatibility.
-Do not implement heatmap, drill-down, or correlation until the swimlane MVP is stable.
+Do not implement heatmap, drill-down, or correlation until the activity MVP is stable.
 
 Before changing code, inspect git status, package.json, src/activity-history-card.ts, src/styles.ts, and the relevant mockups.
 After changes, run npm run typecheck, npm run test, and npm run build.

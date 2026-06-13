@@ -1,6 +1,13 @@
 export type DirectionOption = "auto" | "rtl" | "ltr" | boolean;
 export type DisplayMode = "card" | "panel" | "fullscreen";
-export type ViewMode = "swimlane" | "heatmap" | "detail" | "correlation";
+export type ViewMode =
+  | "activity"
+  | "swimlane"
+  | "legacy_swimlane"
+  | "heatmap"
+  | "detail"
+  | "correlation";
+export type TimelineStyle = "activity" | "legacy";
 export type GroupBy = "area" | "domain" | "floor" | "entity" | "none";
 export type StateMode = "all" | "active_only" | "currently_active";
 export type TimePreset = "24h" | "7d" | "custom";
@@ -75,6 +82,7 @@ export interface ActivityHistoryCardConfig {
   display_mode?: DisplayMode;
   default_view?: ViewMode;
   view_mode?: ViewMode;
+  timeline_style?: TimelineStyle;
   group_by?: GroupBy;
   show_summary?: boolean;
   show_insights?: boolean;
@@ -89,6 +97,8 @@ export interface ActivityHistoryCardConfig {
   min_duration_seconds?: number;
   merge_gap_seconds?: number;
   max_visible_rows?: number;
+  activity_density_buckets?: number;
+  show_activity_density?: boolean;
   smart_filter?: boolean;
   activity_mode?: ActivityMode;
   hide_empty_rows?: boolean;

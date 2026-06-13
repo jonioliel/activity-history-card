@@ -3,8 +3,8 @@
  * Copyright 2019 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const Y = globalThis, _e = Y.ShadowRoot && (Y.ShadyCSS === void 0 || Y.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, pe = Symbol(), be = /* @__PURE__ */ new WeakMap();
-let Ge = class {
+const X = globalThis, _e = X.ShadowRoot && (X.ShadyCSS === void 0 || X.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, pe = Symbol(), ve = /* @__PURE__ */ new WeakMap();
+let Ve = class {
   constructor(e, i, a) {
     if (this._$cssResult$ = !0, a !== pe) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
     this.cssText = e, this.t = i;
@@ -14,7 +14,7 @@ let Ge = class {
     const i = this.t;
     if (_e && e === void 0) {
       const a = i !== void 0 && i.length === 1;
-      a && (e = be.get(i)), e === void 0 && ((this.o = e = new CSSStyleSheet()).replaceSync(this.cssText), a && be.set(i, e));
+      a && (e = ve.get(i)), e === void 0 && ((this.o = e = new CSSStyleSheet()).replaceSync(this.cssText), a && ve.set(i, e));
     }
     return e;
   }
@@ -22,33 +22,33 @@ let Ge = class {
     return this.cssText;
   }
 };
-const _t = (t) => new Ge(typeof t == "string" ? t : t + "", void 0, pe), Ke = (t, ...e) => {
+const bt = (t) => new Ve(typeof t == "string" ? t : t + "", void 0, pe), We = (t, ...e) => {
   const i = t.length === 1 ? t[0] : e.reduce((a, s, n) => a + ((r) => {
     if (r._$cssResult$ === !0) return r.cssText;
     if (typeof r == "number") return r;
     throw Error("Value passed to 'css' function must be a 'css' function result: " + r + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
   })(s) + t[n + 1], t[0]);
-  return new Ge(i, t, pe);
-}, pt = (t, e) => {
+  return new Ve(i, t, pe);
+}, yt = (t, e) => {
   if (_e) t.adoptedStyleSheets = e.map((i) => i instanceof CSSStyleSheet ? i : i.styleSheet);
   else for (const i of e) {
-    const a = document.createElement("style"), s = Y.litNonce;
+    const a = document.createElement("style"), s = X.litNonce;
     s !== void 0 && a.setAttribute("nonce", s), a.textContent = i.cssText, t.appendChild(a);
   }
-}, ve = _e ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((e) => {
+}, be = _e ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((e) => {
   let i = "";
   for (const a of e.cssRules) i += a.cssText;
-  return _t(i);
+  return bt(i);
 })(t) : t;
 /**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const { is: gt, defineProperty: mt, getOwnPropertyDescriptor: ft, getOwnPropertyNames: bt, getOwnPropertySymbols: vt, getPrototypeOf: yt } = Object, te = globalThis, ye = te.trustedTypes, wt = ye ? ye.emptyScript : "", xt = te.reactiveElementPolyfillSupport, U = (t, e) => t, he = { toAttribute(t, e) {
+const { is: wt, defineProperty: xt, getOwnPropertyDescriptor: $t, getOwnPropertyNames: kt, getOwnPropertySymbols: At, getPrototypeOf: St } = Object, te = globalThis, ye = te.trustedTypes, Rt = ye ? ye.emptyScript : "", Ct = te.reactiveElementPolyfillSupport, j = (t, e) => t, he = { toAttribute(t, e) {
   switch (e) {
     case Boolean:
-      t = t ? wt : null;
+      t = t ? Rt : null;
       break;
     case Object:
     case Array:
@@ -73,9 +73,9 @@ const { is: gt, defineProperty: mt, getOwnPropertyDescriptor: ft, getOwnProperty
       }
   }
   return i;
-} }, Ve = (t, e) => !gt(t, e), we = { attribute: !0, type: String, converter: he, reflect: !1, useDefault: !1, hasChanged: Ve };
+} }, Ye = (t, e) => !wt(t, e), we = { attribute: !0, type: String, converter: he, reflect: !1, useDefault: !1, hasChanged: Ye };
 Symbol.metadata ??= Symbol("metadata"), te.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
-let H = class extends HTMLElement {
+let D = class extends HTMLElement {
   static addInitializer(e) {
     this._$Ei(), (this.l ??= []).push(e);
   }
@@ -85,11 +85,11 @@ let H = class extends HTMLElement {
   static createProperty(e, i = we) {
     if (i.state && (i.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(e) && ((i = Object.create(i)).wrapped = !0), this.elementProperties.set(e, i), !i.noAccessor) {
       const a = Symbol(), s = this.getPropertyDescriptor(e, a, i);
-      s !== void 0 && mt(this.prototype, e, s);
+      s !== void 0 && xt(this.prototype, e, s);
     }
   }
   static getPropertyDescriptor(e, i, a) {
-    const { get: s, set: n } = ft(this.prototype, e) ?? { get() {
+    const { get: s, set: n } = $t(this.prototype, e) ?? { get() {
       return this[i];
     }, set(r) {
       this[i] = r;
@@ -103,14 +103,14 @@ let H = class extends HTMLElement {
     return this.elementProperties.get(e) ?? we;
   }
   static _$Ei() {
-    if (this.hasOwnProperty(U("elementProperties"))) return;
-    const e = yt(this);
+    if (this.hasOwnProperty(j("elementProperties"))) return;
+    const e = St(this);
     e.finalize(), e.l !== void 0 && (this.l = [...e.l]), this.elementProperties = new Map(e.elementProperties);
   }
   static finalize() {
-    if (this.hasOwnProperty(U("finalized"))) return;
-    if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(U("properties"))) {
-      const i = this.properties, a = [...bt(i), ...vt(i)];
+    if (this.hasOwnProperty(j("finalized"))) return;
+    if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(j("properties"))) {
+      const i = this.properties, a = [...kt(i), ...At(i)];
       for (const s of a) this.createProperty(s, i[s]);
     }
     const e = this[Symbol.metadata];
@@ -129,8 +129,8 @@ let H = class extends HTMLElement {
     const i = [];
     if (Array.isArray(e)) {
       const a = new Set(e.flat(1 / 0).reverse());
-      for (const s of a) i.unshift(ve(s));
-    } else e !== void 0 && i.push(ve(e));
+      for (const s of a) i.unshift(be(s));
+    } else e !== void 0 && i.push(be(e));
     return i;
   }
   static _$Eu(e, i) {
@@ -156,7 +156,7 @@ let H = class extends HTMLElement {
   }
   createRenderRoot() {
     const e = this.shadowRoot ?? this.attachShadow(this.constructor.shadowRootOptions);
-    return pt(e, this.constructor.elementStyles), e;
+    return yt(e, this.constructor.elementStyles), e;
   }
   connectedCallback() {
     this.renderRoot ??= this.createRenderRoot(), this.enableUpdating(!0), this._$EO?.forEach((e) => e.hostConnected?.());
@@ -188,7 +188,7 @@ let H = class extends HTMLElement {
   requestUpdate(e, i, a, s = !1, n) {
     if (e !== void 0) {
       const r = this.constructor;
-      if (s === !1 && (n = this[e]), a ??= r.getPropertyOptions(e), !((a.hasChanged ?? Ve)(n, i) || a.useDefault && a.reflect && n === this._$Ej?.get(e) && !this.hasAttribute(r._$Eu(e, a)))) return;
+      if (s === !1 && (n = this[e]), a ??= r.getPropertyOptions(e), !((a.hasChanged ?? Ye)(n, i) || a.useDefault && a.reflect && n === this._$Ej?.get(e) && !this.hasAttribute(r._$Eu(e, a)))) return;
       this.C(e, i, a);
     }
     this.isUpdatePending === !1 && (this._$ES = this._$EP());
@@ -256,59 +256,59 @@ let H = class extends HTMLElement {
   firstUpdated(e) {
   }
 };
-H.elementStyles = [], H.shadowRootOptions = { mode: "open" }, H[U("elementProperties")] = /* @__PURE__ */ new Map(), H[U("finalized")] = /* @__PURE__ */ new Map(), xt?.({ ReactiveElement: H }), (te.reactiveElementVersions ??= []).push("2.1.2");
+D.elementStyles = [], D.shadowRootOptions = { mode: "open" }, D[j("elementProperties")] = /* @__PURE__ */ new Map(), D[j("finalized")] = /* @__PURE__ */ new Map(), Ct?.({ ReactiveElement: D }), (te.reactiveElementVersions ??= []).push("2.1.2");
 /**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const ge = globalThis, xe = (t) => t, Q = ge.trustedTypes, $e = Q ? Q.createPolicy("lit-html", { createHTML: (t) => t }) : void 0, We = "$lit$", S = `lit$${Math.random().toFixed(9).slice(2)}$`, Ye = "?" + S, $t = `<${Ye}>`, T = document, j = () => T.createComment(""), q = (t) => t === null || typeof t != "object" && typeof t != "function", me = Array.isArray, kt = (t) => me(t) || typeof t?.[Symbol.iterator] == "function", se = `[ 	
-\f\r]`, B = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, ke = /-->/g, Ae = />/g, R = RegExp(`>|${se}(?:([^\\s"'>=/]+)(${se}*=${se}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), Se = /'/g, Re = /"/g, Je = /^(?:script|style|textarea|title)$/i, At = (t) => (e, ...i) => ({ _$litType$: t, strings: e, values: i }), _ = At(1), P = Symbol.for("lit-noChange"), g = Symbol.for("lit-nothing"), Ce = /* @__PURE__ */ new WeakMap(), E = T.createTreeWalker(T, 129);
-function Xe(t, e) {
+const ge = globalThis, xe = (t) => t, Q = ge.trustedTypes, $e = Q ? Q.createPolicy("lit-html", { createHTML: (t) => t }) : void 0, Je = "$lit$", C = `lit$${Math.random().toFixed(9).slice(2)}$`, Xe = "?" + C, zt = `<${Xe}>`, T = document, K = () => T.createComment(""), V = (t) => t === null || typeof t != "object" && typeof t != "function", me = Array.isArray, Mt = (t) => me(t) || typeof t?.[Symbol.iterator] == "function", se = `[ 	
+\f\r]`, B = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, ke = /-->/g, Ae = />/g, M = RegExp(`>|${se}(?:([^\\s"'>=/]+)(${se}*=${se}*(?:[^ 	
+\f\r"'\`<>=]|("|')|))|$)`, "g"), Se = /'/g, Re = /"/g, Ze = /^(?:script|style|textarea|title)$/i, Et = (t) => (e, ...i) => ({ _$litType$: t, strings: e, values: i }), u = Et(1), L = Symbol.for("lit-noChange"), g = Symbol.for("lit-nothing"), Ce = /* @__PURE__ */ new WeakMap(), E = T.createTreeWalker(T, 129);
+function Qe(t, e) {
   if (!me(t) || !t.hasOwnProperty("raw")) throw Error("invalid template strings array");
   return $e !== void 0 ? $e.createHTML(e) : e;
 }
-const St = (t, e) => {
+const Tt = (t, e) => {
   const i = t.length - 1, a = [];
   let s, n = e === 2 ? "<svg>" : e === 3 ? "<math>" : "", r = B;
   for (let c = 0; c < i; c++) {
     const o = t[c];
-    let h, l, d = -1, u = 0;
-    for (; u < o.length && (r.lastIndex = u, l = r.exec(o), l !== null); ) u = r.lastIndex, r === B ? l[1] === "!--" ? r = ke : l[1] !== void 0 ? r = Ae : l[2] !== void 0 ? (Je.test(l[2]) && (s = RegExp("</" + l[2], "g")), r = R) : l[3] !== void 0 && (r = R) : r === R ? l[0] === ">" ? (r = s ?? B, d = -1) : l[1] === void 0 ? d = -2 : (d = r.lastIndex - l[2].length, h = l[1], r = l[3] === void 0 ? R : l[3] === '"' ? Re : Se) : r === Re || r === Se ? r = R : r === ke || r === Ae ? r = B : (r = R, s = void 0);
-    const p = r === R && t[c + 1].startsWith("/>") ? " " : "";
-    n += r === B ? o + $t : d >= 0 ? (a.push(h), o.slice(0, d) + We + o.slice(d) + S + p) : o + S + (d === -2 ? c : p);
+    let d, l, h = -1, _ = 0;
+    for (; _ < o.length && (r.lastIndex = _, l = r.exec(o), l !== null); ) _ = r.lastIndex, r === B ? l[1] === "!--" ? r = ke : l[1] !== void 0 ? r = Ae : l[2] !== void 0 ? (Ze.test(l[2]) && (s = RegExp("</" + l[2], "g")), r = M) : l[3] !== void 0 && (r = M) : r === M ? l[0] === ">" ? (r = s ?? B, h = -1) : l[1] === void 0 ? h = -2 : (h = r.lastIndex - l[2].length, d = l[1], r = l[3] === void 0 ? M : l[3] === '"' ? Re : Se) : r === Re || r === Se ? r = M : r === ke || r === Ae ? r = B : (r = M, s = void 0);
+    const p = r === M && t[c + 1].startsWith("/>") ? " " : "";
+    n += r === B ? o + zt : h >= 0 ? (a.push(d), o.slice(0, h) + Je + o.slice(h) + C + p) : o + C + (h === -2 ? c : p);
   }
-  return [Xe(t, n + (t[i] || "<?>") + (e === 2 ? "</svg>" : e === 3 ? "</math>" : "")), a];
+  return [Qe(t, n + (t[i] || "<?>") + (e === 2 ? "</svg>" : e === 3 ? "</math>" : "")), a];
 };
-class G {
+class W {
   constructor({ strings: e, _$litType$: i }, a) {
     let s;
     this.parts = [];
     let n = 0, r = 0;
-    const c = e.length - 1, o = this.parts, [h, l] = St(e, i);
-    if (this.el = G.createElement(h, a), E.currentNode = this.el.content, i === 2 || i === 3) {
-      const d = this.el.content.firstChild;
-      d.replaceWith(...d.childNodes);
+    const c = e.length - 1, o = this.parts, [d, l] = Tt(e, i);
+    if (this.el = W.createElement(d, a), E.currentNode = this.el.content, i === 2 || i === 3) {
+      const h = this.el.content.firstChild;
+      h.replaceWith(...h.childNodes);
     }
     for (; (s = E.nextNode()) !== null && o.length < c; ) {
       if (s.nodeType === 1) {
-        if (s.hasAttributes()) for (const d of s.getAttributeNames()) if (d.endsWith(We)) {
-          const u = l[r++], p = s.getAttribute(d).split(S), f = /([.?@])?(.*)/.exec(u);
-          o.push({ type: 1, index: n, name: f[2], strings: p, ctor: f[1] === "." ? Ct : f[1] === "?" ? Et : f[1] === "@" ? zt : ie }), s.removeAttribute(d);
-        } else d.startsWith(S) && (o.push({ type: 6, index: n }), s.removeAttribute(d));
-        if (Je.test(s.tagName)) {
-          const d = s.textContent.split(S), u = d.length - 1;
-          if (u > 0) {
+        if (s.hasAttributes()) for (const h of s.getAttributeNames()) if (h.endsWith(Je)) {
+          const _ = l[r++], p = s.getAttribute(h).split(C), v = /([.?@])?(.*)/.exec(_);
+          o.push({ type: 1, index: n, name: v[2], strings: p, ctor: v[1] === "." ? Dt : v[1] === "?" ? Pt : v[1] === "@" ? Lt : ie }), s.removeAttribute(h);
+        } else h.startsWith(C) && (o.push({ type: 6, index: n }), s.removeAttribute(h));
+        if (Ze.test(s.tagName)) {
+          const h = s.textContent.split(C), _ = h.length - 1;
+          if (_ > 0) {
             s.textContent = Q ? Q.emptyScript : "";
-            for (let p = 0; p < u; p++) s.append(d[p], j()), E.nextNode(), o.push({ type: 2, index: ++n });
-            s.append(d[u], j());
+            for (let p = 0; p < _; p++) s.append(h[p], K()), E.nextNode(), o.push({ type: 2, index: ++n });
+            s.append(h[_], K());
           }
         }
-      } else if (s.nodeType === 8) if (s.data === Ye) o.push({ type: 2, index: n });
+      } else if (s.nodeType === 8) if (s.data === Xe) o.push({ type: 2, index: n });
       else {
-        let d = -1;
-        for (; (d = s.data.indexOf(S, d + 1)) !== -1; ) o.push({ type: 7, index: n }), d += S.length - 1;
+        let h = -1;
+        for (; (h = s.data.indexOf(C, h + 1)) !== -1; ) o.push({ type: 7, index: n }), h += C.length - 1;
       }
       n++;
     }
@@ -318,13 +318,13 @@ class G {
     return a.innerHTML = e, a;
   }
 }
-function L(t, e, i = t, a) {
-  if (e === P) return e;
+function N(t, e, i = t, a) {
+  if (e === L) return e;
   let s = a !== void 0 ? i._$Co?.[a] : i._$Cl;
-  const n = q(e) ? void 0 : e._$litDirective$;
-  return s?.constructor !== n && (s?._$AO?.(!1), n === void 0 ? s = void 0 : (s = new n(t), s._$AT(t, i, a)), a !== void 0 ? (i._$Co ??= [])[a] = s : i._$Cl = s), s !== void 0 && (e = L(t, s._$AS(t, e.values), s, a)), e;
+  const n = V(e) ? void 0 : e._$litDirective$;
+  return s?.constructor !== n && (s?._$AO?.(!1), n === void 0 ? s = void 0 : (s = new n(t), s._$AT(t, i, a)), a !== void 0 ? (i._$Co ??= [])[a] = s : i._$Cl = s), s !== void 0 && (e = N(t, s._$AS(t, e.values), s, a)), e;
 }
-class Rt {
+class Ht {
   constructor(e, i) {
     this._$AV = [], this._$AN = void 0, this._$AD = e, this._$AM = i;
   }
@@ -340,8 +340,8 @@ class Rt {
     let n = E.nextNode(), r = 0, c = 0, o = a[0];
     for (; o !== void 0; ) {
       if (r === o.index) {
-        let h;
-        o.type === 2 ? h = new K(n, n.nextSibling, this, e) : o.type === 1 ? h = new o.ctor(n, o.name, o.strings, this, e) : o.type === 6 && (h = new Tt(n, this, e)), this._$AV.push(h), o = a[++c];
+        let d;
+        o.type === 2 ? d = new Y(n, n.nextSibling, this, e) : o.type === 1 ? d = new o.ctor(n, o.name, o.strings, this, e) : o.type === 6 && (d = new Nt(n, this, e)), this._$AV.push(d), o = a[++c];
       }
       r !== o?.index && (n = E.nextNode(), r++);
     }
@@ -352,7 +352,7 @@ class Rt {
     for (const a of this._$AV) a !== void 0 && (a.strings !== void 0 ? (a._$AI(e, a, i), i += a.strings.length - 2) : a._$AI(e[i])), i++;
   }
 }
-class K {
+class Y {
   get _$AU() {
     return this._$AM?._$AU ?? this._$Cv;
   }
@@ -371,7 +371,7 @@ class K {
     return this._$AB;
   }
   _$AI(e, i = this) {
-    e = L(this, e, i), q(e) ? e === g || e == null || e === "" ? (this._$AH !== g && this._$AR(), this._$AH = g) : e !== this._$AH && e !== P && this._(e) : e._$litType$ !== void 0 ? this.$(e) : e.nodeType !== void 0 ? this.T(e) : kt(e) ? this.k(e) : this._(e);
+    e = N(this, e, i), V(e) ? e === g || e == null || e === "" ? (this._$AH !== g && this._$AR(), this._$AH = g) : e !== this._$AH && e !== L && this._(e) : e._$litType$ !== void 0 ? this.$(e) : e.nodeType !== void 0 ? this.T(e) : Mt(e) ? this.k(e) : this._(e);
   }
   O(e) {
     return this._$AA.parentNode.insertBefore(e, this._$AB);
@@ -380,25 +380,25 @@ class K {
     this._$AH !== e && (this._$AR(), this._$AH = this.O(e));
   }
   _(e) {
-    this._$AH !== g && q(this._$AH) ? this._$AA.nextSibling.data = e : this.T(T.createTextNode(e)), this._$AH = e;
+    this._$AH !== g && V(this._$AH) ? this._$AA.nextSibling.data = e : this.T(T.createTextNode(e)), this._$AH = e;
   }
   $(e) {
-    const { values: i, _$litType$: a } = e, s = typeof a == "number" ? this._$AC(e) : (a.el === void 0 && (a.el = G.createElement(Xe(a.h, a.h[0]), this.options)), a);
+    const { values: i, _$litType$: a } = e, s = typeof a == "number" ? this._$AC(e) : (a.el === void 0 && (a.el = W.createElement(Qe(a.h, a.h[0]), this.options)), a);
     if (this._$AH?._$AD === s) this._$AH.p(i);
     else {
-      const n = new Rt(s, this), r = n.u(this.options);
+      const n = new Ht(s, this), r = n.u(this.options);
       n.p(i), this.T(r), this._$AH = n;
     }
   }
   _$AC(e) {
     let i = Ce.get(e.strings);
-    return i === void 0 && Ce.set(e.strings, i = new G(e)), i;
+    return i === void 0 && Ce.set(e.strings, i = new W(e)), i;
   }
   k(e) {
     me(this._$AH) || (this._$AH = [], this._$AR());
     const i = this._$AH;
     let a, s = 0;
-    for (const n of e) s === i.length ? i.push(a = new K(this.O(j()), this.O(j()), this, this.options)) : a = i[s], a._$AI(n), s++;
+    for (const n of e) s === i.length ? i.push(a = new Y(this.O(K()), this.O(K()), this, this.options)) : a = i[s], a._$AI(n), s++;
     s < i.length && (this._$AR(a && a._$AB.nextSibling, s), i.length = s);
   }
   _$AR(e = this._$AA.nextSibling, i) {
@@ -424,11 +424,11 @@ class ie {
   _$AI(e, i = this, a, s) {
     const n = this.strings;
     let r = !1;
-    if (n === void 0) e = L(this, e, i, 0), r = !q(e) || e !== this._$AH && e !== P, r && (this._$AH = e);
+    if (n === void 0) e = N(this, e, i, 0), r = !V(e) || e !== this._$AH && e !== L, r && (this._$AH = e);
     else {
       const c = e;
-      let o, h;
-      for (e = n[0], o = 0; o < n.length - 1; o++) h = L(this, c[a + o], i, o), h === P && (h = this._$AH[o]), r ||= !q(h) || h !== this._$AH[o], h === g ? e = g : e !== g && (e += (h ?? "") + n[o + 1]), this._$AH[o] = h;
+      let o, d;
+      for (e = n[0], o = 0; o < n.length - 1; o++) d = N(this, c[a + o], i, o), d === L && (d = this._$AH[o]), r ||= !V(d) || d !== this._$AH[o], d === g ? e = g : e !== g && (e += (d ?? "") + n[o + 1]), this._$AH[o] = d;
     }
     r && !s && this.j(e);
   }
@@ -436,7 +436,7 @@ class ie {
     e === g ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
   }
 }
-class Ct extends ie {
+class Dt extends ie {
   constructor() {
     super(...arguments), this.type = 3;
   }
@@ -444,7 +444,7 @@ class Ct extends ie {
     this.element[this.name] = e === g ? void 0 : e;
   }
 }
-class Et extends ie {
+class Pt extends ie {
   constructor() {
     super(...arguments), this.type = 4;
   }
@@ -452,12 +452,12 @@ class Et extends ie {
     this.element.toggleAttribute(this.name, !!e && e !== g);
   }
 }
-class zt extends ie {
+class Lt extends ie {
   constructor(e, i, a, s, n) {
     super(e, i, a, s, n), this.type = 5;
   }
   _$AI(e, i = this) {
-    if ((e = L(this, e, i, 0) ?? g) === P) return;
+    if ((e = N(this, e, i, 0) ?? g) === L) return;
     const a = this._$AH, s = e === g && a !== g || e.capture !== a.capture || e.once !== a.once || e.passive !== a.passive, n = e !== g && (a === g || s);
     s && this.element.removeEventListener(this.name, this, a), n && this.element.addEventListener(this.name, this, e), this._$AH = e;
   }
@@ -465,7 +465,7 @@ class zt extends ie {
     typeof this._$AH == "function" ? this._$AH.call(this.options?.host ?? this.element, e) : this._$AH.handleEvent(e);
   }
 }
-class Tt {
+class Nt {
   constructor(e, i, a) {
     this.element = e, this.type = 6, this._$AN = void 0, this._$AM = i, this.options = a;
   }
@@ -473,17 +473,17 @@ class Tt {
     return this._$AM._$AU;
   }
   _$AI(e) {
-    L(this, e);
+    N(this, e);
   }
 }
-const Mt = ge.litHtmlPolyfillSupport;
-Mt?.(G, K), (ge.litHtmlVersions ??= []).push("3.3.3");
-const Ht = (t, e, i) => {
+const Ot = ge.litHtmlPolyfillSupport;
+Ot?.(W, Y), (ge.litHtmlVersions ??= []).push("3.3.3");
+const It = (t, e, i) => {
   const a = i?.renderBefore ?? e;
   let s = a._$litPart$;
   if (s === void 0) {
     const n = i?.renderBefore ?? null;
-    a._$litPart$ = s = new K(e.insertBefore(j(), n), n, void 0, i ?? {});
+    a._$litPart$ = s = new Y(e.insertBefore(K(), n), n, void 0, i ?? {});
   }
   return s._$AI(t), s;
 };
@@ -493,7 +493,7 @@ const Ht = (t, e, i) => {
  * SPDX-License-Identifier: BSD-3-Clause
  */
 const fe = globalThis;
-class D extends H {
+class P extends D {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
   }
@@ -503,7 +503,7 @@ class D extends H {
   }
   update(e) {
     const i = this.render();
-    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(e), this._$Do = Ht(i, this.renderRoot, this.renderOptions);
+    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(e), this._$Do = It(i, this.renderRoot, this.renderOptions);
   }
   connectedCallback() {
     super.connectedCallback(), this._$Do?.setConnected(!0);
@@ -512,14 +512,14 @@ class D extends H {
     super.disconnectedCallback(), this._$Do?.setConnected(!1);
   }
   render() {
-    return P;
+    return L;
   }
 }
-D._$litElement$ = !0, D.finalized = !0, fe.litElementHydrateSupport?.({ LitElement: D });
-const Dt = fe.litElementPolyfillSupport;
-Dt?.({ LitElement: D });
+P._$litElement$ = !0, P.finalized = !0, fe.litElementHydrateSupport?.({ LitElement: P });
+const Ft = fe.litElementPolyfillSupport;
+Ft?.({ LitElement: P });
 (fe.litElementVersions ??= []).push("4.2.2");
-const Pt = {
+const Bt = {
   light: ["on"],
   switch: ["on"],
   fan: ["on"],
@@ -531,17 +531,18 @@ const Pt = {
   vacuum: ["cleaning", "returning"],
   cover: ["opening", "closing"],
   lock: ["locking", "unlocking"]
-}, Lt = {
+}, Ut = {
   climate: {
     hvac_action: ["cooling", "heating", "drying", "fan"]
   }
-}, v = {
+}, f = {
   title: "היסטוריית פעילות חכמה",
   auto_discover: !0,
   debug: !1,
   hours_to_show: 24,
   live: !1,
   display_mode: "card",
+  view_mode: "activity",
   group_by: "area",
   show_summary: !0,
   show_insights: !0,
@@ -553,14 +554,16 @@ const Pt = {
   refresh_interval_seconds: 300,
   min_duration_seconds: 20,
   merge_gap_seconds: 15,
-  max_visible_rows: 40,
+  max_visible_rows: 24,
+  activity_density_buckets: 0,
+  show_activity_density: !0,
   smart_filter: !0,
   activity_mode: "meaningful",
   hide_empty_rows: !0,
   hide_empty_groups: !0,
-  min_row_active_seconds: 30,
-  max_rows_per_group: 8,
-  max_total_rows: 40,
+  min_row_active_seconds: 10,
+  max_rows_per_group: 5,
+  max_total_rows: 24,
   show_technical_entities: !1,
   show_config_entities: !1,
   show_diagnostic_entities: !1,
@@ -570,7 +573,7 @@ const Pt = {
   collapse_groups: !1,
   timeline_height: "min(62svh, 680px)",
   mobile_breakpoint: 760
-}, N = {
+}, O = {
   light: "תאורה",
   switch: "מתגים",
   binary_sensor: "חיישנים",
@@ -582,14 +585,14 @@ const Pt = {
   humidifier: "לחות",
   vacuum: "שואבים",
   lock: "מנעולים"
-}, J = [
+}, Z = [
   "light",
   "switch",
   "climate",
   "media_player",
   "cover",
   "fan"
-], O = {
+], z = {
   on: "דלוק",
   off: "כבוי",
   cooling: "קירור",
@@ -602,8 +605,8 @@ const Pt = {
   idle: "המתנה",
   unknown: "לא ידוע",
   unavailable: "לא זמין"
-}, Nt = ["ar", "fa", "he", "iw", "ur"];
-function F(t) {
+}, jt = ["ar", "fa", "he", "iw", "ur"];
+function I(t) {
   return t.includes(".") ? t.split(".")[0] ?? t : t;
 }
 function ne(t, e = /* @__PURE__ */ new Date()) {
@@ -614,139 +617,139 @@ function ne(t, e = /* @__PURE__ */ new Date()) {
   const i = t.hours_to_show ?? 24, a = t.end_time ? new Date(t.end_time) : e;
   return { start: new Date(a.getTime() - i * 60 * 60 * 1e3), end: a };
 }
-function Ot(t, e) {
+function Gt(t, e) {
   if (t === !0 || t === "rtl") return !0;
   if (t === !1 || t === "ltr") return !1;
   const i = (e || document.documentElement.lang || navigator.language || "").toLowerCase();
-  return Nt.some(
+  return jt.some(
     (a) => i === a || i.startsWith(`${a}-`)
   );
 }
-function z(t) {
+function A(t) {
   if (!Number.isFinite(t) || t <= 0) return "0 דק׳";
   const e = Math.round(t / 6e4), i = Math.floor(e / 60), a = e % 60;
   return i && a ? `${i}:${String(a).padStart(2, "0")} שעות` : i ? `${i} שעות` : `${a} דק׳`;
 }
-function k(t) {
+function x(t) {
   return new Intl.DateTimeFormat("he-IL", {
     hour: "2-digit",
     minute: "2-digit"
   }).format(t);
 }
-function Ft(t, e, i) {
+function qt(t, e, i) {
   return Math.min(i, Math.max(e, t));
 }
-function X(t, e) {
+function G(t, e) {
   const i = e.end.getTime() - e.start.getTime();
-  return i <= 0 ? 0 : Ft(
+  return i <= 0 ? 0 : qt(
     (t.getTime() - e.start.getTime()) / i * 100,
     0,
     100
   );
 }
-function Ze(t) {
+function et(t) {
   const [, e = t] = t.split(".");
   return e.replace(/_/g, " ");
 }
 function re(t, e = !1) {
   return t ? [
     t.entity.area,
-    N[t.entity.domain] ?? t.entity.domain,
+    O[t.entity.domain] ?? t.entity.domain,
     e ? t.entity.entity_id : void 0
   ].filter(Boolean).join(" · ") : "אין מספיק נתונים";
 }
-function It(t, e, i = !1) {
+function Kt(t, e, i = !1) {
   const a = [
     ["רכיב", t.entity.name],
     ["אזור", t.entity.area ?? "ללא אזור"],
-    ["סוג", N[t.entity.domain] ?? t.entity.domain],
-    ["מצב", O[e.category] ?? e.state],
-    ["התחלה", k(e.start)],
-    ["סיום", k(e.end)],
-    ["משך", z(e.durationMs)]
+    ["סוג", O[t.entity.domain] ?? t.entity.domain],
+    ["מצב", z[e.category] ?? e.state],
+    ["התחלה", x(e.start)],
+    ["סיום", x(e.end)],
+    ["משך", A(e.durationMs)]
   ];
   return i && a.push(["entity_id", t.entity.entity_id]), a;
 }
-const Ee = /* @__PURE__ */ new WeakMap();
-async function Bt(t, e) {
-  const i = t.entities ?? [], a = e ? await Gt(e) : Kt(), s = i.map(
+const ze = /* @__PURE__ */ new WeakMap();
+async function Vt(t, e) {
+  const i = t.entities ?? [], a = e ? await Xt(e) : Zt(), s = i.map(
     (c) => typeof c == "string" ? { entity: c } : c
   );
   let n = !1;
   if (!s.length && e && t.auto_discover !== !1) {
-    const c = Ut(t, e, a);
+    const c = Wt(t, e, a);
     n = c.fallbackUsed, s.push(...c.entities);
   }
   return {
-    entities: s.filter((c) => c.entity && !c.hidden).map((c) => jt(c, t, e, a)).filter((c) => !!c).filter(
-      (c) => et(c.labels ?? [], t, a.labels)
+    entities: s.filter((c) => c.entity && !c.hidden).map((c) => Yt(c, t, e, a)).filter((c) => !!c).filter(
+      (c) => it(c.labels ?? [], t, a.labels)
     ),
-    diagnostics: Vt(a, n, t)
+    diagnostics: Qt(a, n, t)
   };
 }
-function Ut(t, e, i) {
-  const a = t.domains?.length ? t.domains : J, s = M(t.exclude_domains ?? []), n = M(t.areas ?? []), r = [];
+function Wt(t, e, i) {
+  const a = t.domains?.length ? t.domains : Z, s = H(t.exclude_domains ?? []), n = H(t.areas ?? []), r = [];
   if (i.entities.length) {
-    const c = Te(i.areas, "area_id"), o = Te(i.devices, "id");
-    for (const h of i.entities) {
-      if (h.disabled_by || h.hidden_by || !e.states[h.entity_id] || !Qe(h, t, !1)) continue;
-      const l = F(h.entity_id);
-      if (s.has(x(l)) || a.length && !a.includes(l) || !ue(h.entity_id, t)) continue;
-      const d = h.device_id ? o.get(h.device_id) : void 0;
-      if (d?.disabled_by) continue;
-      const u = h.area_id || d?.area_id || void 0;
-      if (!u) continue;
-      const p = c.get(u), f = p?.name ?? u;
-      if (n.size && !n.has(x(u)) && !n.has(x(f)))
+    const c = Ee(i.areas, "area_id"), o = Ee(i.devices, "id");
+    for (const d of i.entities) {
+      if (d.disabled_by || d.hidden_by || !e.states[d.entity_id] || !tt(d, t, !1)) continue;
+      const l = I(d.entity_id);
+      if (s.has($(l)) || a.length && !a.includes(l) || !ue(d.entity_id, t)) continue;
+      const h = d.device_id ? o.get(d.device_id) : void 0;
+      if (h?.disabled_by) continue;
+      const _ = d.area_id || h?.area_id || void 0;
+      if (!_) continue;
+      const p = c.get(_), v = p?.name ?? _;
+      if (n.size && !n.has($(_)) && !n.has($(v)))
         continue;
-      const y = tt(h.labels, d?.labels, p?.labels);
-      et(y, t, i.labels) && r.push({
-        entity: h.entity_id,
-        area: f,
+      const y = at(d.labels, h?.labels, p?.labels);
+      it(y, t, i.labels) && r.push({
+        entity: d.entity_id,
+        area: v,
         domain: l
       });
     }
     return { entities: r, fallbackUsed: !1 };
   }
   for (const [c, o] of Object.entries(e.states)) {
-    const h = F(c);
-    if (s.has(x(h)) || a.length && !a.includes(h) || !ue(c, t)) continue;
+    const d = I(c);
+    if (s.has($(d)) || a.length && !a.includes(d) || !ue(c, t)) continue;
     const l = b(o.attributes.area) ?? b(o.attributes.area_id);
-    l && (n.size && !n.has(x(l)) || r.push({ entity: c, area: l, domain: h }));
+    l && (n.size && !n.has($(l)) || r.push({ entity: c, area: l, domain: d }));
   }
   return { entities: r, fallbackUsed: !0 };
 }
-function jt(t, e, i, a) {
+function Yt(t, e, i, a) {
   const s = i?.states[t.entity], n = a.entities.find(
-    (I) => I.entity_id === t.entity
-  ), r = Xt(t.entity, e);
-  if (n?.disabled_by || n?.hidden_by || n && !Qe(n, e, r))
+    (F) => F.entity_id === t.entity
+  ), r = ai(t.entity, e);
+  if (n?.disabled_by || n?.hidden_by || n && !tt(n, e, r))
     return;
-  const c = n?.device_id ? a.devices.find((I) => I.id === n.device_id) : void 0;
+  const c = n?.device_id ? a.devices.find((F) => F.id === n.device_id) : void 0;
   if (c?.disabled_by) return;
-  const o = t.area ? void 0 : n?.area_id || c?.area_id || void 0, h = t.area ?? Wt(o, a) ?? b(s?.attributes?.area) ?? b(s?.attributes?.area_id);
-  if (e.areas?.length && (!h || !Yt(h, o, e.areas)))
+  const o = t.area ? void 0 : n?.area_id || c?.area_id || void 0, d = t.area ?? ei(o, a) ?? b(s?.attributes?.area) ?? b(s?.attributes?.area_id);
+  if (e.areas?.length && (!d || !ti(d, o, e.areas)))
     return;
-  const l = t.domain ?? F(t.entity);
-  if (!qt(t.entity, l, e)) return;
-  const d = tt(
+  const l = t.domain ?? I(t.entity);
+  if (!Jt(t.entity, l, e)) return;
+  const h = at(
     n?.labels,
     c?.labels,
-    o ? a.areas.find((I) => I.area_id === o)?.labels : void 0
-  ), u = s ? i?.formatEntityName?.(s) : void 0, p = s?.attributes?.friendly_name, f = b(t.name), y = b(n?.name) ?? b(n?.original_name), w = b(c?.name_by_user) ?? b(c?.name), m = b(u), $ = b(p), ae = Ze(t.entity), ut = f ?? Zt(
-    m ?? $ ?? y ?? ae,
+    o ? a.areas.find((F) => F.area_id === o)?.labels : void 0
+  ), _ = s ? i?.formatEntityName?.(s) : void 0, p = s?.attributes?.friendly_name, v = b(t.name), y = b(n?.name) ?? b(n?.original_name), w = b(c?.name_by_user) ?? b(c?.name), m = b(_), k = b(p), ae = et(t.entity), vt = v ?? si(
+    m ?? k ?? y ?? ae,
     w,
     t.entity,
     l
   );
   return {
     entity_id: t.entity,
-    name: ut,
-    area: h,
+    name: vt,
+    area: d,
     area_id: o,
     domain: l,
     icon: t.icon ?? b(s?.attributes?.icon),
-    labels: d,
+    labels: h,
     entity_category: b(n?.entity_category),
     device_id: b(n?.device_id),
     device_name: w,
@@ -757,31 +760,31 @@ function jt(t, e, i, a) {
     config: t
   };
 }
-function qt(t, e, i) {
-  return i.domains?.length && !M(i.domains).has(x(e)) || M(i.exclude_domains ?? []).has(x(e)) ? !1 : ue(t, i);
+function Jt(t, e, i) {
+  return i.domains?.length && !H(i.domains).has($(e)) || H(i.exclude_domains ?? []).has($(e)) ? !1 : ue(t, i);
 }
 function ue(t, e) {
   const i = e.include_entity_globs ?? [], a = [
     ...e.exclude_entities ?? [],
     ...e.exclude_entity_globs ?? []
   ];
-  return !(i.length && !i.some((s) => ze(s).test(t)) || a.length && a.some((s) => ze(s).test(t)));
+  return !(i.length && !i.some((s) => Me(s).test(t)) || a.length && a.some((s) => Me(s).test(t)));
 }
-function Qe(t, e, i) {
+function tt(t, e, i) {
   return i ? !0 : t.entity_category === "config" ? e.show_config_entities === !0 : t.entity_category === "diagnostic" ? e.show_diagnostic_entities === !0 : !0;
 }
-function et(t, e, i) {
-  const a = Jt(t, i), s = M(e.include_labels ?? []), n = M(e.exclude_labels ?? []);
+function it(t, e, i) {
+  const a = ii(t, i), s = H(e.include_labels ?? []), n = H(e.exclude_labels ?? []);
   return !(n.size && [...n].some((r) => a.has(r)) || s.size && ![...s].some((r) => a.has(r)));
 }
-async function Gt(t) {
-  const e = Ee.get(t);
+async function Xt(t) {
+  const e = ze.get(t);
   if (e) return e;
   const i = Promise.all([
-    V(t, "config/area_registry/list"),
-    V(t, "config/device_registry/list"),
-    V(t, "config/entity_registry/list"),
-    V(t, "config/label_registry/list")
+    J(t, "config/area_registry/list"),
+    J(t, "config/device_registry/list"),
+    J(t, "config/entity_registry/list"),
+    J(t, "config/label_registry/list")
   ]).then(([a, s, n, r]) => ({
     areas: a.items,
     devices: s.items,
@@ -792,9 +795,9 @@ async function Gt(t) {
     entityRegistryAvailable: n.available,
     labelRegistryAvailable: r.available
   }));
-  return Ee.set(t, i), i;
+  return ze.set(t, i), i;
 }
-async function V(t, e) {
+async function J(t, e) {
   try {
     const i = await t.callWS({ type: e });
     return {
@@ -805,7 +808,7 @@ async function V(t, e) {
     return { items: [], available: !1 };
   }
 }
-function Kt() {
+function Zt() {
   return {
     areas: [],
     devices: [],
@@ -817,7 +820,7 @@ function Kt() {
     labelRegistryAvailable: !1
   };
 }
-function Vt(t, e, i) {
+function Qt(t, e, i) {
   const a = [];
   return t.areaRegistryAvailable || a.push("area_registry_unavailable"), t.entityRegistryAvailable || a.push("entity_registry_unavailable"), t.deviceRegistryAvailable || a.push("device_registry_unavailable"), (i.include_labels?.length || i.exclude_labels?.length) && !t.labelRegistryAvailable && a.push("label_registry_unavailable"), {
     registryAvailable: t.areaRegistryAvailable || t.entityRegistryAvailable || t.deviceRegistryAvailable,
@@ -832,59 +835,59 @@ function Vt(t, e, i) {
     unavailableReasons: a
   };
 }
-function Wt(t, e) {
+function ei(t, e) {
   if (t)
     return e.areas.find((i) => i.area_id === t)?.name ?? t;
 }
-function Yt(t, e, i) {
-  const a = M(i);
-  return a.has(x(t)) || !!(e && a.has(x(e)));
+function ti(t, e, i) {
+  const a = H(i);
+  return a.has($(t)) || !!(e && a.has($(e)));
 }
-function Jt(t, e) {
+function ii(t, e) {
   const i = new Map(
     e.map((s) => [s.label_id, s.name])
   ), a = /* @__PURE__ */ new Set();
   for (const s of t) {
-    a.add(x(s));
+    a.add($(s));
     const n = i.get(s);
-    n && a.add(x(n));
+    n && a.add($(n));
   }
   return a;
 }
-function tt(...t) {
+function at(...t) {
   return [...new Set(t.flatMap((e) => e ?? []))];
 }
-function ze(t) {
+function Me(t) {
   const e = t.replace(/[|\\{}()[\]^$+?.]/g, "\\$&").replace(/\*/g, ".*");
   return new RegExp(`^${e}$`);
 }
-function Te(t, e) {
+function Ee(t, e) {
   return new Map(t.map((i) => [i[e], i]));
 }
-function M(t) {
-  return new Set(t.map(x).filter(Boolean));
+function H(t) {
+  return new Set(t.map($).filter(Boolean));
 }
-function Xt(t, e) {
+function ai(t, e) {
   return (e.entities ?? []).some(
     (i) => typeof i == "string" ? i === t : i.entity === t
   );
 }
-function x(t) {
+function $(t) {
   return t.trim().toLowerCase();
 }
 function b(t) {
   return typeof t == "string" && t.trim() ? t.trim() : void 0;
 }
-function Zt(t, e, i, a) {
+function si(t, e, i, a) {
   if (!e || !t) return t;
-  const s = x(t), n = x(e);
-  return !s || !n || s.includes(n) || n.includes(s) ? t : a === "switch" && (ei(t) || Qt(t) || t === Ze(i)) ? `${e} - ${t}` : t;
+  const s = $(t), n = $(e);
+  return !s || !n || s.includes(n) || n.includes(s) ? t : a === "switch" && (ri(t) || ni(t) || t === et(i)) ? `${e} - ${t}` : t;
 }
-function Qt(t) {
+function ni(t) {
   const e = t.trim();
   return e.length <= 16 && /^[a-z0-9][a-z0-9 ._()/+-]*$/i.test(e);
 }
-function ei(t) {
+function ri(t) {
   return (/* @__PURE__ */ new Set([
     "power",
     "switch",
@@ -902,9 +905,9 @@ function ei(t) {
     "הפעלה",
     "כיבוי",
     "דולק"
-  ])).has(x(t));
+  ])).has($(t));
 }
-function ti(t, e) {
+function oi(t, e) {
   const i = e.search.trim().toLowerCase();
   return t.filter((a) => {
     const { entity: s } = a;
@@ -925,7 +928,7 @@ function ti(t, e) {
     return !0;
   });
 }
-function Me(t, e) {
+function Te(t, e) {
   if (e === "none" || e === "entity")
     return [He("all", "כל הרכיבים", t)];
   const i = /* @__PURE__ */ new Map();
@@ -936,7 +939,7 @@ function Me(t, e) {
   return [...i.entries()].map(
     ([a, s]) => He(
       a,
-      e === "domain" ? N[a] ?? a : a,
+      e === "domain" ? O[a] ?? a : a,
       s
     )
   ).sort(
@@ -958,7 +961,7 @@ function He(t, e, i) {
     totalActiveMs: s
   };
 }
-function ii(t) {
+function ci(t) {
   return JSON.stringify({
     mock: t.mock,
     start: t.start,
@@ -975,14 +978,14 @@ function ii(t) {
 function De(t) {
   return t.config?.attributes?.length || t.config?.active_attributes && Object.keys(t.config.active_attributes).length ? !0 : ["climate", "humidifier", "water_heater"].includes(t.domain);
 }
-async function ai(t, e, i, a) {
-  const { withAttributes: s, withoutAttributes: n } = it(e), r = await Promise.all([
+async function li(t, e, i, a) {
+  const { withAttributes: s, withoutAttributes: n } = st(e), r = await Promise.all([
     n.length ? Pe(t, n, i, a, !0) : Promise.resolve({}),
     s.length ? Pe(t, s, i, a, !1) : Promise.resolve({})
   ]);
   return Object.assign({}, ...r);
 }
-function it(t) {
+function st(t) {
   return {
     withAttributes: t.filter(De),
     withoutAttributes: t.filter((e) => !De(e))
@@ -998,9 +1001,9 @@ async function Pe(t, e, i, a, s) {
     significant_changes_only: a.significant_changes_only ?? !0,
     no_attributes: s
   });
-  return si(r, n);
+  return di(r, n);
 }
-function si(t, e) {
+function di(t, e) {
   const i = {};
   if (Array.isArray(t))
     return t.forEach((a, s) => {
@@ -1019,21 +1022,21 @@ function Le(t, e) {
   let i = e;
   return t.map((a) => {
     if (!a || typeof a != "object") return;
-    const s = a, n = A(s.entity_id) ?? i;
+    const s = a, n = S(s.entity_id) ?? i;
     n && (i = n);
-    const r = A(s.last_changed) ?? A(s.lc) ?? A(s.last_updated) ?? A(s.lu), c = A(s.state) ?? A(s.s);
+    const r = S(s.last_changed) ?? S(s.lc) ?? S(s.last_updated) ?? S(s.lu), c = S(s.state) ?? S(s.s);
     if (!n || !c || !r) return;
-    const o = Ne(s.attributes) ?? Ne(s.a), h = {
+    const o = Ne(s.attributes) ?? Ne(s.a), d = {
       entity_id: n,
       state: c,
       last_changed: r
     };
-    o && (h.attributes = o);
-    const l = A(s.last_updated) ?? A(s.lu);
-    return l && (h.last_updated = l), h;
+    o && (d.attributes = o);
+    const l = S(s.last_updated) ?? S(s.lu);
+    return l && (d.last_updated = l), d;
   }).filter((a) => a !== void 0);
 }
-function A(t) {
+function S(t) {
   return typeof t == "string" ? t : void 0;
 }
 function Ne(t) {
@@ -1041,28 +1044,28 @@ function Ne(t) {
 }
 function Oe(t, e, i, a, s = {}) {
   return e.map((n) => {
-    const r = ni(
+    const r = hi(
       t[n.entity_id] ?? [],
       s[n.entity_id],
       i,
       n.entity_id
     ).filter((l) => l.state != null && l.last_changed).sort(
-      (l, d) => new Date(l.last_changed).getTime() - new Date(d.last_changed).getTime()
-    ), c = ci(r), o = oi(c, n, i, a), h = o.filter((l) => l.active);
+      (l, h) => new Date(l.last_changed).getTime() - new Date(h.last_changed).getTime()
+    ), c = pi(r), o = _i(c, n, i, a), d = o.filter((l) => l.active);
     return {
       entity: n,
       segments: o,
-      totalActiveMs: h.reduce(
-        (l, d) => l + d.durationMs,
+      totalActiveMs: d.reduce(
+        (l, h) => l + h.durationMs,
         0
       ),
-      eventCount: h.length,
+      eventCount: d.length,
       currentState: o.at(-1)?.state,
       currentCategory: o.at(-1)?.category
     };
   });
 }
-function ni(t, e, i, a) {
+function hi(t, e, i, a) {
   const s = [...t];
   if (!e) return s;
   const n = new Date(
@@ -1071,7 +1074,7 @@ function ni(t, e, i, a) {
     Math.max(n, i.start.getTime()),
     i.end.getTime()
   ) : i.start.getTime(), c = s.filter((o) => o.entity_id === a).sort(
-    (o, h) => new Date(o.last_changed).getTime() - new Date(h.last_changed).getTime()
+    (o, d) => new Date(o.last_changed).getTime() - new Date(d.last_changed).getTime()
   ).at(-1);
   return (!c || new Date(c.last_changed).getTime() < r || c.state !== e.state) && s.push({
     entity_id: a,
@@ -1081,65 +1084,65 @@ function ni(t, e, i, a) {
     last_updated: e.last_updated
   }), s;
 }
-function ri(t, e, i) {
+function ui(t, e, i) {
   if (e === "unknown" || e === "unavailable")
     return { category: "unknown", active: !1 };
-  const a = t.domain || F(t.entity_id), n = t.config?.active_states ?? Pt[a] ?? ["on"], r = t.config?.active_attributes ?? Lt[a] ?? {};
+  const a = t.domain || I(t.entity_id), n = t.config?.active_states ?? Bt[a] ?? ["on"], r = t.config?.active_attributes ?? Ut[a] ?? {};
   if (a === "climate" && !t.config?.active_states) {
     const o = i?.hvac_action;
     if (typeof o == "string" && o.trim()) {
-      const h = r.hvac_action ?? [];
+      const d = r.hvac_action ?? [];
       return {
         category: oe(a, o),
-        active: h.includes(o)
+        active: d.includes(o)
       };
     }
   }
-  for (const [o, h] of Object.entries(r)) {
+  for (const [o, d] of Object.entries(r)) {
     const l = i?.[o];
-    if (typeof l == "string" && h.includes(l))
+    if (typeof l == "string" && d.includes(l))
       return { category: oe(a, l), active: !0 };
   }
   const c = n.includes(e);
   return { category: oe(a, e), active: c };
 }
-function oi(t, e, i, a) {
+function _i(t, e, i, a) {
   if (!t.length) return [];
   const s = [], n = i.start.getTime(), r = i.end.getTime();
   for (let o = 0; o < t.length; o += 1) {
-    const h = t[o];
-    if (!h) continue;
-    const l = t[o + 1], d = new Date(h.last_changed).getTime(), u = l ? new Date(l.last_changed).getTime() : r, p = Math.max(d, n), f = Math.min(u, r);
-    if (f <= p) continue;
-    const y = ri(
+    const d = t[o];
+    if (!d) continue;
+    const l = t[o + 1], h = new Date(d.last_changed).getTime(), _ = l ? new Date(l.last_changed).getTime() : r, p = Math.max(h, n), v = Math.min(_, r);
+    if (v <= p) continue;
+    const y = ui(
       e,
-      h.state,
-      h.attributes
-    ), w = f - p;
+      d.state,
+      d.attributes
+    ), w = v - p;
     s.push({
       entity_id: e.entity_id,
-      state: h.state,
+      state: d.state,
       category: y.category,
       active: y.active,
       start: new Date(p),
-      end: new Date(f),
+      end: new Date(v),
       durationMs: w,
-      attributes: h.attributes
+      attributes: d.attributes
     });
   }
-  return li(s, a.merge_gap_seconds ?? 0).filter(
+  return gi(s, a.merge_gap_seconds ?? 0).filter(
     (o) => !o.active || !a.min_duration_seconds || o.durationMs >= a.min_duration_seconds * 1e3
   );
 }
-function ci(t) {
+function pi(t) {
   const e = [];
   for (const i of t) {
     const a = e.at(-1);
-    a && a.state === i.state && Fe(a) === Fe(i) || e.push(i);
+    a && a.state === i.state && Ie(a) === Ie(i) || e.push(i);
   }
   return e;
 }
-function Fe(t) {
+function Ie(t) {
   const e = t.attributes ?? {}, i = {
     hvac_action: e.hvac_action,
     temperature: e.temperature,
@@ -1148,7 +1151,7 @@ function Fe(t) {
   };
   return JSON.stringify(i);
 }
-function li(t, e) {
+function gi(t, e) {
   if (!t.length) return t;
   const i = Math.max(0, e) * 1e3, a = [];
   for (const s of t) {
@@ -1160,7 +1163,7 @@ function li(t, e) {
 function oe(t, e) {
   return e === "unknown" || e === "unavailable" ? "unknown" : ["off", "closed", "idle", "paused", "standby"].includes(e) ? e === "idle" ? "idle" : "off" : ["cool", "cooling"].includes(e) ? "cooling" : ["heat", "heating"].includes(e) ? "heating" : ["playing"].includes(e) ? "playing" : ["opening", "open"].includes(e) ? "opening" : ["closing"].includes(e) ? "closing" : t === "climate" && ["drying", "dry"].includes(e) ? "drying" : t === "climate" && ["fan", "fan_only"].includes(e) ? "fan" : "on";
 }
-const Ie = [
+const Fe = [
   {
     entity_id: "light.living_room_main",
     name: "תאורת סלון",
@@ -1317,8 +1320,8 @@ const Ie = [
     ]
   }
 ];
-function di(t) {
-  return at(t).map((e) => ({
+function mi(t) {
+  return nt(t).map((e) => ({
     entity_id: e.entity_id,
     name: e.name,
     area: e.area,
@@ -1329,9 +1332,9 @@ function di(t) {
     config: { entity: e.entity_id, name: e.name, area: e.area }
   }));
 }
-function hi(t, e) {
+function fi(t, e) {
   const i = {}, a = t.end.getTime();
-  for (const s of at(e)) {
+  for (const s of nt(e)) {
     const n = [
       ce(s.entity_id, "off", t.start.getTime(), void 0)
     ];
@@ -1361,10 +1364,10 @@ function hi(t, e) {
   }
   return i;
 }
-function at(t) {
-  return t === "large_noisy_home" ? [...Ie, ...ui()] : Ie;
+function nt(t) {
+  return t === "large_noisy_home" ? [...Fe, ...vi()] : Fe;
 }
-function ui() {
+function vi() {
   const t = [
     "Power",
     "Extra dry",
@@ -1411,7 +1414,7 @@ function ce(t, e, i, a) {
     last_updated: new Date(i).toISOString()
   };
 }
-function _i(t, e, i = 320, a = 220) {
+function bi(t, e, i = 320, a = 220) {
   if (e.width <= 640)
     return {
       x: 12,
@@ -1424,78 +1427,93 @@ function _i(t, e, i = 320, a = 220) {
 function Be(t, e, i) {
   return i < e ? e : Math.min(i, Math.max(e, t));
 }
-function st(t) {
+function rt(t) {
   return !Number.isFinite(t) || !t ? 300 : Math.max(30, Math.floor(t));
 }
-function pi(t) {
+function yi(t) {
   if (!t.hasFetchedOnce) return !0;
   if (!t.live) return !1;
-  const e = st(t.refreshIntervalSeconds) * 1e3;
+  const e = rt(t.refreshIntervalSeconds) * 1e3;
   return t.now - t.lastHistoryFetchAt >= e;
 }
-function gi() {
-  return _`<div class="ahc-state-card">
+function wi() {
+  return u`<div class="ahc-state-card">
     <div>
       <h3 class="ahc-state-card__title">קורלציות</h3>
       <p>מצב קורלציה ויומן אירועים יפותח בשלב הבא.</p>
     </div>
   </div>`;
 }
-function mi() {
-  return _`<div class="ahc-state-card">
+function xi() {
+  return u`<div class="ahc-state-card">
     <div>
       <h3 class="ahc-state-card__title">פירוט רכיב</h3>
       <p>מסך Drill-down לרכיב יפותח אחרי תצוגת Swimlane.</p>
     </div>
   </div>`;
 }
-function fi() {
-  return _`<div class="ahc-state-card">
+function $i() {
+  return u`<div class="ahc-state-card">
     <div>
       <h3 class="ahc-state-card__title">Heatmap</h3>
       <p>מצב זה יפותח אחרי ה-MVP.</p>
     </div>
   </div>`;
 }
-const nt = {
-  light: "mdi:lightbulb",
-  switch: "mdi:toggle-switch",
-  climate: "mdi:air-conditioner",
-  media_player: "mdi:music",
-  cover: "mdi:window-shutter",
-  fan: "mdi:fan",
-  humidifier: "mdi:air-humidifier",
-  vacuum: "mdi:robot-vacuum",
-  lock: "mdi:lock",
-  binary_sensor: "mdi:motion-sensor"
-}, bi = [
-  [/סלון|living/i, "mdi:sofa"],
-  [/מטבח|kitchen/i, "mdi:countertop"],
-  [/שינה|הורים|bed/i, "mdi:bed"],
-  [/ילד|ילדים|kids|child/i, "mdi:bunk-bed"],
-  [/מרפסת|גינה|garden|balcony/i, "mdi:flower"],
-  [/כניסה|entry|door/i, "mdi:door"]
-];
-function vi(t) {
-  if (t.icon?.startsWith("mdi:") || t.icon && !t.icon.includes(":")) return t.icon;
-  const e = t.domain || F(t.entity_id);
-  return nt[e] ?? "mdi:circle-medium";
+function ki(t, e, i) {
+  const a = Ai(e, i), s = Si(e, a), n = s.map(() => /* @__PURE__ */ new Set());
+  for (const c of t)
+    for (const o of c.segments)
+      if (o.active)
+        for (let d = 0; d < s.length; d += 1) {
+          const l = s[d];
+          if (!l) continue;
+          const h = Ri(o, l.start, l.end);
+          h <= 0 || (l.totalActiveMs += h, l.eventCount += Ci(o, l) ? 1 : 0, n[d]?.add(c.entity.entity_id));
+        }
+  const r = Math.max(
+    1,
+    ...s.map((c) => c.totalActiveMs)
+  );
+  return s.map((c, o) => ({
+    ...c,
+    activeEntityCount: n[o]?.size ?? 0,
+    intensity: c.totalActiveMs / r
+  }));
 }
-function yi(t) {
-  if (t.icon?.startsWith("mdi:") || t.icon && !t.icon.includes(":")) return t.icon;
-  const e = nt[t.id];
-  return e || (bi.find(([a]) => a.test(t.title))?.[1] ?? "mdi:home-outline");
+function Ai(t, e) {
+  const i = e.activity_density_buckets;
+  if (typeof i == "number" && Number.isFinite(i) && i > 0)
+    return Math.max(1, Math.floor(i));
+  const a = Math.max(
+    1,
+    (t.end.getTime() - t.start.getTime()) / 36e5
+  );
+  return a <= 30 ? 24 : a <= 24 * 3 ? 48 : 84;
 }
-function rt(t, e) {
-  return t.startsWith("mdi:") ? _`<ha-icon class=${e} icon=${t}></ha-icon>` : _`<span class=${e} aria-hidden="true">${t}</span>`;
+function Si(t, e) {
+  const i = t.start.getTime(), a = t.end.getTime(), n = Math.max(1, a - i) / e;
+  return Array.from({ length: e }, (r, c) => {
+    const o = i + c * n, d = c === e - 1 ? a : o + n;
+    return {
+      start: new Date(o),
+      end: new Date(d),
+      totalActiveMs: 0,
+      eventCount: 0,
+      activeEntityCount: 0,
+      intensity: 0
+    };
+  });
 }
-function wi(t, e = "ahc-entity-icon") {
-  return rt(vi(t), e);
+function Ri(t, e, i) {
+  const a = Math.max(t.start.getTime(), e.getTime()), s = Math.min(t.end.getTime(), i.getTime());
+  return Math.max(0, s - a);
 }
-function xi(t, e = "ahc-group-icon") {
-  return rt(yi(t), e);
+function Ci(t, e) {
+  const i = t.start.getTime();
+  return i >= e.start.getTime() && i < e.end.getTime();
 }
-const $i = [
+const zi = [
   "extra dry",
   "half load",
   "silence on demand",
@@ -1548,7 +1566,7 @@ const $i = [
   "ענן",
   "גשר",
   "רכזת"
-], ki = [
+], Mi = [
   "firmware",
   "update",
   "battery",
@@ -1573,7 +1591,7 @@ const $i = [
   "ענן",
   "גשר",
   "רכזת"
-], Ai = /* @__PURE__ */ new Set([
+], Ei = /* @__PURE__ */ new Set([
   "power",
   "program",
   "extra dry",
@@ -1589,26 +1607,26 @@ const $i = [
   "unavailable"
 ]);
 function le(t, e, i = {}) {
-  const a = i.showAll === !0 || e.activity_mode === "all", s = Li(e, a), n = e.smart_filter !== !1 && s === "meaningful" && !a, r = e.show_inactive_baselines ?? v.show_inactive_baselines, c = /* @__PURE__ */ new Map(), o = dt(e), h = (ht(e.min_row_active_seconds) ?? v.min_row_active_seconds) * 1e3, l = je(e.max_rows_per_group) ?? v.max_rows_per_group, d = je(e.max_total_rows) ?? v.max_total_rows;
-  let u = 0;
-  const p = [], f = [];
+  const a = i.showAll === !0 || e.activity_mode === "all", s = Ui(e, a), n = e.smart_filter !== !1 && s === "meaningful" && !a, r = e.show_inactive_baselines ?? f.show_inactive_baselines, c = /* @__PURE__ */ new Map(), o = dt(e), d = (ht(e.min_row_active_seconds) ?? f.min_row_active_seconds) * 1e3, l = je(e.max_rows_per_group) ?? f.max_rows_per_group, h = je(e.max_total_rows) ?? f.max_total_rows;
+  let _ = 0;
+  const p = [], v = [];
   for (const w of t) {
     const m = o.has(w.entity.entity_id);
-    m && (u += 1);
-    const $ = n ? Ci(w, e, h, m) : { row: w };
-    $.reason ? (f.push(w), c.set(w.entity.entity_id, $.reason)) : $.row && p.push($.row);
+    m && (_ += 1);
+    const k = n ? Di(w, e, d, m) : { row: w };
+    k.reason ? (v.push(w), c.set(w.entity.entity_id, k.reason)) : k.row && p.push(k.row);
   }
-  const y = n ? zi(p, f, c, {
+  const y = n ? Li(p, v, c, {
     groupBy: i.groupBy ?? "area",
     manualEntityIds: o,
     maxRowsPerGroup: l,
-    maxTotalRows: d
-  }) : { rows: p, hiddenRows: f };
+    maxTotalRows: h
+  }) : { rows: p, hiddenRows: v };
   return {
     rows: y.rows,
     hiddenRows: y.hiddenRows,
     hiddenReasons: c,
-    diagnostics: Mi({
+    diagnostics: Oi({
       totalRows: t.length,
       visibleRows: y.rows.length,
       hiddenRows: y.hiddenRows.length,
@@ -1617,13 +1635,13 @@ function le(t, e, i = {}) {
       activityMode: s,
       showInactiveBaselines: r,
       showAll: a,
-      manualRowsProtected: u,
+      manualRowsProtected: _,
       maxRowsPerGroup: l,
-      maxTotalRows: d
+      maxTotalRows: h
     })
   };
 }
-function Si(t, e) {
+function Ti(t, e) {
   if (dt(e).has(t.entity_id))
     return { visible: !0, confidence: "explicit" };
   if (t.hidden_by)
@@ -1635,20 +1653,20 @@ function Si(t, e) {
   if (t.entity_category === "diagnostic" && e.show_diagnostic_entities !== !0)
     return { visible: !1, reason: "diagnostic", confidence: "registry" };
   if (e.show_technical_entities !== !0) {
-    const i = Di(t);
-    if (Hi(t))
+    const i = Fi(t);
+    if (Ii(t))
       return { visible: !1, reason: "technical", confidence: "heuristic" };
     if (i)
       return { visible: !1, reason: "noisy_name", confidence: "heuristic" };
   }
   return { visible: !0, confidence: "heuristic" };
 }
-function Ri(t, e) {
+function Hi(t, e) {
   return t.segments.filter(
     (i) => ct(i) && i.durationMs >= e
   );
 }
-function Z(t) {
+function q(t) {
   if (!t) return "";
   if (t.showAll)
     return "מצב הצגת הכל פעיל";
@@ -1661,18 +1679,18 @@ function Z(t) {
     `${t.hiddenConfigRows + t.hiddenDiagnosticRows} אבחון/הגדרה`
   ), t.hiddenMaxRows && e.push(`${t.hiddenMaxRows} מעבר למגבלה`), `מציג ${t.visibleRows} רכיבים פעילים מתוך ${t.totalRows}${e.length ? ` · הוסתרו ${e.join(", ")}` : ""}`;
 }
-function Ci(t, e, i, a) {
-  const s = Si(t.entity, e);
+function Di(t, e, i, a) {
+  const s = Ti(t.entity, e);
   if (!a && !s.visible)
     return { reason: s.reason ?? "technical" };
-  const n = Ri(t, i);
-  return n.length ? { row: Ei(t, n) } : a ? { row: t } : (e.hide_empty_rows ?? v.hide_empty_rows) === !1 ? { row: t } : t.segments.length ? {
+  const n = Hi(t, i);
+  return n.length ? { row: Pi(t, n) } : a ? { row: t } : (e.hide_empty_rows ?? f.hide_empty_rows) === !1 ? { row: t } : t.segments.length ? {
     reason: t.segments.some(
       (c) => ct(c) && c.durationMs < i
     ) ? "too_short" : "no_meaningful_activity"
   } : { reason: "empty" };
 }
-function Ei(t, e) {
+function Pi(t, e) {
   const i = e.reduce(
     (s, n) => s + n.durationMs,
     0
@@ -1688,32 +1706,32 @@ function Ei(t, e) {
 function ct(t) {
   return t.active && !ot.has(t.category);
 }
-function zi(t, e, i, a) {
+function Li(t, e, i, a) {
   const s = t.filter(
-    (d) => a.manualEntityIds.has(d.entity.entity_id)
+    (h) => a.manualEntityIds.has(h.entity.entity_id)
   ), n = t.filter(
-    (d) => !a.manualEntityIds.has(d.entity.entity_id)
+    (h) => !a.manualEntityIds.has(h.entity.entity_id)
   ), r = /* @__PURE__ */ new Map();
-  for (const d of de(n)) {
-    const u = Ti(d, a.groupBy), p = r.get(u) ?? [];
+  for (const h of de(n)) {
+    const _ = Ni(h, a.groupBy), p = r.get(_) ?? [];
     if (p.length >= a.maxRowsPerGroup) {
-      e.push(d), i.set(d.entity.entity_id, "max_rows");
+      e.push(h), i.set(h.entity.entity_id, "max_rows");
       continue;
     }
-    p.push(d), r.set(u, p);
+    p.push(h), r.set(_, p);
   }
   const c = [...r.values()].flat(), o = new Set(
-    s.map((d) => d.entity.entity_id)
-  ), h = [
+    s.map((h) => h.entity.entity_id)
+  ), d = [
     ...de(s),
     ...de(c)
   ], l = [];
-  for (const d of h) {
-    if (!o.has(d.entity.entity_id) && l.length >= a.maxTotalRows) {
-      e.push(d), i.set(d.entity.entity_id, "max_rows");
+  for (const h of d) {
+    if (!o.has(h.entity.entity_id) && l.length >= a.maxTotalRows) {
+      e.push(h), i.set(h.entity.entity_id, "max_rows");
       continue;
     }
-    l.push(d);
+    l.push(h);
   }
   return { rows: l, hiddenRows: e };
 }
@@ -1728,10 +1746,10 @@ function Ue(t) {
     (i) => i.active && i.start.getTime() <= e && i.end.getTime() >= e - 9e4
   );
 }
-function Ti(t, e) {
+function Ni(t, e) {
   return e === "domain" ? t.entity.domain || "other" : e === "none" || e === "entity" ? "all" : t.entity.area || "ללא אזור";
 }
-function Mi(t) {
+function Oi(t) {
   const e = {};
   for (const i of t.hiddenReasons.values())
     e[i] = (e[i] ?? 0) + 1;
@@ -1760,15 +1778,15 @@ function Mi(t) {
     maxTotalRows: t.maxTotalRows
   };
 }
-function Hi(t) {
-  const e = Pi(t, !0);
-  return ki.some((i) => lt(e, i));
+function Ii(t) {
+  const e = Bi(t, !0);
+  return Mi.some((i) => lt(e, i));
 }
-function Di(t) {
+function Fi(t) {
   const e = ee(t.name), i = ee(t.entity_id), a = `${e} ${i}`;
-  return t.domain === "switch" && Ai.has(e) ? !0 : $i.some((s) => lt(a, s));
+  return t.domain === "switch" && Ei.has(e) ? !0 : zi.some((s) => lt(a, s));
 }
-function Pi(t, e = !1) {
+function Bi(t, e = !1) {
   return [
     t.entity_id,
     t.name,
@@ -1787,8 +1805,8 @@ function lt(t, e) {
   }
   return t.includes(i);
 }
-function Li(t, e) {
-  return e ? "all" : t.activity_mode ?? v.activity_mode;
+function Ui(t, e) {
+  return e ? "all" : t.activity_mode ?? f.activity_mode;
 }
 function dt(t) {
   return new Set(
@@ -1807,10 +1825,48 @@ function je(t) {
 function ee(t) {
   return t.trim().toLowerCase().replace(/[_./-]+/g, " ").replace(/\s+/g, " ");
 }
-function Ni(t) {
+const ut = {
+  light: "mdi:lightbulb",
+  switch: "mdi:toggle-switch",
+  climate: "mdi:air-conditioner",
+  media_player: "mdi:music",
+  cover: "mdi:window-shutter",
+  fan: "mdi:fan",
+  humidifier: "mdi:air-humidifier",
+  vacuum: "mdi:robot-vacuum",
+  lock: "mdi:lock",
+  binary_sensor: "mdi:motion-sensor"
+}, ji = [
+  [/סלון|living/i, "mdi:sofa"],
+  [/מטבח|kitchen/i, "mdi:countertop"],
+  [/שינה|הורים|bed/i, "mdi:bed"],
+  [/ילד|ילדים|kids|child/i, "mdi:bunk-bed"],
+  [/מרפסת|גינה|garden|balcony/i, "mdi:flower"],
+  [/כניסה|entry|door/i, "mdi:door"]
+];
+function Gi(t) {
+  if (t.icon?.startsWith("mdi:") || t.icon && !t.icon.includes(":")) return t.icon;
+  const e = t.domain || I(t.entity_id);
+  return ut[e] ?? "mdi:circle-medium";
+}
+function qi(t) {
+  if (t.icon?.startsWith("mdi:") || t.icon && !t.icon.includes(":")) return t.icon;
+  const e = ut[t.id];
+  return e || (ji.find(([a]) => a.test(t.title))?.[1] ?? "mdi:home-outline");
+}
+function _t(t, e) {
+  return t.startsWith("mdi:") ? u`<ha-icon class=${e} icon=${t}></ha-icon>` : u`<span class=${e} aria-hidden="true">${t}</span>`;
+}
+function pt(t, e = "ahc-entity-icon") {
+  return _t(Gi(t), e);
+}
+function gt(t, e = "ahc-group-icon") {
+  return _t(qi(t), e);
+}
+function Ki(t) {
   return t > 70 ? "ultra-dense" : t > 30 ? "dense" : "normal";
 }
-function Oi(t, e) {
+function mt(t, e) {
   const i = t.reduce(
     (c, o) => c + o.rows.length,
     0
@@ -1834,15 +1890,204 @@ function Oi(t, e) {
     totalRowCount: i,
     visibleRowCount: r,
     hiddenRowCount: Math.max(0, i - r),
-    density: Ni(r)
+    density: Ki(r)
   };
 }
-function Fi(t) {
-  const e = Oi(
+const Vi = 0.5;
+function Wi(t, e) {
+  const i = e.start.getTime(), a = e.end.getTime(), s = Math.max(1, a - i), n = Math.max(t.start.getTime(), i), r = Math.min(t.end.getTime(), a), c = Math.min(Math.max(n, i), a), o = Math.min(Math.max(r, i), a), d = Math.max(0, o - c), l = Ge((c - i) / s * 100), h = Ge(d / s * 100);
+  return {
+    leftPct: l,
+    widthPct: h,
+    minVisible: t.active && d > 0 && h < Vi
+  };
+}
+function Ge(t) {
+  return Number.isFinite(t) ? Math.min(100, Math.max(0, t)) : 0;
+}
+function Yi(t) {
+  const e = ft(
+    t.groups,
+    t.range,
+    t.config
+  ), i = ta(t.range), a = q(t.curation), s = ia(t.range);
+  return e.visibleRowCount ? u`
+    <section class="ahc-activity" aria-label="ציר זמן פעילות">
+      <header class="ahc-activity__header">
+        <div class="ahc-activity__heading">
+          <h3>ציר זמן פעילות</h3>
+          <p>
+            מציג ${e.visibleRowCount} רכיבים פעילים מתוך
+            ${t.curation?.totalRows ?? e.totalRowCount}
+            ${e.hiddenRowCount ? u` · ${e.hiddenRowCount} נוספים הוסתרו מהתצוגה` : null}
+            ${a ? u` · ${a}` : null}
+          </p>
+        </div>
+        <div class="ahc-activity__range">${s}</div>
+      </header>
+
+      ${t.config.show_activity_density === !1 ? null : Zi(e.density)}
+
+      <div class="ahc-activity__axis" dir="ltr" aria-hidden="true">
+        ${i.map(
+    (n) => u`<span class="ahc-activity__tick" style="left:${n.percent}%"
+              >${n.label}</span
+            >`
+  )}
+      </div>
+
+      <div class="ahc-activity__groups">
+        ${e.groups.map(
+    (n) => Ji(n, t.range, t)
+  )}
+      </div>
+
+      ${e.hiddenRowCount ? u`<p class="ahc-activity__more">
+            + ${e.hiddenRowCount} רכיבים נוספים הוסתרו. אפשר ללחוץ “הצג
+            הכל” למצב legacy/debug.
+          </p>` : null}
+    </section>
+  ` : Qi();
+}
+function ft(t, e, i) {
+  const a = t.map((c) => {
+    const o = c.rows.filter(ea), d = o.reduce(
+      (l, h) => l + h.totalActiveMs,
+      0
+    );
+    return {
+      ...c,
+      rows: o,
+      totalActiveMs: d,
+      subtitle: `${o.length} רכיבים`
+    };
+  }).filter((c) => c.rows.length > 0).sort(
+    (c, o) => o.totalActiveMs - c.totalActiveMs || o.rows.length - c.rows.length || c.title.localeCompare(o.title, "he")
+  ), s = mt(
+    a,
+    i.max_visible_rows ?? i.max_total_rows
+  ), n = s.groups.filter((c) => c.rows.length > 0), r = n.flatMap((c) => c.rows);
+  return {
+    groups: n,
+    density: ki(r, e, i),
+    totalRowCount: s.totalRowCount,
+    visibleRowCount: r.length,
+    hiddenRowCount: Math.max(0, s.totalRowCount - r.length)
+  };
+}
+function Ji(t, e, i) {
+  return u`
+    <article class="ahc-activity-group" aria-label=${t.title}>
+      <header class="ahc-activity-group__header">
+        <span class="ahc-activity-group__title">
+          ${gt(t)}<strong>${t.title}</strong>
+        </span>
+        <span class="ahc-activity-group__meta">
+          ${t.rows.length} רכיבים · ${A(t.totalActiveMs)}
+        </span>
+      </header>
+      <div class="ahc-activity-group__rows">
+        ${t.rows.map((a) => Xi(a, e, i))}
+      </div>
+    </article>
+  `;
+}
+function Xi(t, e, i) {
+  return u`
+    <div class="ahc-activity-row">
+      <div class="ahc-activity-row__label" dir="rtl">
+        ${pt(t.entity)}
+        <span class="ahc-activity-row__name" title=${t.entity.name}>
+          ${t.entity.name}
+        </span>
+      </div>
+      <div
+        class="ahc-activity-row__plot"
+        dir="ltr"
+        role="img"
+        aria-label=${`ציר זמן עבור ${t.entity.name}`}
+      >
+        ${t.segments.map((a, s) => {
+    if (!a.active) return null;
+    const n = Wi(a, e);
+    if (n.widthPct <= 0) return null;
+    const r = `${t.entity.name}, ${z[a.category]}, ${x(a.start)} עד ${x(a.end)}, ${A(
+      a.durationMs
+    )}`;
+    return u`
+            <button
+              class="ahc-activity-segment"
+              type="button"
+              data-category=${a.category}
+              data-min-visible=${n.minVisible ? "true" : "false"}
+              style=${`left:${n.leftPct}%;width:max(var(--ahc-activity-segment-min-width), ${n.widthPct}%);`}
+              aria-label=${r}
+              @click=${(c) => i.onSegmentClick?.(c, t.entity.entity_id, s)}
+            >
+              <span>${z[a.category]}</span>
+            </button>
+          `;
+  })}
+      </div>
+    </div>
+  `;
+}
+function Zi(t) {
+  return u`
+    <div
+      class="ahc-activity__density-strip"
+      dir="ltr"
+      aria-label="צפיפות פעילות לאורך הזמן"
+    >
+      ${t.map(
+    (e) => u`
+          <span
+            class="ahc-activity__density-bar"
+            style=${`--intensity:${e.intensity}`}
+            title=${`${x(e.start)} - ${x(
+      e.end
+    )}: ${A(e.totalActiveMs)}`}
+          ></span>
+        `
+  )}
+    </div>
+  `;
+}
+function Qi() {
+  return u`
+    <section class="ahc-activity ahc-activity-empty">
+      <h3>לא נמצאה פעילות משמעותית בטווח הזה</h3>
+      <p>נסה להגדיל את טווח הזמן, להציג את כל הרכיבים, או לפתוח סינון מתקדם.</p>
+    </section>
+  `;
+}
+function ea(t) {
+  return t.segments.some((e) => e.active);
+}
+function ta(t) {
+  const e = Math.max(
+    1,
+    (t.end.getTime() - t.start.getTime()) / 36e5
+  ), i = e <= 24 ? 3 : e <= 72 ? 6 : 24, a = [], s = new Date(t.start);
+  for (s.setMinutes(0, 0, 0); s < t.end; )
+    s >= t.start && a.push({
+      label: x(s),
+      percent: G(s, t)
+    }), s.setHours(s.getHours() + i);
+  return a.push({ label: x(t.end), percent: 100 }), a;
+}
+function ia(t) {
+  const e = Math.round(
+    (t.end.getTime() - t.start.getTime()) / 36e5
+  );
+  return e >= 24 * 7 ? "7 ימים" : e >= 24 ? `${Math.round(e / 24)} ימים` : `${e} שעות`;
+}
+function aa(t) {
+  const e = mt(
     t.groups,
     t.config.max_visible_rows
-  ), i = ji(t.range), a = Z(t.curation), s = /* @__PURE__ */ new Date(), n = X(s, t.range), r = t.config.show_inactive_baselines === !0, c = t.config.show_now_line !== !1 && s.getTime() >= t.range.start.getTime() && s.getTime() <= t.range.end.getTime() + 9e4;
-  return _`
+  ), i = oa(t.range), a = q(t.curation), s = /* @__PURE__ */ new Date(), n = G(s, t.range), r = t.config.show_inactive_baselines === !0, c = t.config.show_now_line !== !1 && s.getTime() >= t.range.start.getTime() && s.getTime() <= t.range.end.getTime() + 9e4;
+  return u`
     <section
       class=${`ahc-timeline-card ahc-timeline-card--${e.density}${r ? " ahc-timeline-card--baselines" : ""}`}
       aria-label="ציר זמן פעילות"
@@ -1851,17 +2096,17 @@ function Fi(t) {
       <div class="ahc-timeline-toolbar">
         <h3 class="ahc-timeline-title">ציר זמן פעילות</h3>
         <span class="ahc__metric-subtitle">
-          ${k(t.range.start)} – ${k(t.range.end)}
+          ${x(t.range.start)} – ${x(t.range.end)}
           ${e.hiddenRowCount ? ` · מציג ${e.visibleRowCount} מתוך ${e.totalRowCount}` : ""}
         </span>
-        ${a ? _`<span class="ahc-curation-note">${a}</span>` : null}
+        ${a ? u`<span class="ahc-curation-note">${a}</span>` : null}
       </div>
       <div class="ahc-timeline-scroll">
         <div class="ahc-timeline" dir="ltr">
           <div class="ahc-timeline__axis" aria-hidden="true">
             <div class="ahc-timeline__ticks">
               ${i.map(
-    (o) => _`<span
+    (o) => u`<span
                     class="ahc-timeline__tick"
                     style="left:${o.percent}%"
                     >${o.label}</span
@@ -1872,29 +2117,29 @@ function Fi(t) {
           </div>
           <div class="ahc-timeline__groups">
             ${e.groups.map((o) => {
-    const h = Ii(
+    const d = sa(
       o,
       t.config
     );
-    return _`
+    return u`
                 <details
                   class="ahc-group"
                   aria-label=${o.title}
-                  ?open=${!h}
+                  ?open=${!d}
                 >
                   <summary class="ahc-group__header">
                     <span class="ahc-group__title"
-                      >${xi(o)}<span
+                      >${gt(o)}<span
                         >${o.title}</span
                       ></span
                     >
                     <span class="ahc-group__meta"
-                      >${z(o.totalActiveMs)} •
+                      >${A(o.totalActiveMs)} •
                       ${o.subtitle ?? ""}</span
                     >
                   </summary>
                   ${o.rows.map(
-      (l) => _`
+      (l) => u`
                       <div class="ahc-row">
                         <div class="ahc-row__track">
                           <svg
@@ -1904,50 +2149,50 @@ function Fi(t) {
                             role="img"
                             aria-label=${`ציר זמן עבור ${l.entity.name}`}
                           >
-                            ${r ? _`<line
+                            ${r ? u`<line
                                   class="ahc-row__svg-track"
                                   x1="1"
                                   x2="99"
                                   y1="16"
                                   y2="16"
                                 ></line>` : null}
-                            ${l.segments.map((d, u) => {
-        const p = X(
-          d.start,
+                            ${l.segments.map((h, _) => {
+        const p = G(
+          h.start,
           t.range
-        ), f = X(
-          d.end,
+        ), v = G(
+          h.end,
           t.range
-        ), y = Math.max(0.65, f - p);
-        if (!Bi(
-          d,
+        ), y = Math.max(0.65, v - p);
+        if (!na(
+          h,
           t.config
         ))
           return null;
-        const w = `${l.entity.name}, ${O[d.category]}, ${k(d.start)} עד ${k(d.end)}, ${z(d.durationMs)}`;
-        return _`
+        const w = `${l.entity.name}, ${z[h.category]}, ${x(h.start)} עד ${x(h.end)}, ${A(h.durationMs)}`;
+        return u`
                                 <rect
-                                  class=${d.active ? "ahc-segment-svg" : "ahc-segment-svg ahc-segment-svg--inactive"}
-                                  data-category=${d.category}
-                                  data-active=${d.active ? "true" : "false"}
+                                  class=${h.active ? "ahc-segment-svg" : "ahc-segment-svg ahc-segment-svg--inactive"}
+                                  data-category=${h.category}
+                                  data-active=${h.active ? "true" : "false"}
                                   x=${p}
-                                  y=${d.active ? "12" : "15"}
+                                  y=${h.active ? "12" : "15"}
                                   width=${y}
-                                  height=${d.active ? "8" : "2"}
-                                  rx=${d.active ? "4" : "1"}
+                                  height=${h.active ? "8" : "2"}
+                                  rx=${h.active ? "4" : "1"}
                                   tabindex="0"
                                   role="button"
                                   aria-label=${w}
                                   @click=${(m) => t.onSegmentClick?.(
           m,
           l.entity.entity_id,
-          u
+          _
         )}
                                   @keydown=${(m) => {
           (m.key === "Enter" || m.key === " ") && (m.preventDefault(), t.onSegmentClick?.(
             m,
             l.entity.entity_id,
-            u
+            _
           ));
         }}
                                 >
@@ -1958,46 +2203,46 @@ function Fi(t) {
                           </svg>
                         </div>
                         <div class="ahc-row__label" dir="rtl">
-                          ${wi(l.entity)}
+                          ${pt(l.entity)}
                           <span
                             class="ahc-row__name"
                             title=${t.config.debug ? l.entity.entity_id : l.entity.name}
                             >${l.entity.name}</span
                           >
-                          ${l.currentCategory ? _`<span
+                          ${l.currentCategory ? u`<span
                                 class="ahc-row__state-chip"
                                 data-state=${l.currentCategory}
-                                >${O[l.currentCategory]}</span
+                                >${z[l.currentCategory]}</span
                               >` : null}
                         </div>
                       </div>
                     `
     )}
-                  ${o.rows.length ? null : _`<div class="ahc-group__empty">
+                  ${o.rows.length ? null : u`<div class="ahc-group__empty">
                         אין שורות גלויות בקבוצה הזו
                       </div>`}
                 </details>
               `;
   })}
           </div>
-          ${c ? _`<div class="ahc-now-line" style="left:${n}%">
+          ${c ? u`<div class="ahc-now-line" style="left:${n}%">
                 <span class="ahc-now-line__label">עכשיו</span>
               </div>` : null}
         </div>
       </div>
-      ${t.config.show_legend === !1 ? null : Ui()}
+      ${t.config.show_legend === !1 ? null : ra()}
     </section>
   `;
 }
-function Ii(t, e) {
+function sa(t, e) {
   const i = new Set(e.default_collapsed_groups ?? []);
   return i.has(t.id) || i.has(t.title) ? !0 : !!(e.collapse_groups && t.totalActiveMs <= 0);
 }
-function Bi(t, e) {
+function na(t, e) {
   return t.active || e.show_inactive_baselines === !0;
 }
-function Ui() {
-  return _`<div class="ahc-legend" aria-label="מקרא">
+function ra() {
+  return u`<div class="ahc-legend" aria-label="מקרא">
     ${[
     ["on", "var(--ahc-on)"],
     ["cooling", "var(--ahc-cooling)"],
@@ -2008,26 +2253,26 @@ function Ui() {
     ["off", "var(--ahc-off)"],
     ["unknown", "var(--ahc-unknown)"]
   ].map(
-    ([e, i]) => _`<span class="ahc-legend__item"
+    ([e, i]) => u`<span class="ahc-legend__item"
           ><span class="ahc-legend__swatch" style="--swatch:${i}"></span
-          >${O[e]}</span
+          >${z[e]}</span
         >`
   )}
   </div>`;
 }
-function ji(t) {
+function oa(t) {
   const e = Math.max(
     1,
     (t.end.getTime() - t.start.getTime()) / 36e5
   ), i = e <= 24 ? 3 : e <= 72 ? 6 : 24, a = [], s = new Date(t.start);
   for (s.setMinutes(0, 0, 0); s < t.end; )
     s >= t.start && a.push({
-      label: k(s),
-      percent: X(s, t)
+      label: x(s),
+      percent: G(s, t)
     }), s.setHours(s.getHours() + i);
-  return a.push({ label: k(t.end), percent: 100 }), a;
+  return a.push({ label: x(t.end), percent: 100 }), a;
 }
-const qi = Ke`
+const ca = We`
   /*
   Activity History Card design baseline
   Target: Home Assistant Lovelace custom card, RTL-first, mobile-first capable.
@@ -2119,6 +2364,11 @@ const qi = Ke`
     --ahc-group-gap: 12px;
     --ahc-segment-height: 8px;
     --ahc-segment-min-width: 4px;
+    --ahc-activity-row-height: 34px;
+    --ahc-activity-label-width: 220px;
+    --ahc-activity-segment-height: 9px;
+    --ahc-activity-segment-min-width: 4px;
+    --ahc-activity-group-gap: 12px;
 
     --ahc-chip-height: 40px;
     --ahc-touch-target: 44px;
@@ -2707,6 +2957,282 @@ const qi = Ke`
       var(--ahc-accent),
       rgba(37, 99, 235, 0.38)
     );
+  }
+
+  /* Activity dashboard timeline */
+  .ahc-activity {
+    direction: rtl;
+    display: grid;
+    gap: var(--ahc-gap-md);
+    min-inline-size: 0;
+    min-block-size: 420px;
+    padding: var(--ahc-gap-md);
+    border: 1px solid var(--ahc-border-soft);
+    border-radius: var(--ahc-radius-md);
+    background: linear-gradient(
+      180deg,
+      rgba(30, 41, 59, 0.42),
+      rgba(2, 6, 23, 0.24)
+    );
+    overflow: hidden;
+  }
+
+  .ahc-activity__header {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: var(--ahc-gap-md);
+    padding-block-end: var(--ahc-gap-xs);
+    border-block-end: 1px solid rgba(148, 163, 184, 0.12);
+  }
+
+  .ahc-activity__heading {
+    min-inline-size: 0;
+    text-align: start;
+  }
+
+  .ahc-activity__heading h3 {
+    margin: 0;
+    color: var(--ahc-text);
+    font-size: 1.08rem;
+    font-weight: 850;
+  }
+
+  .ahc-activity__heading p,
+  .ahc-activity__more {
+    margin: 6px 0 0;
+    color: var(--ahc-muted);
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+
+  .ahc-activity__range {
+    flex: 0 0 auto;
+    min-block-size: 36px;
+    display: inline-flex;
+    align-items: center;
+    padding-inline: 12px;
+    border: 1px solid rgba(56, 189, 248, 0.28);
+    border-radius: 999px;
+    background: rgba(14, 165, 233, 0.1);
+    color: #bae6fd;
+    font-size: 0.82rem;
+    font-weight: 800;
+  }
+
+  .ahc-activity__density-strip {
+    direction: ltr;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(5px, 1fr);
+    align-items: end;
+    gap: 3px;
+    min-block-size: 58px;
+    padding-block: 8px;
+    padding-inline: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: var(--ahc-radius-sm);
+    background: rgba(2, 6, 23, 0.28);
+  }
+
+  .ahc-activity__density-bar {
+    display: block;
+    block-size: max(6px, calc(var(--intensity, 0) * 48px));
+    border-radius: 999px 999px 3px 3px;
+    background: linear-gradient(
+      180deg,
+      rgba(125, 211, 252, 0.95),
+      rgba(34, 197, 94, 0.34)
+    );
+    opacity: max(0.18, calc(var(--intensity, 0) * 0.92));
+    box-shadow: 0 4px 14px rgba(14, 165, 233, 0.16);
+  }
+
+  .ahc-activity__axis {
+    direction: ltr;
+    position: relative;
+    min-block-size: 32px;
+    margin-inline-start: 0;
+    margin-inline-end: var(--ahc-activity-label-width);
+    border-block-end: 1px solid rgba(148, 163, 184, 0.1);
+  }
+
+  .ahc-activity__tick {
+    position: absolute;
+    inset-block: 0;
+    transform: translateX(-50%);
+    min-inline-size: 42px;
+    display: grid;
+    place-items: center;
+    color: var(--ahc-muted);
+    font-size: 0.75rem;
+  }
+
+  .ahc-activity__tick::after {
+    content: "";
+    position: absolute;
+    inset-block-end: 0;
+    inline-size: 1px;
+    block-size: 9px;
+    background: rgba(148, 163, 184, 0.16);
+  }
+
+  .ahc-activity__groups {
+    display: grid;
+    gap: var(--ahc-activity-group-gap);
+    min-inline-size: 0;
+  }
+
+  .ahc-activity-group {
+    display: grid;
+    gap: var(--ahc-gap-sm);
+    padding: var(--ahc-gap-sm);
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    border-radius: var(--ahc-radius-md);
+    background: rgba(15, 23, 42, 0.46);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .ahc-activity-group__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ahc-gap-sm);
+    min-block-size: 32px;
+  }
+
+  .ahc-activity-group__title {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ahc-gap-xs);
+    color: var(--ahc-text);
+    font-weight: 850;
+  }
+
+  .ahc-activity-group__meta {
+    color: var(--ahc-muted);
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+
+  .ahc-activity-group__rows {
+    display: grid;
+    gap: 4px;
+  }
+
+  .ahc-activity-row {
+    direction: rtl;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--ahc-activity-label-width);
+    align-items: center;
+    gap: var(--ahc-gap-sm);
+    min-block-size: var(--ahc-activity-row-height);
+  }
+
+  .ahc-activity-row__label {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--ahc-gap-xs);
+    min-inline-size: 0;
+    color: var(--ahc-text);
+  }
+
+  .ahc-activity-row__name {
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.84rem;
+    font-weight: 760;
+  }
+
+  .ahc-activity-row__plot {
+    direction: ltr;
+    position: relative;
+    min-inline-size: 0;
+    min-block-size: var(--ahc-activity-row-height);
+    overflow: visible;
+    border-radius: 999px;
+    background-image: linear-gradient(
+      to right,
+      rgba(148, 163, 184, 0.08) 1px,
+      transparent 1px
+    );
+    background-size: calc(100% / 8) 100%;
+  }
+
+  .ahc-activity-segment {
+    appearance: none;
+    position: absolute;
+    inset-block-start: 50%;
+    min-inline-size: var(--ahc-activity-segment-min-width);
+    block-size: var(--ahc-activity-segment-height);
+    transform: translateY(-50%);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    padding: 0;
+    cursor: pointer;
+    overflow: hidden;
+    color: transparent;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.13),
+      0 7px 18px rgba(0, 0, 0, 0.22);
+  }
+
+  .ahc-activity-segment span {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .ahc-activity-segment:focus-visible {
+    outline: 2px solid var(--ahc-focus);
+    outline-offset: 3px;
+  }
+
+  .ahc-activity-segment[data-category="on"] {
+    background: linear-gradient(90deg, var(--ahc-on), #86efac);
+  }
+  .ahc-activity-segment[data-category="cooling"] {
+    background: linear-gradient(90deg, var(--ahc-cooling), #7dd3fc);
+  }
+  .ahc-activity-segment[data-category="heating"] {
+    background: linear-gradient(90deg, var(--ahc-heating), #fdba74);
+  }
+  .ahc-activity-segment[data-category="drying"],
+  .ahc-activity-segment[data-category="fan"] {
+    background: linear-gradient(90deg, var(--ahc-idle), #5eead4);
+  }
+  .ahc-activity-segment[data-category="playing"] {
+    background: linear-gradient(90deg, var(--ahc-playing), #c4b5fd);
+  }
+  .ahc-activity-segment[data-category="opening"] {
+    background: linear-gradient(90deg, var(--ahc-opening), #fde68a);
+  }
+  .ahc-activity-segment[data-category="closing"] {
+    background: linear-gradient(90deg, var(--ahc-closing), #e2e8f0);
+  }
+
+  .ahc-activity-empty {
+    place-items: center;
+    min-block-size: 260px;
+    text-align: center;
+  }
+
+  .ahc-activity-empty h3 {
+    margin: 0;
+    color: var(--ahc-text);
+    font-size: 1.18rem;
+    font-weight: 850;
+  }
+
+  .ahc-activity-empty p {
+    max-inline-size: 520px;
+    margin: var(--ahc-gap-xs) 0 0;
+    color: var(--ahc-muted);
   }
 
   /* Timeline */
@@ -3616,6 +4142,7 @@ const qi = Ke`
   @media (max-width: 1100px) {
     :host {
       --ahc-label-width: 180px;
+      --ahc-activity-label-width: 190px;
     }
 
     .ahc__body {
@@ -3638,6 +4165,7 @@ const qi = Ke`
   @media (max-width: 900px) {
     :host {
       --ahc-label-width: 180px;
+      --ahc-activity-label-width: 180px;
     }
   }
 
@@ -3645,6 +4173,7 @@ const qi = Ke`
     :host {
       --ahc-chip-height: 44px;
       --ahc-label-width: 180px;
+      --ahc-activity-label-width: 160px;
     }
 
     .ahc {
@@ -3782,6 +4311,34 @@ const qi = Ke`
       flex: 0 0 min(78vw, 280px);
     }
 
+    .ahc-activity {
+      padding: var(--ahc-gap-sm);
+    }
+
+    .ahc-activity__header,
+    .ahc-activity-group__header {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .ahc-activity__range,
+    .ahc-activity-group__meta {
+      align-self: start;
+    }
+
+    .ahc-activity__axis {
+      margin-inline-end: var(--ahc-activity-label-width);
+    }
+
+    .ahc-activity-row {
+      grid-template-columns: minmax(260px, 1fr) var(--ahc-activity-label-width);
+      gap: var(--ahc-gap-xs);
+    }
+
+    .ahc-activity-group {
+      overflow-x: auto;
+    }
+
     .ahc-timeline-card {
       border-radius: var(--ahc-radius-md);
       background: transparent;
@@ -3884,12 +4441,14 @@ const qi = Ke`
   @media (max-width: 600px) {
     :host {
       --ahc-label-width: 150px;
+      --ahc-activity-label-width: 145px;
     }
   }
 
   @media (max-width: 420px) {
     :host {
       --ahc-label-width: 130px;
+      --ahc-activity-label-width: 132px;
     }
 
     .ahc__summary-grid {
@@ -3911,6 +4470,15 @@ const qi = Ke`
 
     .ahc-row__state-chip {
       display: none;
+    }
+
+    .ahc-activity-row__name {
+      font-size: 0.78rem;
+    }
+
+    .ahc-activity__density-strip {
+      grid-auto-columns: minmax(4px, 1fr);
+      gap: 2px;
     }
   }
 
@@ -3993,34 +4561,34 @@ const qi = Ke`
     font-size: 0.74rem;
   }
 `;
-function W(t) {
-  const e = t.flatMap((u) => u.rows), i = e.flatMap(
-    (u) => u.segments.filter((p) => p.active)
+function U(t) {
+  const e = t.flatMap((_) => _.rows), i = e.flatMap(
+    (_) => _.segments.filter((p) => p.active)
   ), a = i.reduce(
-    (u, p) => u + p.durationMs,
+    (_, p) => _ + p.durationMs,
     0
-  ), s = e.filter((u) => u.totalActiveMs > 0), n = i.length, r = Date.now(), c = e.filter(
-    (u) => u.segments.some(
+  ), s = e.filter((_) => _.totalActiveMs > 0), n = i.length, r = Date.now(), c = e.filter(
+    (_) => _.segments.some(
       (p) => p.active && p.start.getTime() <= r && p.end.getTime() >= r - 9e4
     )
   ).length, o = [...i].sort(
-    (u, p) => p.start.getTime() - u.start.getTime()
-  )[0], h = o ? e.find((u) => u.entity.entity_id === o.entity_id) : void 0, l = [...s].sort(
-    (u, p) => p.totalActiveMs - u.totalActiveMs
-  )[0], d = [...t].filter((u) => u.totalActiveMs > 0).sort((u, p) => p.totalActiveMs - u.totalActiveMs)[0];
+    (_, p) => p.start.getTime() - _.start.getTime()
+  )[0], d = o ? e.find((_) => _.entity.entity_id === o.entity_id) : void 0, l = [...s].sort(
+    (_, p) => p.totalActiveMs - _.totalActiveMs
+  )[0], h = [...t].filter((_) => _.totalActiveMs > 0).sort((_, p) => p.totalActiveMs - _.totalActiveMs)[0];
   return {
     totalActiveMs: a,
     activeEntityCount: s.length,
     eventCount: n,
     activeNowCount: c,
     lastEvent: o,
-    lastEventRow: h,
+    lastEventRow: d,
     mostActiveEntity: l,
-    mostActiveArea: d,
-    peakBucketLabel: Gi(i)
+    mostActiveArea: h,
+    peakBucketLabel: la(i)
   };
 }
-function Gi(t) {
+function la(t) {
   if (!t.length) return;
   const e = new Array(24).fill(0);
   for (const s of t) {
@@ -4031,14 +4599,18 @@ function Gi(t) {
   if (!(a < 0))
     return `${String(a).padStart(2, "0")}:00 – ${String((a + 1) % 24).padStart(2, "0")}:00`;
 }
-class Ki extends D {
+function qe(t, e = !1) {
+  const i = t.view_mode ?? t.default_view ?? f.view_mode;
+  return e && i === "activity" || i === "legacy_swimlane" || i === "swimlane" && t.timeline_style === "legacy" ? "legacy_swimlane" : i === "heatmap" ? "heatmap" : i === "detail" ? "detail" : i === "correlation" ? "correlation" : "activity";
+}
+class da extends P {
   constructor() {
     super(...arguments), this._config = {
       type: "custom:activity-history-card"
-    }, this._areas = [], this._labels = [], this._domains = J, this._loadedOptions = !1;
+    }, this._areas = [], this._labels = [], this._domains = Z, this._loadedOptions = !1;
   }
   static {
-    this.styles = Ke`
+    this.styles = We`
     :host {
       display: block;
       color: var(--primary-text-color, #e5e7eb);
@@ -4139,17 +4711,18 @@ class Ki extends D {
       ...e,
       type: "custom:activity-history-card",
       auto_discover: e.auto_discover ?? !0,
-      hours_to_show: e.hours_to_show ?? v.hours_to_show,
-      display_mode: e.display_mode ?? v.display_mode,
-      group_by: e.group_by ?? v.group_by
+      hours_to_show: e.hours_to_show ?? f.hours_to_show,
+      display_mode: e.display_mode ?? f.display_mode,
+      view_mode: e.view_mode ?? f.view_mode,
+      group_by: e.group_by ?? f.group_by
     }, this.requestUpdate();
   }
   set hass(e) {
     this._hass = e, this._loadedOptions || (this._loadedOptions = !0, this._loadOptions());
   }
   render() {
-    const e = this._config, i = e.domains?.length ? e.domains : J;
-    return _`
+    const e = this._config, i = e.domains?.length ? e.domains : Z;
+    return u`
       <div class="editor">
         <section class="section">
           <h3>הגדרות כלליות</h3>
@@ -4158,8 +4731,8 @@ class Ki extends D {
               כותרת
               <input
                 type="text"
-                .value=${e.title ?? v.title}
-                @input=${(a) => this._setValue("title", C(a))}
+                .value=${e.title ?? f.title}
+                @input=${(a) => this._setValue("title", R(a))}
               />
             </label>
             <label>
@@ -4169,7 +4742,7 @@ class Ki extends D {
                 min="1"
                 max="168"
                 .value=${String(e.hours_to_show ?? 24)}
-                @input=${(a) => this._setNumber("hours_to_show", C(a))}
+                @input=${(a) => this._setNumber("hours_to_show", R(a))}
               />
             </label>
           </div>
@@ -4180,7 +4753,7 @@ class Ki extends D {
                 .value=${e.display_mode ?? "panel"}
                 @change=${(a) => this._setValue(
       "display_mode",
-      C(a)
+      R(a)
     )}
               >
                 <option value="card">כרטיס רגיל</option>
@@ -4195,6 +4768,29 @@ class Ki extends D {
                 @change=${(a) => this._setChecked("mock_data", a)}
               />
               נתוני דוגמה
+            </label>
+          </div>
+          <div class="row">
+            <label>
+              תצוגת ציר זמן
+              <select
+                .value=${e.view_mode ?? f.view_mode}
+                @change=${(a) => this._setValue("view_mode", R(a))}
+              >
+                <option value="activity">Activity dashboard</option>
+                <option value="legacy_swimlane">Legacy swimlane / debug</option>
+                <option value="heatmap">Heatmap placeholder</option>
+                <option value="detail">Detail placeholder</option>
+                <option value="correlation">Correlation placeholder</option>
+              </select>
+            </label>
+            <label class="check">
+              <input
+                type="checkbox"
+                .checked=${e.show_activity_density !== !1}
+                @change=${(a) => this._setChecked("show_activity_density", a)}
+              />
+              הצג פס צפיפות פעילות
             </label>
           </div>
           <label class="check">
@@ -4243,10 +4839,10 @@ class Ki extends D {
             <label>
               מצב פעילות
               <select
-                .value=${e.activity_mode ?? v.activity_mode}
+                .value=${e.activity_mode ?? f.activity_mode}
                 @change=${(a) => this._setValue(
       "activity_mode",
-      C(a)
+      R(a)
     )}
               >
                 <option value="meaningful">פעילות משמעותית</option>
@@ -4260,9 +4856,9 @@ class Ki extends D {
                 min="0"
                 max="3600"
                 .value=${String(
-      e.min_row_active_seconds ?? v.min_row_active_seconds
+      e.min_row_active_seconds ?? f.min_row_active_seconds
     )}
-                @input=${(a) => this._setNumber("min_row_active_seconds", C(a))}
+                @input=${(a) => this._setNumber("min_row_active_seconds", R(a))}
               />
             </label>
             <label>
@@ -4272,9 +4868,9 @@ class Ki extends D {
                 min="1"
                 max="60"
                 .value=${String(
-      e.max_rows_per_group ?? v.max_rows_per_group
+      e.max_rows_per_group ?? f.max_rows_per_group
     )}
-                @input=${(a) => this._setNumber("max_rows_per_group", C(a))}
+                @input=${(a) => this._setNumber("max_rows_per_group", R(a))}
               />
             </label>
             <label>
@@ -4284,9 +4880,9 @@ class Ki extends D {
                 min="1"
                 max="200"
                 .value=${String(
-      e.max_total_rows ?? v.max_total_rows
+      e.max_total_rows ?? f.max_total_rows
     )}
-                @input=${(a) => this._setNumber("max_total_rows", C(a))}
+                @input=${(a) => this._setNumber("max_total_rows", R(a))}
               />
             </label>
           </div>
@@ -4338,7 +4934,7 @@ class Ki extends D {
       (a) => this._renderArrayCheckbox(
         "domains",
         a,
-        N[a] ?? a,
+        O[a] ?? a,
         i.includes(a)
       )
     )}
@@ -4351,7 +4947,7 @@ class Ki extends D {
 
         <section class="section">
           <h3>אזורים</h3>
-          ${this._areas.length ? _`<div class="check-grid">
+          ${this._areas.length ? u`<div class="check-grid">
                 ${this._areas.map(
       (a) => this._renderArrayCheckbox(
         "areas",
@@ -4360,7 +4956,7 @@ class Ki extends D {
         (e.areas ?? []).includes(a.name) || (e.areas ?? []).includes(a.area_id)
       )
     )}
-              </div>` : _`<p class="hint">
+              </div>` : u`<p class="hint">
                 לא נטענו אזורים מה־registry. אפשר עדיין לערוך YAML ידנית.
               </p>`}
           <p class="hint">
@@ -4370,7 +4966,7 @@ class Ki extends D {
 
         <section class="section">
           <h3>לייבלים</h3>
-          ${this._labels.length ? this._renderLabelControls(e) : _`<p class="hint">
+          ${this._labels.length ? this._renderLabelControls(e) : u`<p class="hint">
                 לא נמצאו labels ב־Home Assistant, או שהגרסה לא תומכת ב־label
                 registry.
               </p>`}
@@ -4379,7 +4975,7 @@ class Ki extends D {
     `;
   }
   _renderLabelControls(e) {
-    return _`
+    return u`
       <p class="hint">
         בחר labels להצגה או להסתרה. הסתרה גוברת על הצגה, כך שאפשר למשל להסתיר
         "לא להצגה" או "רכיבים מוגנים".
@@ -4409,7 +5005,7 @@ class Ki extends D {
     `;
   }
   _renderArrayCheckbox(e, i, a, s) {
-    return _`
+    return u`
       <label class="check">
         <input
           type="checkbox"
@@ -4426,10 +5022,10 @@ class Ki extends D {
       this._safeRegistryCall("config/area_registry/list"),
       this._safeRegistryCall("config/label_registry/list")
     ]), a = [
-      ...new Set(Object.keys(this._hass.states).map(F))
+      ...new Set(Object.keys(this._hass.states).map(I))
     ].filter(Boolean).sort();
     this._areas = e.sort((s, n) => s.name.localeCompare(n.name, "he")), this._labels = i.sort((s, n) => s.name.localeCompare(n.name, "he")), this._domains = [
-      .../* @__PURE__ */ new Set([...J, ...a])
+      .../* @__PURE__ */ new Set([...Z, ...a])
     ].sort(), this.requestUpdate();
   }
   async _safeRegistryCall(e) {
@@ -4470,14 +5066,14 @@ class Ki extends D {
     ), this.requestUpdate();
   }
 }
-function C(t) {
+function R(t) {
   return t.target.value;
 }
 customElements.get("activity-history-card-editor") || customElements.define(
   "activity-history-card-editor",
-  Ki
+  da
 );
-class Vi extends D {
+class ha extends P {
   constructor() {
     super(...arguments), this._rows = [], this._visibleRows = [], this._groups = [], this._loading = !1, this._fullscreen = !1, this._filterSheetOpen = !1, this._usingMockData = !1, this._showAllRows = !1, this._fetchToken = 0, this._lastFetchKey = "", this._hasFetchedOnce = !1, this._initialLoad = !1, this._backgroundLoading = !1, this._lastResolvedEntityKey = "", this._lastHistoryFetchAt = 0, this._historyCache = /* @__PURE__ */ new Map(), this._filter = {
       search: "",
@@ -4488,9 +5084,9 @@ class Vi extends D {
       timePreset: "24h"
     }, this._openSegmentPopover = (e, i, a) => {
       e.preventDefault(), e.stopPropagation();
-      const s = this._visibleRows.find((h) => h.entity.entity_id === i) ?? this._rows.find((h) => h.entity.entity_id === i), n = s?.segments[a], r = e.currentTarget instanceof Element ? e.currentTarget : void 0;
+      const s = this._visibleRows.find((d) => d.entity.entity_id === i) ?? this._rows.find((d) => d.entity.entity_id === i), n = s?.segments[a], r = e.currentTarget instanceof Element ? e.currentTarget : void 0;
       if (!s || !n || !r) return;
-      const c = r.getBoundingClientRect(), o = _i(c, {
+      const c = r.getBoundingClientRect(), o = bi(c, {
         width: window.innerWidth,
         height: window.innerHeight
       });
@@ -4564,7 +5160,7 @@ class Vi extends D {
     };
   }
   static {
-    this.styles = qi;
+    this.styles = ca;
   }
   static getConfigElement() {
     return document.createElement("activity-history-card-editor");
@@ -4572,9 +5168,10 @@ class Vi extends D {
   static getStubConfig() {
     return {
       type: "custom:activity-history-card",
-      title: v.title,
+      title: f.title,
       auto_discover: !0,
       display_mode: "panel",
+      view_mode: "activity",
       hours_to_show: 24,
       group_by: "area"
     };
@@ -4586,16 +5183,16 @@ class Vi extends D {
       );
     const i = this._initialTimePreset(e);
     this._config = {
-      ...v,
+      ...f,
       ...e,
-      view_mode: e.view_mode ?? e.default_view ?? "swimlane",
-      group_by: e.group_by ?? v.group_by,
+      view_mode: e.view_mode ?? e.default_view ?? f.view_mode,
+      group_by: e.group_by ?? f.group_by,
       filters: {
         show: !0,
         show_search: !0,
-        show_area_chips: !0,
-        show_domain_chips: !0,
-        show_state_mode: !0,
+        show_area_chips: !1,
+        show_domain_chips: !1,
+        show_state_mode: !1,
         active_only: !1,
         ...e.filters ?? {}
       }
@@ -4611,7 +5208,7 @@ class Vi extends D {
     });
   }
   set hass(e) {
-    this._hass = e, pi({
+    this._hass = e, yi({
       hasFetchedOnce: this._hasFetchedOnce,
       live: this._config?.live !== !1,
       lastHistoryFetchAt: this._lastHistoryFetchAt,
@@ -4637,8 +5234,8 @@ class Vi extends D {
     };
   }
   render() {
-    if (!this._config) return _``;
-    const e = this._hass?.locale?.language ?? this._hass?.language, i = Ot(
+    if (!this._config) return u``;
+    const e = this._hass?.locale?.language ?? this._hass?.language, i = Gt(
       this._config.direction ?? this._config.rtl ?? "auto",
       e
     ), a = [
@@ -4650,7 +5247,7 @@ class Vi extends D {
       this._backgroundLoading ? "ahc--background-loading" : "",
       this._visibleRows.length > 70 ? "ahc--ultra-dense" : this._visibleRows.length > 30 ? "ahc--dense" : ""
     ].filter(Boolean).join(" ");
-    return _`
+    return u`
       <ha-card
         class=${a}
         dir=${i ? "rtl" : "ltr"}
@@ -4668,21 +5265,21 @@ class Vi extends D {
   }
   _renderBody() {
     const e = this._config.show_insights !== !1;
-    return _`
+    return u`
       <section
         class=${e ? "ahc__body" : "ahc__body ahc__body--no-insights"}
       >
-        <main class="ahc__timeline-panel">${this._renderMainContent()}</main>
+        <main class="ahc__main">${this._renderMainContent()}</main>
         ${e ? this._renderInsights() : g}
       </section>
     `;
   }
   _renderHeader() {
     const e = `${this._timePresetLabel(this._filter.timePreset)} · ${this._usingMockData ? "נתוני דוגמה" : "נתוני Home Assistant"}`;
-    return _`
+    return u`
       <header class="ahc__topbar">
         <div class="ahc__toolbar">
-          ${this._config.show_fullscreen_button === !1 ? g : _`
+          ${this._config.show_fullscreen_button === !1 ? g : u`
                 <button
                   class="ahc__button ahc__button--ghost"
                   type="button"
@@ -4703,7 +5300,7 @@ class Vi extends D {
           >
             <span aria-hidden="true">↻</span><span>רענן</span>
           </button>
-          ${this._backgroundLoading ? _`<span class="ahc__refresh-indicator" role="status"
+          ${this._backgroundLoading ? u`<span class="ahc__refresh-indicator" role="status"
                 >מעדכן...</span
               >` : g}
         </div>
@@ -4713,7 +5310,7 @@ class Vi extends D {
               ><ha-icon icon="mdi:chart-timeline-variant"></ha-icon
             ></span>
             <h2 class="ahc__title">
-              ${this._config.title ?? v.title}
+              ${this._config.title ?? f.title}
             </h2>
           </div>
           <p class="ahc__subtitle">${e}</p>
@@ -4724,12 +5321,12 @@ class Vi extends D {
   }
   _renderLastEventPill() {
     const e = this._summary, i = e?.lastEventRow, a = e?.lastEvent;
-    return !i || !a ? g : _`
+    return !i || !a ? g : u`
       <div class="ahc-last-event">
         <span class="ahc-last-event__label">אירוע אחרון</span>
         <strong>${i.entity.name}</strong>
         <span
-          >${k(a.start)} · ${O[a.category]} ·
+          >${x(a.start)} · ${z[a.category]} ·
           ${re(i, this._config.debug === !0)}</span
         >
       </div>
@@ -4737,8 +5334,8 @@ class Vi extends D {
   }
   _renderFilters() {
     if (this._config.filters?.show === !1) return g;
-    const e = Z(this._curation), i = !!(this._curation?.hiddenRows || this._showAllRows);
-    return _`
+    const e = q(this._curation), i = !!(this._curation?.hiddenRows || this._showAllRows);
+    return u`
       <section class="ahc__filters" aria-label="מסננים">
         <div class="ahc__filter-row ahc__filter-row--primary">
           <span class="ahc__filter-label">טווח זמן</span>
@@ -4802,7 +5399,7 @@ class Vi extends D {
           >
             <span aria-hidden="true">▾</span><span>סינון</span>
           </button>
-          ${i ? _`<button
+          ${i ? u`<button
                 class="ahc__button ahc__button--ghost"
                 type="button"
                 aria-pressed=${this._showAllRows ? "true" : "false"}
@@ -4810,13 +5407,13 @@ class Vi extends D {
               >
                 ${this._showAllRows ? "הצג רק פעילות" : "הצג הכל"}
               </button>` : g}
-          ${e ? _`<span class="ahc-curation-note">${e}</span>` : g}
+          ${e ? u`<span class="ahc-curation-note">${e}</span>` : g}
         </div>
       </section>
     `;
   }
   _renderChip(e, i, a) {
-    return _`<button
+    return u`<button
       class="ahc__chip"
       type="button"
       aria-pressed=${i ? "true" : "false"}
@@ -4828,7 +5425,7 @@ class Vi extends D {
   _renderSummary() {
     if (this._config.show_summary === !1) return g;
     const e = this._summary, i = this._visibleRows.length || this._rows.length, a = this._config.summary_scope === "all" ? "לפי כל הרכיבים שנמצאו" : "לפי הרכיבים שמוצגים";
-    return _`
+    return u`
       <section class="ahc__summary-grid" aria-label="סיכום פעילות">
         <article class="ahc__metric">
           <div class="ahc__metric-copy">
@@ -4864,7 +5461,7 @@ class Vi extends D {
           <div class="ahc__metric-copy">
             <span class="ahc__metric-label">סה״כ שעות־רכיב</span>
             <span class="ahc__metric-value ahc__metric-value--positive"
-              >${z(e?.totalActiveMs ?? 0)}</span
+              >${A(e?.totalActiveMs ?? 0)}</span
             >
             <span class="ahc__metric-subtitle">${a}</span>
           </div>
@@ -4876,7 +5473,7 @@ class Vi extends D {
   _renderSummaryLegacy() {
     if (this._config.show_summary === !1) return g;
     const e = this._summary, i = e?.lastEventRow, a = e?.lastEvent;
-    return _`
+    return u`
       <section class="ahc__summary-grid" aria-label="סיכום פעילות">
         <article class="ahc__metric">
           <div class="ahc__metric-copy">
@@ -4885,7 +5482,7 @@ class Vi extends D {
               >${i?.entity.name ?? "אין"}</span
             >
             <span class="ahc__metric-subtitle">
-              ${a && i ? `${k(a.start)} · ${O[a.category]} · ${re(i, this._config.debug === !0)}` : "לא נמצאו אירועים בטווח"}
+              ${a && i ? `${x(a.start)} · ${z[a.category]} · ${re(i, this._config.debug === !0)}` : "לא נמצאו אירועים בטווח"}
             </span>
           </div>
           <span class="ahc__metric-icon" aria-hidden="true">♪</span>
@@ -4894,7 +5491,7 @@ class Vi extends D {
           <div class="ahc__metric-copy">
             <span class="ahc__metric-label">סה״כ שעות־רכיב</span>
             <span class="ahc__metric-value ahc__metric-value--positive"
-              >${z(e?.totalActiveMs ?? 0)}</span
+              >${A(e?.totalActiveMs ?? 0)}</span
             >
             <span class="ahc__metric-subtitle"
               >סכום פעילות על פני כל הרכיבים</span
@@ -4929,7 +5526,7 @@ class Vi extends D {
     if (this._initialLoad && !this._rows.length)
       return this._renderInitialLoading();
     if (this._error && !this._rows.length)
-      return _`<div class="ahc-state-card">
+      return u`<div class="ahc-state-card">
         <div>
           <h3 class="ahc-state-card__title">שגיאה בטעינת ההיסטוריה</h3>
           <p>${this._error}</p>
@@ -4940,20 +5537,36 @@ class Vi extends D {
         this._emptyReason ?? "no_resolved_entities"
       );
     const e = this._resolveRange();
-    switch (this._config.view_mode ?? this._config.default_view ?? "swimlane") {
+    switch (qe(this._config, this._showAllRows)) {
       case "heatmap":
-        return fi();
+        return $i();
       case "detail":
-        return mi();
+        return xi();
       case "correlation":
-        return gi();
-      case "swimlane":
+        return wi();
+      case "legacy_swimlane":
+        return aa({
+          groups: this._groups,
+          range: e,
+          config: this._showAllRows && this._config.view_mode === "activity" ? {
+            ...this._config,
+            show_inactive_baselines: !0,
+            max_visible_rows: Math.max(
+              this._config.max_visible_rows ?? 0,
+              80
+            )
+          } : this._config,
+          summary: this._summary ?? U(this._groups),
+          curation: this._curation,
+          onSegmentClick: this._openSegmentPopover
+        });
+      case "activity":
       default:
-        return Fi({
+        return Yi({
           groups: this._groups,
           range: e,
           config: this._config,
-          summary: this._summary ?? W(this._groups),
+          summary: this._summary ?? U(this._groups),
           curation: this._curation,
           onSegmentClick: this._openSegmentPopover
         });
@@ -4961,7 +5574,7 @@ class Vi extends D {
   }
   _renderInitialLoading() {
     const e = !this._hass && !this._usingMockData ? "ממתין לחיבור Home Assistant." : "מושך היסטוריה מה-Recorder.";
-    return _`
+    return u`
       <section class="ahc-loading" aria-label="טעינת היסטוריה" aria-busy="true">
         <div class="ahc-loading__copy">
           <h3>טוען ציר זמן...</h3>
@@ -4969,11 +5582,11 @@ class Vi extends D {
         </div>
         <div class="ahc-loading__timeline" aria-hidden="true">
           ${Array.from({ length: 4 }).map(
-      (i, a) => _`
+      (i, a) => u`
               <div class="ahc-loading__group">
                 <span></span>
                 ${Array.from({ length: 5 }).map(
-        (s, n) => _`<i
+        (s, n) => u`<i
                       style="--delay:${a + n}; --width:${42 + (a + n) % 4 * 12}%"
                     ></i>`
       )}
@@ -4986,13 +5599,13 @@ class Vi extends D {
   }
   _renderSegmentPopover() {
     const e = this._segmentPopover;
-    if (!e) return _``;
-    const i = It(
+    if (!e) return u``;
+    const i = Kt(
       e.row,
       e.segment,
       this._config.debug === !0
     );
-    return _`
+    return u`
       <aside
         class="ahc-popover"
         data-placement=${e.placement}
@@ -5011,7 +5624,7 @@ class Vi extends D {
         <h3 class="ahc-popover__title">${e.row.entity.name}</h3>
         <dl class="ahc-popover__dl">
           ${i.map(
-      ([a, s]) => _`<dt class="ahc-popover__dt">${a}</dt>
+      ([a, s]) => u`<dt class="ahc-popover__dt">${a}</dt>
                 <dd class="ahc-popover__dd">${s}</dd>`
     )}
         </dl>
@@ -5066,23 +5679,23 @@ activity_mode: all
 show_inactive_baselines: true`
       }
     }[e], s = e === "no_resolved_entities" && this._diagnostics?.discovery?.unavailableReasons.length ? this._diagnostics.discovery.unavailableReasons.join(", ") : "";
-    return _`
+    return u`
       <div class="ahc-state-card">
         <div>
           <h3 class="ahc-state-card__title">${a.title}</h3>
           <p>${a.body}</p>
-          ${s ? _`<p>
+          ${s ? u`<p>
                 אזהרת discovery: ${s}. אם האזורים לא זמינים, נסה
                 להגדיר entities ידנית או להפעיל debug.
               </p>` : g}
-          ${e === "no_meaningful_activity" && this._config.debug ? _`<p class="ahc-debug__meta">
-                ${Z(this._curation)}
+          ${e === "no_meaningful_activity" && this._config.debug ? u`<p class="ahc-debug__meta">
+                ${q(this._curation)}
               </p>` : g}
           <pre
             class="ahc-state-card__yaml"
             dir="ltr"
           ><code>${a.yaml}</code></pre>
-          ${e === "no_meaningful_activity" ? _`<div class="ahc-empty-actions">
+          ${e === "no_meaningful_activity" ? u`<div class="ahc-empty-actions">
                 <button
                   class="ahc__button ahc__button--primary"
                   type="button"
@@ -5111,7 +5724,7 @@ show_inactive_baselines: true`
   }
   _renderDiagnostics() {
     const e = this._diagnostics;
-    return e ? _`
+    return e ? u`
       <details class="ahc-debug" aria-label="אבחון">
         <summary class="ahc-debug__header">
           <strong>Debug</strong>
@@ -5194,21 +5807,21 @@ show_inactive_baselines: true`
         <p class="ahc-debug__meta">
           מסננים: ${JSON.stringify(e.activeFilters)}
         </p>
-        ${e.curation ? _`<p class="ahc-debug__meta" dir="ltr">
+        ${e.curation ? u`<p class="ahc-debug__meta" dir="ltr">
               curation: ${JSON.stringify(e.curation.hiddenByReason)}
             </p>` : g}
-        ${e.discovery?.unavailableReasons.length ? _`<p class="ahc-debug__meta">
+        ${e.discovery?.unavailableReasons.length ? u`<p class="ahc-debug__meta">
               Registry warnings:
               ${e.discovery.unavailableReasons.join(", ")}
             </p>` : g}
       </details>
-    ` : _`<details class="ahc-debug" aria-label="אבחון">
+    ` : u`<details class="ahc-debug" aria-label="אבחון">
         <summary>Debug · ממתין לטעינת נתונים...</summary>
       </details>`;
   }
   _renderInsights() {
     const e = this._summary, i = e?.mostActiveEntity, a = e?.mostActiveArea, s = !!(e && e.eventCount > 0);
-    return _`
+    return u`
       <aside
         class="ahc__insights ahc__insights-panel"
         aria-label="תובנות חכמות"
@@ -5222,7 +5835,7 @@ show_inactive_baselines: true`
             >${i?.entity.name ?? "אין מספיק נתונים"}</span
           >
           <span class="ahc__insight-subtitle"
-            >${i ? `${z(i.totalActiveMs)} · ${re(i, this._config.debug === !0)}` : "צריך היסטוריה פעילה בטווח"}</span
+            >${i ? `${A(i.totalActiveMs)} · ${re(i, this._config.debug === !0)}` : "צריך היסטוריה פעילה בטווח"}</span
           >
         </article>
         <article class="ahc__insight-card">
@@ -5231,7 +5844,7 @@ show_inactive_baselines: true`
             >${a?.title ?? "אין מספיק נתונים"}</span
           >
           <span class="ahc__insight-subtitle"
-            >${a ? `${z(a.totalActiveMs)} · ${a.subtitle ?? ""}` : "אין אזור עם פעילות משמעותית"}</span
+            >${a ? `${A(a.totalActiveMs)} · ${a.subtitle ?? ""}` : "אין אזור עם פעילות משמעותית"}</span
           >
         </article>
         <article class="ahc__insight-card">
@@ -5242,7 +5855,7 @@ show_inactive_baselines: true`
           <span class="ahc__insight-subtitle">לפי משך פעילות</span>
           <span class="ahc__spark" aria-hidden="true"
             >${[35, 48, 62, 44, 72, 54, 38].map(
-      (n) => _`<i style="--bar:${s ? n : 12}%"></i>`
+      (n) => u`<i style="--bar:${s ? n : 12}%"></i>`
     )}</span
           >
         </article>
@@ -5260,7 +5873,7 @@ show_inactive_baselines: true`
   }
   _renderFilterSheet() {
     const e = this._availableAreas(), i = this._availableDomains(), a = this._visibleRows;
-    return _`
+    return u`
       <div
         class="ahc-filter-sheet-backdrop"
         @click=${this._closeFilterSheet}
@@ -5339,7 +5952,7 @@ show_inactive_baselines: true`
     )}
             ${i.map(
       (s) => this._renderChip(
-        N[s] ?? s,
+        O[s] ?? s,
         this._filter.domains.includes(s),
         () => this._toggleDomain(s)
       )
@@ -5390,7 +6003,7 @@ show_inactive_baselines: true`
           >
             <span>${this._showAllRows ? "הצג רק פעילות" : "הצג הכל"}</span>
             <small
-              >${Z(this._curation) || "הסתר שורות ריקות, טכניות וקצרות מאוד"}</small
+              >${q(this._curation) || "הסתר שורות ריקות, טכניות וקצרות מאוד"}</small
             >
           </button>
         </div>
@@ -5434,19 +6047,19 @@ show_inactive_baselines: true`
           </div>
           <div class="ahc-entity-list">
             ${a.slice(0, 32).map(
-      (s) => _`
+      (s) => u`
                 <span class="ahc-entity-list__item">
                   <span>${s.entity.name}</span>
                   <small
                     >${[
         s.entity.area,
-        N[s.entity.domain] ?? s.entity.domain
+        O[s.entity.domain] ?? s.entity.domain
       ].filter(Boolean).join(" · ")}</small
                   >
                 </span>
               `
     )}
-            ${a.length > 32 ? _`<span class="ahc-entity-list__more"
+            ${a.length > 32 ? u`<span class="ahc-entity-list__more"
                   >ועוד ${a.length - 32} רכיבים</span
                 >` : g}
           </div>
@@ -5488,42 +6101,42 @@ show_inactive_baselines: true`
     const n = ++this._fetchToken, r = !this._hasFetchedOnce && !this._rows.length;
     this._initialLoad = r, this._loading = r, this._backgroundLoading = !r, this._error = void 0, this._rows.length || (this._emptyReason = void 0), this._usingMockData = s, this.requestUpdate();
     const c = s ? {
-      entities: di(this._config.mock_profile),
+      entities: mi(this._config.mock_profile),
       diagnostics: void 0
-    } : await Bt(this._config, this._hass);
+    } : await Vt(this._config, this._hass);
     if (n !== this._fetchToken) return;
-    const o = c.entities, h = Wi(o), l = this._resolveRange(), d = it(o), u = ii({
+    const o = c.entities, d = ua(o), l = this._resolveRange(), h = st(o), _ = ci({
       mock: s,
       start: l.start.toISOString(),
       end: l.end.toISOString(),
       entityIds: o.map((m) => m.entity_id),
-      withAttributes: d.withAttributes.map(
+      withAttributes: h.withAttributes.map(
         (m) => m.entity_id
       ),
-      withoutAttributes: d.withoutAttributes.map(
+      withoutAttributes: h.withoutAttributes.map(
         (m) => m.entity_id
       ),
       includeLabels: this._config.include_labels ?? [],
       excludeLabels: this._config.exclude_labels ?? [],
       significant: this._config.significant_changes_only,
       minimal: this._config.minimal_response
-    }), p = i && ["manual", "timer", "interval", "config"].includes(e), y = !!(this._lastResolvedEntityKey && this._lastResolvedEntityKey !== h) && e === "interval" ? "entities" : e, w = (m, $, ae = c.diagnostics) => {
-      this._lastResolvedEntityKey = h, this._lastHistoryFetchAt = Date.now(), this._hasFetchedOnce = !0, this._setPostLoadState(
-        $,
+    }), p = i && ["manual", "timer", "interval", "config"].includes(e), y = !!(this._lastResolvedEntityKey && this._lastResolvedEntityKey !== d) && e === "interval" ? "entities" : e, w = (m, k, ae = c.diagnostics) => {
+      this._lastResolvedEntityKey = d, this._lastHistoryFetchAt = Date.now(), this._hasFetchedOnce = !0, this._setPostLoadState(
+        k,
         l,
-        d,
+        h,
         m,
         s,
         ae,
         {
           reason: y,
-          key: u,
+          key: _,
           durationMs: Date.now() - a
         }
       ), this._syncRefreshTimer();
     };
     if (!o.length) {
-      this._usingMockData = !1, this._rows = [], this._visibleRows = [], this._groups = [], this._summary = W([]), this._curation = le([], this._config).diagnostics, this._emptyReason = this._config.auto_discover === !1 && !this._config.entities?.length ? "no_entities_selected" : "no_resolved_entities", this._setDiagnostics({
+      this._usingMockData = !1, this._rows = [], this._visibleRows = [], this._groups = [], this._summary = U([]), this._curation = le([], this._config).diagnostics, this._emptyReason = this._config.auto_discover === !1 && !this._config.entities?.length ? "no_entities_selected" : "no_resolved_entities", this._setDiagnostics({
         resolvedEntityCount: 0,
         historyRecordCount: 0,
         timelineSegmentCount: 0,
@@ -5540,59 +6153,63 @@ show_inactive_baselines: true`
         lastFetchTime: /* @__PURE__ */ new Date(),
         fetchDurationMs: Date.now() - a,
         fetchReason: y,
-        currentHistoryKey: u,
+        currentHistoryKey: _,
         refreshIntervalSeconds: this._refreshIntervalSeconds(),
         initialLoad: r,
         backgroundLoading: !1
-      }), this._hasFetchedOnce = !0, this._lastResolvedEntityKey = h, this._lastHistoryFetchAt = Date.now(), this._initialLoad = !1, this._loading = !1, this._backgroundLoading = !1, this._error = void 0, this._syncRefreshTimer(), this.requestUpdate();
+      }), this._hasFetchedOnce = !0, this._lastResolvedEntityKey = d, this._lastHistoryFetchAt = Date.now(), this._initialLoad = !1, this._loading = !1, this._backgroundLoading = !1, this._error = void 0, this._syncRefreshTimer(), this.requestUpdate();
       return;
     }
-    if (!p && u === this._lastFetchKey) {
-      const m = this._historyCache.get(u);
+    if (!p && _ === this._lastFetchKey) {
+      const m = this._historyCache.get(_);
       if (m) {
-        const $ = qe(m);
+        const k = Ke(m);
         this._rows = Oe(
           m,
           o,
           l,
           this._config,
           this._hass?.states ?? {}
-        ), w(!0, $), this._initialLoad = !1, this._loading = !1, this._backgroundLoading = !1, this._error = void 0, this._rebuildGroups();
+        ), w(!0, k), this._initialLoad = !1, this._loading = !1, this._backgroundLoading = !1, this._error = void 0, this._rebuildGroups();
         return;
       }
     }
     try {
-      let m = p ? void 0 : this._historyCache.get(u);
-      if (m || (m = s ? hi(l, this._config.mock_profile) : await ai(
+      let m = p ? void 0 : this._historyCache.get(_);
+      if (m || (m = s ? fi(l, this._config.mock_profile) : await li(
         this._hass,
         o,
         l,
         this._config
-      ), this._historyCache.set(u, m)), n !== this._fetchToken) return;
-      const $ = qe(m);
+      ), this._historyCache.set(_, m)), n !== this._fetchToken) return;
+      const k = Ke(m);
       this._rows = Oe(
         m,
         o,
         l,
         this._config,
         this._hass?.states ?? {}
-      ), w(!1, $), this._lastFetchKey = u, this._rebuildGroups();
+      ), w(!1, k), this._lastFetchKey = _, this._rebuildGroups();
     } catch (m) {
-      this._error = m instanceof Error ? m.message : String(m), this._rows.length || (this._visibleRows = [], this._groups = [], this._summary = W([]), this._curation = le([], this._config).diagnostics, this._emptyReason = void 0);
+      this._error = m instanceof Error ? m.message : String(m), this._rows.length || (this._visibleRows = [], this._groups = [], this._summary = U([]), this._curation = le([], this._config).diagnostics, this._emptyReason = void 0);
     } finally {
       n === this._fetchToken && (this._initialLoad = !1, this._loading = !1, this._backgroundLoading = !1, this.requestUpdate());
     }
   }
   _rebuildGroups() {
-    const e = ti(this._rows, this._filter), i = le(e, this._config, {
+    const e = oi(this._rows, this._filter), i = le(e, this._config, {
       showAll: this._showAllRows,
       groupBy: this._filter.groupBy
     });
-    this._visibleRows = i.rows, this._curation = i.diagnostics, this._groups = Me(i.rows, this._filter.groupBy).filter(
-      (s) => this._config.hide_empty_groups === !1 || s.rows.length > 0
+    this._visibleRows = i.rows, this._curation = i.diagnostics, this._groups = Te(i.rows, this._filter.groupBy).filter(
+      (n) => this._config.hide_empty_groups === !1 || n.rows.length > 0
     );
-    const a = this._config.summary_scope === "all" ? Me(e, this._filter.groupBy) : this._groups;
-    this._summary = W(a), this._rows.length && !e.length ? this._emptyReason = "all_entities_filtered" : e.length && !i.rows.length ? this._emptyReason = "no_meaningful_activity" : (this._emptyReason === "all_entities_filtered" || this._emptyReason === "no_meaningful_activity") && (this._emptyReason = void 0), this._diagnostics && this._setDiagnostics({
+    const a = qe(this._config, this._showAllRows), s = this._config.summary_scope === "all" ? Te(e, this._filter.groupBy) : a === "activity" ? ft(
+      this._groups,
+      this._resolveRange(),
+      this._config
+    ).groups : this._groups;
+    this._summary = U(s), this._rows.length && !e.length ? this._emptyReason = "all_entities_filtered" : e.length && !i.rows.length ? this._emptyReason = "no_meaningful_activity" : (this._emptyReason === "all_entities_filtered" || this._emptyReason === "no_meaningful_activity") && (this._emptyReason = void 0), this._diagnostics && this._setDiagnostics({
       ...this._diagnostics,
       filteredRowCount: e.length,
       renderedGroupCount: this._groups.length,
@@ -5602,17 +6219,17 @@ show_inactive_baselines: true`
   }
   _setPostLoadState(e, i, a, s, n, r, c) {
     const o = this._rows.reduce(
-      (l, d) => l + d.segments.length,
+      (l, h) => l + h.segments.length,
       0
-    ), h = this._rows.reduce(
-      (l, d) => l + d.segments.filter((u) => u.active).length,
+    ), d = this._rows.reduce(
+      (l, h) => l + h.segments.filter((_) => _.active).length,
       0
     );
-    e === 0 && h === 0 ? this._emptyReason = "no_history_returned" : e > 0 && o === 0 ? this._emptyReason = "history_unusable" : this._emptyReason = void 0, this._setDiagnostics({
+    e === 0 && d === 0 ? this._emptyReason = "no_history_returned" : e > 0 && o === 0 ? this._emptyReason = "history_unusable" : this._emptyReason = void 0, this._setDiagnostics({
       resolvedEntityCount: this._rows.length,
       historyRecordCount: e,
       timelineSegmentCount: o,
-      activeTimelineSegmentCount: h,
+      activeTimelineSegmentCount: d,
       filteredRowCount: this._rows.length,
       renderedGroupCount: 0,
       activeFilters: { ...this._filter },
@@ -5645,7 +6262,7 @@ show_inactive_baselines: true`
     }, e * 1e3);
   }
   _refreshIntervalSeconds() {
-    return st(
+    return rt(
       this._config?.refresh_interval_seconds
     );
   }
@@ -5713,16 +6330,16 @@ show_inactive_baselines: true`
     return e === "7d" ? "7 ימים" : e === "custom" ? "טווח מותאם" : "24 שעות אחרונות";
   }
 }
-function qe(t) {
+function Ke(t) {
   return Object.values(t).reduce(
     (e, i) => e + i.length,
     0
   );
 }
-function Wi(t) {
+function ua(t) {
   return t.map((e) => "entity" in e ? e.entity.entity_id : e.entity_id).sort().join("|");
 }
-customElements.get("activity-history-card") || customElements.define("activity-history-card", Vi);
+customElements.get("activity-history-card") || customElements.define("activity-history-card", ha);
 window.customCards = window.customCards || [];
 window.customCards.some((t) => t.type === "activity-history-card") || window.customCards.push({
   type: "activity-history-card",
@@ -5732,6 +6349,6 @@ window.customCards.some((t) => t.type === "activity-history-card") || window.cus
   documentationURL: "https://github.com/jonioliel/activity-history-card"
 });
 export {
-  Vi as ActivityHistoryCard
+  ha as ActivityHistoryCard
 };
 //# sourceMappingURL=activity-history-card.js.map

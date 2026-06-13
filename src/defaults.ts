@@ -47,6 +47,7 @@ export const DEFAULT_CONFIG: Required<
     | "hours_to_show"
     | "live"
     | "display_mode"
+    | "view_mode"
     | "group_by"
     | "show_summary"
     | "show_insights"
@@ -59,6 +60,8 @@ export const DEFAULT_CONFIG: Required<
     | "min_duration_seconds"
     | "merge_gap_seconds"
     | "max_visible_rows"
+    | "activity_density_buckets"
+    | "show_activity_density"
     | "smart_filter"
     | "activity_mode"
     | "hide_empty_rows"
@@ -83,6 +86,7 @@ export const DEFAULT_CONFIG: Required<
   hours_to_show: 24,
   live: false,
   display_mode: "card",
+  view_mode: "activity",
   group_by: "area",
   show_summary: true,
   show_insights: true,
@@ -94,14 +98,16 @@ export const DEFAULT_CONFIG: Required<
   refresh_interval_seconds: 300,
   min_duration_seconds: 20,
   merge_gap_seconds: 15,
-  max_visible_rows: 40,
+  max_visible_rows: 24,
+  activity_density_buckets: 0,
+  show_activity_density: true,
   smart_filter: true,
   activity_mode: "meaningful",
   hide_empty_rows: true,
   hide_empty_groups: true,
-  min_row_active_seconds: 30,
-  max_rows_per_group: 8,
-  max_total_rows: 40,
+  min_row_active_seconds: 10,
+  max_rows_per_group: 5,
+  max_total_rows: 24,
   show_technical_entities: false,
   show_config_entities: false,
   show_diagnostic_entities: false,

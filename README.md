@@ -1,6 +1,6 @@
 # Activity History Card
 
-כרטיס Lovelace ל-Home Assistant שמציג היסטוריית פעילות כציר זמן מסוג swimlane, עם תמיכה מלאה בעברית, RTL, מובייל, אזורים, סינון לפי סוג רכיב ו-labels.
+כרטיס Lovelace ל-Home Assistant שמציג היסטוריית פעילות כ-dashboard נקי: פס צפיפות פעילות, כרטיסי אזורים, שורות פעילות משמעותיות בלבד, תמיכה מלאה בעברית, RTL, מובייל, אזורים, סינון לפי סוג רכיב ו-labels.
 
 ```yaml
 type: custom:activity-history-card
@@ -33,6 +33,7 @@ Type: `JavaScript Module`
 ```yaml
 type: custom:activity-history-card
 title: היסטוריית פעילות חכמה
+view_mode: activity
 mock_data: false
 auto_discover: true
 display_mode: panel
@@ -43,10 +44,11 @@ smart_filter: true
 activity_mode: meaningful
 hide_empty_rows: true
 show_inactive_baselines: false
-min_row_active_seconds: 30
-max_rows_per_group: 8
-max_total_rows: 40
-max_visible_rows: 40
+min_row_active_seconds: 10
+max_rows_per_group: 5
+max_total_rows: 24
+max_visible_rows: 24
+show_activity_density: true
 timeline_height: min(62svh, 680px)
 collapse_groups: false
 exclude_labels:
@@ -61,26 +63,45 @@ exclude_labels:
 ```yaml
 type: custom:activity-history-card
 title: היסטוריית פעילות חכמה
+view_mode: activity
 mock_data: false
 auto_discover: true
+display_mode: panel
 live: false
 refresh_interval_seconds: 300
-display_mode: panel
 hours_to_show: 24
 group_by: area
 smart_filter: true
 activity_mode: meaningful
 hide_empty_rows: true
+hide_empty_groups: true
 show_inactive_baselines: false
-min_row_active_seconds: 30
-max_rows_per_group: 8
-max_total_rows: 40
+min_row_active_seconds: 10
+max_rows_per_group: 5
+max_total_rows: 24
 show_technical_entities: false
 show_config_entities: false
 show_diagnostic_entities: false
 summary_scope: visible
-max_visible_rows: 40
+max_visible_rows: 24
+show_activity_density: true
+show_summary: true
+show_insights: true
+debug: false
 timeline_height: min(62svh, 680px)
+filters:
+  show: true
+  show_search: true
+  show_area_chips: false
+  show_domain_chips: false
+  show_state_mode: false
+domains:
+  - light
+  - switch
+  - climate
+  - media_player
+  - cover
+  - fan
 exclude_labels:
   - לא להצגה
   - רכיבים מוגנים
@@ -90,6 +111,8 @@ exclude_labels:
 
 ```yaml
 type: custom:activity-history-card
+title: היסטוריית פעילות - legacy/debug
+view_mode: legacy_swimlane
 mock_data: false
 auto_discover: true
 debug: true
@@ -97,6 +120,8 @@ hours_to_show: 24
 refresh_interval_seconds: 300
 smart_filter: false
 activity_mode: all
+hide_empty_rows: false
+hide_empty_groups: false
 show_inactive_baselines: true
 show_technical_entities: true
 show_config_entities: true
@@ -187,13 +212,19 @@ auto_discover: true
 smart_filter: true
 activity_mode: meaningful
 show_inactive_baselines: false
-min_row_active_seconds: 30
-max_rows_per_group: 8
-max_total_rows: 40
+min_row_active_seconds: 10
+max_rows_per_group: 5
+max_total_rows: 24
 show_technical_entities: false
 show_config_entities: false
 show_diagnostic_entities: false
 ```
+
+## מצבי תצוגה
+
+`view_mode: activity` הוא מצב ברירת המחדל והמומלץ. הוא לא מציג טבלת registry גולמית, אלא dashboard שמראה איפה ומתי הייתה פעילות משמעותית: פס צפיפות פעילות עליון, ציר זמן נקי משמאל לימין, וכרטיסי אזורים עם שורות פעילות בלבד.
+
+`view_mode: legacy_swimlane` שומר את רנדרר ה-swimlane הישן. הוא שימושי לדיבוג, לבדיקת רכיבים שהוסתרו, או כאשר מפעילים “הצג הכל”.
 
 ## מצב debug
 
@@ -252,6 +283,7 @@ debug: true
 | -------------------------- | ----------------------- | ---------------------------------------------------------- |
 | `mock_data`                | `false`                 | מציג נתוני דוגמה רק כאשר מוגדר `true` במפורש               |
 | `mock_profile`             | `default`               | פרופיל דוגמה; למשל `large_noisy_home` לבדיקות עומס/רעש     |
+| `view_mode`                | `activity`              | `activity` מומלץ; `legacy_swimlane` לדיבוג/בדיקה גולמית    |
 | `auto_discover`            | `true`                  | מגלה רכיבים שמשויכים לאזורים                               |
 | `areas`                    | all                     | רשימת אזורים להצגה                                         |
 | `domains`                  | useful activity domains | סוגי רכיבים להצגה                                          |
@@ -263,14 +295,15 @@ debug: true
 | `activity_mode`            | `meaningful`            | `meaningful` מציג פעילות אמיתית; `all` מציג הכל לבדיקה     |
 | `hide_empty_rows`          | `true`                  | מסתיר רכיבים ללא פעילות משמעותית בטווח הנוכחי              |
 | `show_inactive_baselines`  | `false`                 | מציג קווי baseline כבויים רק כאשר מוגדר `true`             |
-| `min_row_active_seconds`   | `30`                    | פעילות קצרה יותר תוסתר כאשר `smart_filter` פעיל            |
-| `max_rows_per_group`       | `8`                     | מגביל כמה שורות אוטומטיות יוצגו בכל אזור/קבוצה             |
-| `max_total_rows`           | `40`                    | מגביל את כלל השורות האוטומטיות בתצוגה                      |
+| `min_row_active_seconds`   | `10`                    | פעילות קצרה יותר תוסתר כאשר `smart_filter` פעיל            |
+| `max_rows_per_group`       | `5`                     | מגביל כמה שורות אוטומטיות יוצגו בכל אזור/קבוצה             |
+| `max_total_rows`           | `24`                    | מגביל את כלל השורות האוטומטיות בתצוגה                      |
+| `show_activity_density`    | `true`                  | מציג פס צפיפות פעילות עליון בתצוגת `activity`              |
 | `show_technical_entities`  | `false`                 | מאפשר להציג נתבים, הגדרות תוכנית ורעש טכני                 |
 | `show_config_entities`     | `false`                 | מאפשר להציג ישויות registry מסוג `config`                  |
 | `show_diagnostic_entities` | `false`                 | מאפשר להציג ישויות registry מסוג `diagnostic`              |
 | `summary_scope`            | `visible`               | מחשב סיכום לפי השורות המוצגות או לפי כל השורות המסוננות    |
-| `max_visible_rows`         | `40`                    | מגביל את מספר השורות הגלויות כדי לשמור על ביצועים וקריאות  |
+| `max_visible_rows`         | `24`                    | מגביל את מספר השורות הגלויות כדי לשמור על ביצועים וקריאות  |
 | `timeline_height`          | `min(62svh, 680px)`     | גובה פנימי של אזור הטיימליין לפני גלילה                    |
 | `collapse_groups`          | `false`                 | מאפשר קיפול קבוצות; קבוצות ללא פעילות יכולות להתחיל סגורות |
 | `default_collapsed_groups` | `[]`                    | רשימת שמות/IDs של קבוצות שייפתחו סגורות                    |
@@ -309,7 +342,8 @@ dist/activity-history-card.js
 
 ## מגבלות MVP
 
-- מצב swimlane הוא המצב הפעיל של ה-MVP.
+- מצב `activity` הוא המצב הפעיל והמומלץ של ה-MVP.
+- `legacy_swimlane` נשאר זמין לדיבוג ולבדיקה גולמית של שורות.
 - Heatmap, drill-down ו-correlation נשארים placeholders בלבד בשלב הזה.
 - Timeline נשאר כרונולוגי משמאל לימין, בזמן שכל הטקסטים והפקדים מותאמים ל-RTL.
 - היסטוריה תלויה ב-Home Assistant Recorder ובזמינות הרשומות עבור הישויות שבחרת.

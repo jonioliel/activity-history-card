@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { shouldRenderTimelineSegment } from "../src/renderers/swimlane-renderer";
-import type { TimelineSegment } from "../src/types";
+import {
+  renderSwimlaneTimeline,
+  shouldRenderTimelineSegment,
+} from "../src/renderers/swimlane-renderer";
+import { summarizeActivity } from "../src/summary";
+import type { TimelineGroup, TimelineSegment } from "../src/types";
 
 const inactiveSegment: TimelineSegment = {
   entity_id: "switch.pool_power",
@@ -43,5 +47,39 @@ describe("shouldRenderTimelineSegment", () => {
         type: "custom:activity-history-card",
       }),
     ).toBe(true);
+  });
+
+  it("keeps the legacy swimlane renderer available", () => {
+    const group: TimelineGroup = {
+      id: "living",
+      title: "Living",
+      rows: [
+        {
+          entity: {
+            entity_id: "switch.test",
+            name: "Test switch",
+            domain: "switch",
+          },
+          segments: [activeSegment],
+          totalActiveMs: activeSegment.durationMs,
+          eventCount: 1,
+        },
+      ],
+      totalActiveMs: activeSegment.durationMs,
+    };
+    const result = renderSwimlaneTimeline({
+      groups: [group],
+      range: {
+        start: activeSegment.start,
+        end: activeSegment.end,
+      },
+      config: {
+        type: "custom:activity-history-card",
+        view_mode: "legacy_swimlane",
+      },
+      summary: summarizeActivity([group]),
+    }) as unknown as { strings: readonly string[] };
+
+    expect(result.strings.join("")).toContain("ahc-timeline-toolbar");
   });
 });

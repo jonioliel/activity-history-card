@@ -9,7 +9,7 @@ live: false
 refresh_interval_seconds: 300
 rtl: auto
 display_mode: panel # card | panel | fullscreen
-default_view: swimlane # swimlane | heatmap | detail | correlation
+view_mode: activity # activity | legacy_swimlane | heatmap | detail | correlation
 group_by: area # area | domain | floor | entity | none
 
 show_summary: true
@@ -29,16 +29,18 @@ activity_mode: meaningful # meaningful | all
 hide_empty_rows: true
 hide_empty_groups: true
 show_inactive_baselines: false
-min_row_active_seconds: 30
-max_rows_per_group: 8
-max_total_rows: 40
+min_row_active_seconds: 10
+max_rows_per_group: 5
+max_total_rows: 24
 show_technical_entities: false
 show_config_entities: false
 show_diagnostic_entities: false
 show_entity_id_when_name_missing: false
 summary_scope: visible # visible | all
+show_activity_density: true
+activity_density_buckets: 0 # 0 = auto
 
-max_visible_rows: 40
+max_visible_rows: 24
 collapse_groups: false
 default_collapsed_groups: []
 timeline_height: min(62svh, 680px)
@@ -63,9 +65,9 @@ include_labels: []
 filters:
   show: true
   show_search: true
-  show_area_chips: true
-  show_domain_chips: true
-  show_state_mode: true
+  show_area_chips: false
+  show_domain_chips: false
+  show_state_mode: false
   default_areas: []
   active_only: false
 
