@@ -77,6 +77,14 @@ Implemented:
 - Summary distinguishes summed entity-hours from active entity count
 - Last-event summary and insights prefer friendly names
 - Desktop filters are compact; mobile keeps the advanced filter bottom sheet
+- UI polish pass for the stable swimlane MVP:
+  - body grid is rendered through a dedicated structure
+  - desktop summary is limited to four cleaner cards
+  - last event appears as a compact header pill
+  - segment click/tap/focus opens a popover, not a drill-down page
+  - timeline supports `max_visible_rows`, `timeline_height`, `collapse_groups`, and `default_collapsed_groups`
+  - row density switches to dense/ultra-dense for long lists
+  - insights use friendly names and show a short usage pattern card
 - Placeholder renderers only for heatmap, detail, and correlation
 - HACS custom repository metadata via `hacs.json`
 - HACS-installable bundle at `dist/activity-history-card.js`
@@ -116,7 +124,7 @@ npm run build
 Latest verified results:
 
 - `npm run typecheck` passed
-- `npm run test` passed, 30 tests
+- `npm run test` passed, 35 tests
 - `npm run build` passed
 
 The generated `dist/activity-history-card.js` is intentionally tracked for HACS. `dist/activity-history-card.js.map` remains ignored.

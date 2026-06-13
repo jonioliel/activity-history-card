@@ -85,6 +85,10 @@ export interface ActivityHistoryCardConfig {
   refresh_interval_seconds?: number;
   min_duration_seconds?: number;
   merge_gap_seconds?: number;
+  max_visible_rows?: number;
+  collapse_groups?: boolean;
+  default_collapsed_groups?: string[];
+  timeline_height?: string;
   mobile_breakpoint?: number;
   filters?: FilterConfig;
   entities?: Array<string | EntityConfig>;

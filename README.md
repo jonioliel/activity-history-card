@@ -39,12 +39,45 @@ display_mode: panel
 hours_to_show: 24
 refresh_interval_seconds: 300
 group_by: area
+max_visible_rows: 80
+timeline_height: min(62svh, 680px)
+collapse_groups: false
 exclude_labels:
   - לא להצגה
   - רכיבים מוגנים
 ```
 
 במצב הזה הכרטיס מנסה למצוא אוטומטית רכיבים שמוגדרים באזורים של Home Assistant. אם אין אזורים, או שה-Registry לא זמין לגרסת Home Assistant שלך, הכרטיס יציג הודעה ברורה ויציע YAML חלופי.
+
+## YAML מומלץ לייצור
+
+```yaml
+type: custom:activity-history-card
+title: היסטוריית פעילות חכמה
+mock_data: false
+auto_discover: true
+live: true
+refresh_interval_seconds: 300
+display_mode: panel
+hours_to_show: 24
+group_by: area
+max_visible_rows: 80
+timeline_height: min(62svh, 680px)
+exclude_labels:
+  - לא להצגה
+  - רכיבים מוגנים
+```
+
+## YAML מומלץ לדיבאג
+
+```yaml
+type: custom:activity-history-card
+mock_data: false
+auto_discover: true
+debug: true
+hours_to_show: 24
+refresh_interval_seconds: 300
+```
 
 ## סינון לפי אזורים ודומיינים
 
@@ -127,6 +160,7 @@ type: custom:activity-history-card
 mock_data: false
 auto_discover: true
 debug: true
+refresh_interval_seconds: 300
 ```
 
 כאשר `debug: true`, הכרטיס מציג פאנל קטן עם:
@@ -169,6 +203,10 @@ display_mode: panel
 | `exclude_labels` | none | מסתיר רכיבים עם labels אלה |
 | `hours_to_show` | `24` | טווח זמן להצגה |
 | `refresh_interval_seconds` | `300` | תדירות רענון רקע כאשר `live: true` |
+| `max_visible_rows` | `80` | מגביל את מספר השורות הגלויות כדי לשמור על ביצועים וקריאות |
+| `timeline_height` | `min(62svh, 680px)` | גובה פנימי של אזור הטיימליין לפני גלילה |
+| `collapse_groups` | `false` | מאפשר קיפול קבוצות; קבוצות ללא פעילות יכולות להתחיל סגורות |
+| `default_collapsed_groups` | `[]` | רשימת שמות/IDs של קבוצות שייפתחו סגורות |
 | `group_by` | `area` | `area`, `domain`, `entity`, `none` |
 | `display_mode` | `panel` | `card`, `panel`, `fullscreen` |
 | `debug` | `false` | מציג דיאגנוסטיקה בכרטיס |

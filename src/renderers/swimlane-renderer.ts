@@ -1,6 +1,7 @@
 import { html, type TemplateResult } from "lit";
 import { CATEGORY_LABELS_HE } from "../defaults";
 import { formatDuration, formatTime, timeToPercent } from "../format";
+import { limitTimelineGroups } from "../timeline-layout";
 import type { ActivityHistoryCardConfig, ActivitySummary, TimelineGroup, TimeRange } from "../types";
 
 export interface SwimlaneRendererOptions {
@@ -12,6 +13,7 @@ export interface SwimlaneRendererOptions {
 }
 
 export function renderSwimlaneTimeline(options: SwimlaneRendererOptions): TemplateResult {
+  const display = limitTimelineGroups(options.groups, options.config.max_visible_rows);
   const ticks = buildTicks(options.range);
   const now = new Date();
   const nowPercent = timeToPercent(now, options.range);
@@ -21,10 +23,17 @@ export function renderSwimlaneTimeline(options: SwimlaneRendererOptions): Templa
     now.getTime() <= options.range.end.getTime() + 90000;
 
   return html`
-    <section class="ahc-timeline-card" aria-label="ציר זמן פעילות">
+    <section
+      class=${`ahc-timeline-card ahc-timeline-card--${display.density}`}
+      aria-label="ציר זמן פעילות"
+      style=${options.config.timeline_height ? `--ahc-timeline-height:${options.config.timeline_height}` : ""}
+    >
       <div class="ahc-timeline-toolbar">
         <h3 class="ahc-timeline-title">ציר זמן פעילות</h3>
-        <span class="ahc__metric-subtitle">${formatTime(options.range.start)} – ${formatTime(options.range.end)}</span>
+        <span class="ahc__metric-subtitle">
+          ${formatTime(options.range.start)} – ${formatTime(options.range.end)}
+          ${display.hiddenRowCount ? ` · מציג ${display.visibleRowCount} מתוך ${display.totalRowCount}` : ""}
+        </span>
       </div>
       <div class="ahc-timeline-scroll">
         <div class="ahc-timeline">
@@ -37,13 +46,14 @@ export function renderSwimlaneTimeline(options: SwimlaneRendererOptions): Templa
             </div>
           </div>
           <div class="ahc-timeline__groups">
-            ${options.groups.map(
-              (group) => html`
-                <section class="ahc-group" aria-label=${group.title}>
-                  <header class="ahc-group__header">
+            ${display.groups.map((group) => {
+              const collapsed = groupShouldStartCollapsed(group, options.config);
+              return html`
+                <details class="ahc-group" aria-label=${group.title} ?open=${!collapsed}>
+                  <summary class="ahc-group__header">
                     <span class="ahc-group__title">${group.icon ? html`<span>${group.icon}</span>` : null}${group.title}</span>
                     <span class="ahc-group__meta">${formatDuration(group.totalActiveMs)} • ${group.subtitle ?? ""}</span>
-                  </header>
+                  </summary>
                   ${group.rows.map(
                     (row) => html`
                       <div class="ahc-row">
@@ -98,9 +108,10 @@ export function renderSwimlaneTimeline(options: SwimlaneRendererOptions): Templa
                       </div>
                     `,
                   )}
-                </section>
-              `,
-            )}
+                  ${!group.rows.length ? html`<div class="ahc-group__empty">אין שורות גלויות בקבוצה הזו</div>` : null}
+                </details>
+              `;
+            })}
           </div>
           ${showNow
             ? html`<div class="ahc-now-line" style="left:${nowPercent}%"><span class="ahc-now-line__label">עכשיו</span></div>`
@@ -110,6 +121,12 @@ export function renderSwimlaneTimeline(options: SwimlaneRendererOptions): Templa
       ${options.config.show_legend === false ? null : renderLegend()}
     </section>
   `;
+}
+
+function groupShouldStartCollapsed(group: TimelineGroup, config: ActivityHistoryCardConfig): boolean {
+  const configured = new Set(config.default_collapsed_groups ?? []);
+  if (configured.has(group.id) || configured.has(group.title)) return true;
+  return Boolean(config.collapse_groups && group.totalActiveMs <= 0);
 }
 
 function renderLegend(): TemplateResult {

@@ -52,6 +52,9 @@ export const DEFAULT_CONFIG: Required<
     | "refresh_interval_seconds"
     | "min_duration_seconds"
     | "merge_gap_seconds"
+    | "max_visible_rows"
+    | "collapse_groups"
+    | "timeline_height"
     | "mobile_breakpoint"
   >
 > = {
@@ -72,6 +75,9 @@ export const DEFAULT_CONFIG: Required<
   refresh_interval_seconds: 300,
   min_duration_seconds: 20,
   merge_gap_seconds: 15,
+  max_visible_rows: 80,
+  collapse_groups: false,
+  timeline_height: "min(62svh, 680px)",
   mobile_breakpoint: 760,
 };
 

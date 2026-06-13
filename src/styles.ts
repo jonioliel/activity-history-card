@@ -77,8 +77,8 @@ export const activityHistoryCardStyles = css`
   box-sizing: border-box;
   position: relative;
   display: grid;
-  gap: var(--ahc-gap-md);
-  padding: var(--ahc-gap-lg);
+  gap: var(--ahc-gap-sm);
+  padding: clamp(14px, 1.6vw, 22px);
   color: var(--ahc-text);
   background:
     radial-gradient(circle at 92% 0%, rgba(14, 165, 233, 0.22), transparent 34%),
@@ -182,13 +182,34 @@ export const activityHistoryCardStyles = css`
   line-height: 1.45;
 }
 
+.ahc-last-event {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-inline-size: min(560px, 100%);
+  min-block-size: 34px;
+  padding-block: 4px;
+  padding-inline: 10px;
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.24);
+  color: var(--ahc-muted);
+  font-size: 0.78rem;
+}
+
+.ahc-last-event strong,
+.ahc-last-event__label {
+  color: var(--ahc-text);
+  font-weight: 850;
+}
+
 .ahc__toolbar {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
   justify-content: flex-start;
   gap: var(--ahc-gap-sm);
-  min-inline-size: min(720px, 100%);
+  min-inline-size: min(460px, 100%);
 }
 
 .ahc__search {
@@ -336,7 +357,7 @@ export const activityHistoryCardStyles = css`
   display: flex;
   align-items: center;
   gap: var(--ahc-gap-xs);
-  padding: var(--ahc-gap-sm);
+  padding: 10px;
   border: 1px solid var(--ahc-border-soft);
   border-radius: var(--ahc-radius-md);
   background: rgba(15, 23, 42, 0.38);
@@ -350,6 +371,7 @@ export const activityHistoryCardStyles = css`
   flex-wrap: nowrap;
   gap: var(--ahc-gap-xs);
   min-inline-size: 0;
+  inline-size: 100%;
 }
 
 .ahc__filter-row--compact {
@@ -375,17 +397,17 @@ export const activityHistoryCardStyles = css`
 /* Summary */
 .ahc__summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: var(--ahc-gap-md);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--ahc-gap-sm);
 }
 
 .ahc__metric {
-  min-block-size: 92px;
+  min-block-size: 82px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--ahc-gap-md);
-  padding: var(--ahc-gap-md);
+  gap: var(--ahc-gap-sm);
+  padding: 12px 14px;
   border: 1px solid var(--ahc-border-soft);
   border-radius: var(--ahc-radius-md);
   background: linear-gradient(180deg, rgba(30, 41, 59, 0.54), rgba(15, 23, 42, 0.58));
@@ -408,7 +430,7 @@ export const activityHistoryCardStyles = css`
 .ahc__metric-value {
   display: block;
   color: var(--ahc-text);
-  font-size: 1.8rem;
+  font-size: 1.95rem;
   line-height: 1.05;
   font-weight: 850;
   letter-spacing: 0;
@@ -429,9 +451,9 @@ export const activityHistoryCardStyles = css`
 .ahc__metric-icon {
   display: inline-grid;
   place-items: center;
-  inline-size: 52px;
-  block-size: 52px;
-  border-radius: 18px;
+  inline-size: 46px;
+  block-size: 46px;
+  border-radius: 14px;
   border: 1px solid var(--ahc-border-soft);
   background: rgba(2, 6, 23, 0.22);
   color: var(--ahc-accent);
@@ -440,9 +462,10 @@ export const activityHistoryCardStyles = css`
 /* Layout body */
 .ahc__body {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 300px);
   gap: var(--ahc-gap-md);
-  align-items: stretch;
+  align-items: start;
+  max-inline-size: 1920px;
 }
 
 .ahc__body--no-insights {
@@ -459,7 +482,7 @@ export const activityHistoryCardStyles = css`
   display: grid;
   gap: var(--ahc-gap-sm);
   align-content: start;
-  padding: var(--ahc-gap-md);
+  padding: var(--ahc-gap-sm);
   border: 1px solid var(--ahc-border-soft);
   border-radius: var(--ahc-radius-md);
   background: linear-gradient(180deg, rgba(30, 41, 59, 0.50), rgba(15, 23, 42, 0.52));
@@ -477,7 +500,7 @@ export const activityHistoryCardStyles = css`
 }
 
 .ahc__insight-card {
-  padding: var(--ahc-gap-md);
+  padding: 12px;
   border: 1px solid var(--ahc-border-soft);
   border-radius: var(--ahc-radius-md);
   background: rgba(15, 23, 42, 0.52);
@@ -494,8 +517,9 @@ export const activityHistoryCardStyles = css`
 .ahc__insight-value {
   display: block;
   color: var(--ahc-text);
-  font-size: 1.3rem;
+  font-size: 1.12rem;
   font-weight: 850;
+  overflow-wrap: anywhere;
 }
 
 .ahc__insight-subtitle {
@@ -503,6 +527,22 @@ export const activityHistoryCardStyles = css`
   color: var(--ahc-muted);
   font-size: 0.78rem;
   margin-block-start: 6px;
+}
+
+.ahc__spark {
+  display: flex;
+  align-items: end;
+  gap: 5px;
+  block-size: 34px;
+  margin-block-start: 10px;
+}
+
+.ahc__spark i {
+  inline-size: 8px;
+  block-size: var(--bar, 20%);
+  min-block-size: 4px;
+  border-radius: 999px 999px 2px 2px;
+  background: linear-gradient(180deg, var(--ahc-accent), rgba(37, 99, 235, 0.38));
 }
 
 /* Timeline */
@@ -533,6 +573,7 @@ export const activityHistoryCardStyles = css`
 
 .ahc-timeline-scroll {
   inline-size: 100%;
+  max-block-size: var(--ahc-timeline-height, min(62svh, 680px));
   overflow: auto;
   overscroll-behavior-inline: contain;
   scrollbar-color: rgba(56, 189, 248, 0.42) rgba(15, 23, 42, 0.30);
@@ -558,6 +599,9 @@ export const activityHistoryCardStyles = css`
 }
 
 .ahc-timeline__axis-spacer {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 4;
   direction: rtl;
   display: flex;
   align-items: center;
@@ -597,9 +641,13 @@ export const activityHistoryCardStyles = css`
   border-block-end: 1px solid rgba(148, 163, 184, 0.10);
 }
 
+.ahc-group:nth-child(even) {
+  background: rgba(15, 23, 42, 0.18);
+}
+
 .ahc-group__header {
   position: sticky;
-  inset-inline-end: 0;
+  inset-inline-start: 0;
   z-index: 2;
   display: flex;
   align-items: center;
@@ -609,6 +657,19 @@ export const activityHistoryCardStyles = css`
   padding-block: 0;
   padding-inline: var(--ahc-gap-md);
   background: linear-gradient(90deg, rgba(15, 23, 42, 0.78), rgba(30, 41, 59, 0.70));
+  cursor: pointer;
+  list-style: none;
+}
+
+.ahc-group__header::-webkit-details-marker {
+  display: none;
+}
+
+.ahc-group__empty {
+  direction: rtl;
+  padding: var(--ahc-gap-md);
+  color: var(--ahc-muted);
+  font-size: 0.82rem;
 }
 
 .ahc-group__title {
@@ -637,6 +698,9 @@ export const activityHistoryCardStyles = css`
 }
 
 .ahc-row__label {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 2;
   direction: rtl;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -644,7 +708,8 @@ export const activityHistoryCardStyles = css`
   gap: var(--ahc-gap-xs);
   padding-inline: var(--ahc-gap-md) var(--ahc-gap-sm);
   border-inline-end: 1px solid rgba(148, 163, 184, 0.12);
-  background: rgba(2, 6, 23, 0.18);
+  background: rgba(4, 10, 24, 0.88);
+  backdrop-filter: blur(10px);
   min-inline-size: 0;
 }
 
@@ -766,9 +831,9 @@ export const activityHistoryCardStyles = css`
 .ahc-now-line {
   position: absolute;
   inset-block: 0;
-  inline-size: 2px;
-  background: var(--ahc-now);
-  box-shadow: 0 0 0 1px rgba(96,165,250,0.25), 0 0 22px rgba(96,165,250,0.42);
+  inline-size: 1px;
+  background: linear-gradient(180deg, transparent, var(--ahc-now) 12%, var(--ahc-now) 88%, transparent);
+  box-shadow: 0 0 0 1px rgba(96,165,250,0.14), 0 0 18px rgba(96,165,250,0.30);
   pointer-events: none;
   z-index: 4;
 }
@@ -780,7 +845,7 @@ export const activityHistoryCardStyles = css`
   padding-block: 2px;
   padding-inline: 8px;
   border-radius: 999px;
-  background: rgba(37, 99, 235, 0.72);
+  background: rgba(37, 99, 235, 0.62);
   color: #dbeafe;
   font-size: 0.72rem;
   font-weight: 800;
@@ -818,6 +883,8 @@ export const activityHistoryCardStyles = css`
 .ahc-popover {
   direction: rtl;
   position: fixed;
+  inset-inline-start: var(--ahc-popover-x, 16px);
+  inset-block-start: var(--ahc-popover-y, 16px);
   z-index: 2147483641;
   max-inline-size: min(320px, calc(100vw - 32px));
   padding: var(--ahc-gap-md);
@@ -827,6 +894,20 @@ export const activityHistoryCardStyles = css`
   color: var(--ahc-text);
   box-shadow: var(--ahc-shadow);
   backdrop-filter: blur(18px);
+}
+
+.ahc-popover__close {
+  appearance: none;
+  position: absolute;
+  inset-block-start: 8px;
+  inset-inline-end: 8px;
+  inline-size: 30px;
+  block-size: 30px;
+  border: 1px solid var(--ahc-border-soft);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.32);
+  color: var(--ahc-text);
+  cursor: pointer;
 }
 
 .ahc-popover__title {
@@ -1157,7 +1238,11 @@ export const activityHistoryCardStyles = css`
   }
 
   .ahc__insights {
-    display: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ahc__insights-title {
+    grid-column: 1 / -1;
   }
 }
 
@@ -1241,11 +1326,20 @@ export const activityHistoryCardStyles = css`
   }
 
   .ahc__summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
     gap: var(--ahc-gap-sm);
+    scrollbar-width: none;
+  }
+
+  .ahc__summary-grid::-webkit-scrollbar {
+    display: none;
   }
 
   .ahc__metric {
+    flex: 0 0 min(44vw, 230px);
+    scroll-snap-align: start;
     min-block-size: 104px;
     grid-template-columns: minmax(0, 1fr) auto;
     padding: var(--ahc-gap-sm);
@@ -1258,7 +1352,24 @@ export const activityHistoryCardStyles = css`
   }
 
   .ahc__insights {
+    display: flex;
+    overflow-x: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    scrollbar-width: none;
+  }
+
+  .ahc__insights::-webkit-scrollbar {
     display: none;
+  }
+
+  .ahc__insights-title {
+    display: none;
+  }
+
+  .ahc__insight-card {
+    flex: 0 0 min(78vw, 280px);
   }
 
   .ahc-timeline-card {
@@ -1328,6 +1439,7 @@ export const activityHistoryCardStyles = css`
     inset-block-end: 12px !important;
     inset-block-start: auto !important;
     max-inline-size: none;
+    border-radius: 24px;
   }
 
   .ahc-filter-sheet {
@@ -1356,7 +1468,7 @@ export const activityHistoryCardStyles = css`
 
 @media (max-width: 420px) {
   .ahc__summary-grid {
-    grid-template-columns: 1fr 1fr;
+    margin-inline: -2px;
   }
 
   .ahc__metric-value {
@@ -1426,6 +1538,30 @@ export const activityHistoryCardStyles = css`
 
 .ahc--dense .ahc-row__state-chip {
   display: none;
+}
+
+.ahc--dense .ahc-row__name {
+  font-size: 0.78rem;
+}
+
+.ahc--ultra-dense .ahc-row,
+.ahc-timeline-card--ultra-dense .ahc-row {
+  min-block-size: 24px;
+}
+
+.ahc--ultra-dense .ahc-row__track,
+.ahc-timeline-card--ultra-dense .ahc-row__track {
+  min-block-size: 24px;
+}
+
+.ahc--ultra-dense .ahc-row__state-chip,
+.ahc-timeline-card--ultra-dense .ahc-row__state-chip {
+  display: none;
+}
+
+.ahc--ultra-dense .ahc-row__name,
+.ahc-timeline-card--ultra-dense .ahc-row__name {
+  font-size: 0.74rem;
 }
 
 `;

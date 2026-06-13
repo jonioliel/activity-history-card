@@ -2,6 +2,8 @@ type: custom:activity-history-card
 title: היסטוריית פעילות חכמה
 auto_discover: true
 debug: false
+mock_data: false # true מציג נתוני דוגמה בלי היסטוריית Home Assistant
+
 hours_to_show: 24
 live: true
 refresh_interval_seconds: 300
@@ -9,35 +11,50 @@ rtl: auto
 display_mode: panel # card | panel | fullscreen
 default_view: swimlane # swimlane | heatmap | detail | correlation
 group_by: area # area | domain | floor | entity | none
+
 show_summary: true
 show_insights: true
 show_now_line: true
 show_legend: true
 show_fullscreen_button: true
+
 significant_changes_only: true
 minimal_response: true
-mock_data: false # true מציג נתוני דוגמה בלי היסטוריית Home Assistant
 min_duration_seconds: 20
 merge_gap_seconds: 15
 mobile_breakpoint: 760
+
+max_visible_rows: 80
+collapse_groups: false
+default_collapsed_groups: []
+timeline_height: min(62svh, 680px)
+
+domains:
+  - light
+  - switch
+  - climate
+  - media_player
+  - cover
+  - fan
+exclude_domains: []
+include_entity_globs: []
+exclude_entity_globs: []
+exclude_entities:
+  - sensor.*
+exclude_labels:
+  - לא להצגה
+  - רכיבים מוגנים
+include_labels: []
+
 filters:
   show: true
   show_search: true
   show_area_chips: true
   show_domain_chips: true
   show_state_mode: true
-  default_domains:
-    - light
-    - switch
-    - climate
-    - media_player
-  - cover
-  - fan
-exclude_domains: []
-include_entity_globs: []
-exclude_entity_globs: []
   default_areas: []
   active_only: false
+
 entities:
   - entity: light.living_room_main
     name: תאורת סלון
@@ -65,12 +82,7 @@ entities:
     name: תריס מטבח
     area: מטבח
     active_states: ["opening", "closing"]
-exclude_entities:
-  - sensor.*
-exclude_labels:
-  - לא להצגה
-  - רכיבים מוגנים
-include_labels: []
+
 colors:
   on: "var(--success-color)"
   off: "var(--disabled-text-color)"

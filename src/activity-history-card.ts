@@ -1,5 +1,6 @@
 import { LitElement, html, nothing, type TemplateResult } from "lit";
 import { CATEGORY_LABELS_HE, DEFAULT_CONFIG, DOMAIN_LABELS_HE } from "./defaults";
+import { formatEntityLine, formatSegmentSummary } from "./display-text";
 import { resolveEntityMetasWithDiagnostics } from "./entity-resolver";
 import { filterRows, groupRows } from "./filters";
 import { buildHistoryCacheKey } from "./history-key";
@@ -7,6 +8,7 @@ import { fetchHistory, getHistoryRequestPlan } from "./history-client";
 import { formatDuration, formatTime, isRtl, resolveTimeRange } from "./format";
 import { intervalizeHistory } from "./intervalize";
 import { getMockEntities, getMockHistory } from "./mock-data";
+import { positionPopover } from "./popover-position";
 import { normalizeRefreshIntervalSeconds, shouldRefreshFromHassSetter, type HistoryRefreshReason } from "./refresh-policy";
 import { renderCorrelationPlaceholder } from "./renderers/correlation-renderer";
 import { renderDetailPlaceholder } from "./renderers/detail-renderer";
@@ -27,6 +29,7 @@ import type {
   TimeRange,
   TimelineGroup,
   TimelineRow,
+  TimelineSegment,
 } from "./types";
 
 const CARD_VERSION = "0.1.0";
@@ -36,6 +39,14 @@ type EmptyStateReason =
   | "no_history_returned"
   | "history_unusable"
   | "all_entities_filtered";
+
+interface SegmentPopoverState {
+  row: TimelineRow;
+  segment: TimelineSegment;
+  x: number;
+  y: number;
+  placement: "floating" | "bottom";
+}
 
 export class ActivityHistoryCard extends LitElement {
   static override styles = activityHistoryCardStyles;
@@ -64,6 +75,7 @@ export class ActivityHistoryCard extends LitElement {
   private _error?: string;
   private _emptyReason?: EmptyStateReason;
   private _diagnostics?: ActivityDiagnostics;
+  private _segmentPopover?: SegmentPopoverState;
   private _fullscreen = false;
   private _filterSheetOpen = false;
   private _usingMockData = false;
@@ -152,6 +164,7 @@ export class ActivityHistoryCard extends LitElement {
     this._inFlightHistoryRequest = undefined;
     document.removeEventListener("keydown", this._onDocumentKeyDown);
     document.removeEventListener("fullscreenchange", this._onFullscreenChange);
+    document.removeEventListener("pointerdown", this._onDocumentPointerDown);
   }
 
   getCardSize(): number {
@@ -180,7 +193,7 @@ export class ActivityHistoryCard extends LitElement {
       this._filterSheetOpen ? "ahc--sheet-open" : "",
       this._usingMockData ? "ahc--mock" : "",
       this._backgroundLoading ? "ahc--background-loading" : "",
-      this._rows.length > 40 ? "ahc--dense" : "",
+      this._rows.length > 70 ? "ahc--ultra-dense" : this._rows.length > 30 ? "ahc--dense" : "",
     ]
       .filter(Boolean)
       .join(" ");
@@ -189,12 +202,20 @@ export class ActivityHistoryCard extends LitElement {
       <ha-card class=${classes} dir=${rtl ? "rtl" : "ltr"} tabindex=${this._fullscreen ? "0" : "-1"} aria-busy=${this._initialLoad ? "true" : "false"}>
         ${this._renderHeader()} ${this._renderFilters()} ${this._renderSummary()}
         ${this._config.debug ? this._renderDiagnostics() : nothing}
-        <div class=${this._config.show_insights === false ? "ahc__body ahc__body--no-insights" : "ahc__body"}>
-          <main class="ahc__main">${this._renderMainContent()}</main>
-          ${this._config.show_insights === false ? nothing : this._renderInsights()}
-        </div>
+        ${this._renderBody()}
+        ${this._segmentPopover ? this._renderSegmentPopover() : nothing}
         ${this._filterSheetOpen ? this._renderFilterSheet() : nothing}
       </ha-card>
+    `;
+  }
+
+  private _renderBody(): TemplateResult {
+    const showInsights = this._config.show_insights !== false;
+    return html`
+      <div class=${showInsights ? "ahc__body" : "ahc__body ahc__body--no-insights"}>
+        <main class="ahc__main">${this._renderMainContent()}</main>
+        ${showInsights ? this._renderInsights() : nothing}
+      </div>
     `;
   }
 
@@ -220,19 +241,6 @@ export class ActivityHistoryCard extends LitElement {
             <span aria-hidden="true">↻</span><span>רענן</span>
           </button>
           ${this._backgroundLoading ? html`<span class="ahc__refresh-indicator" role="status">מעדכן...</span>` : nothing}
-          <div class="ahc__search">
-            <span class="ahc__search-icon" aria-hidden="true">⌕</span>
-            <input
-              class="ahc__search-input"
-              type="search"
-              .value=${this._filter.search}
-              placeholder="חיפוש ישות או אזור..."
-              @input=${this._onSearchInput}
-            />
-          </div>
-          <button class="ahc__button ahc__button--ghost ahc__filter-toggle" type="button" @click=${this._openFilterSheet} aria-expanded=${this._filterSheetOpen ? "true" : "false"}>
-            <span aria-hidden="true">▾</span><span>סינון</span>
-          </button>
         </div>
         <div class="ahc__title-block">
           <div class="ahc__title-row">
@@ -240,17 +248,28 @@ export class ActivityHistoryCard extends LitElement {
             <h2 class="ahc__title">${this._config.title ?? DEFAULT_CONFIG.title}</h2>
           </div>
           <p class="ahc__subtitle">${subtitle}</p>
+          ${this._renderLastEventPill()}
         </div>
       </header>
     `;
   }
 
+  private _renderLastEventPill(): TemplateResult | typeof nothing {
+    const summary = this._summary;
+    const row = summary?.lastEventRow;
+    const event = summary?.lastEvent;
+    if (!row || !event) return nothing;
+    return html`
+      <div class="ahc-last-event">
+        <span class="ahc-last-event__label">אירוע אחרון</span>
+        <strong>${row.entity.name}</strong>
+        <span>${formatTime(event.start)} · ${CATEGORY_LABELS_HE[event.category]} · ${formatEntityLine(row, this._config.debug === true)}</span>
+      </div>
+    `;
+  }
+
   private _renderFilters(): TemplateResult | typeof nothing {
     if (this._config.filters?.show === false) return nothing;
-    const domains = this._availableDomains();
-    const areas = this._availableAreas();
-    const visibleAreas = areas.slice(0, 5);
-    const hiddenAreaCount = Math.max(0, areas.length - visibleAreas.length);
 
     return html`
       <section class="ahc__filters" aria-label="מסננים">
@@ -263,39 +282,22 @@ export class ActivityHistoryCard extends LitElement {
           <div class="ahc__segmented" aria-label="קיבוץ לפי">
             <button class="ahc__segmented-button" type="button" aria-pressed=${this._filter.groupBy === "area"} @click=${() => this._setGroupBy("area")}>אזור</button>
             <button class="ahc__segmented-button" type="button" aria-pressed=${this._filter.groupBy === "domain"} @click=${() => this._setGroupBy("domain")}>סוג</button>
+            <button class="ahc__segmented-button" type="button" aria-pressed=${this._filter.groupBy === "none"} @click=${() => this._setGroupBy("none")}>ללא</button>
           </div>
+          <div class="ahc__search">
+            <span class="ahc__search-icon" aria-hidden="true">⌕</span>
+            <input
+              class="ahc__search-input"
+              type="search"
+              .value=${this._filter.search}
+              placeholder="חיפוש רכיב או אזור..."
+              @input=${this._onSearchInput}
+            />
+          </div>
+          <button class="ahc__button ahc__button--primary" type="button" @click=${this._openFilterSheet} aria-expanded=${this._filterSheetOpen ? "true" : "false"}>
+            <span aria-hidden="true">▾</span><span>סינון</span>
+          </button>
         </div>
-        ${this._config.filters?.show_area_chips === false
-          ? nothing
-          : html`
-              <div class="ahc__filter-row ahc__filter-row--compact">
-                <span class="ahc__filter-label">אזור</span>
-                ${this._renderChip("הכל", !this._filter.areas.length, () => this._setAreas([]))}
-                ${visibleAreas.map((area) => this._renderChip(area, this._filter.areas.includes(area), () => this._toggleArea(area)))}
-                ${hiddenAreaCount
-                  ? html`<button class="ahc__chip ahc__chip--more" type="button" @click=${this._openFilterSheet}>עוד ${hiddenAreaCount}...</button>`
-                  : nothing}
-              </div>
-            `}
-        ${this._config.filters?.show_domain_chips === false
-          ? nothing
-          : html`
-              <div class="ahc__filter-row ahc__filter-row--compact">
-                <span class="ahc__filter-label">סוג ישות</span>
-                ${this._renderChip("הכל", !this._filter.domains.length, () => this._setDomains([]))}
-                ${domains.map((domain) => this._renderChip(DOMAIN_LABELS_HE[domain] ?? domain, this._filter.domains.includes(domain), () => this._toggleDomain(domain)))}
-              </div>
-            `}
-        ${this._config.filters?.show_state_mode === false
-          ? nothing
-          : html`
-              <div class="ahc__filter-row">
-                <span class="ahc__filter-label">מצב</span>
-                ${this._renderChip("כל המצבים", this._filter.stateMode === "all", () => this._setStateMode("all"))}
-                ${this._renderChip("רק פעילים", this._filter.stateMode === "active_only", () => this._setStateMode("active_only"))}
-                ${this._renderChip("פעילים עכשיו", this._filter.stateMode === "currently_active", () => this._setStateMode("currently_active"))}
-              </div>
-            `}
       </section>
     `;
   }
@@ -307,11 +309,6 @@ export class ActivityHistoryCard extends LitElement {
   private _renderSummary(): TemplateResult | typeof nothing {
     if (this._config.show_summary === false) return nothing;
     const summary = this._summary;
-    const lastEventRow = summary?.lastEventRow;
-    const lastEventState = summary?.lastEvent ? CATEGORY_LABELS_HE[summary.lastEvent.category] : undefined;
-    const lastEventSubtitle = lastEventRow
-      ? [lastEventRow.entity.area, lastEventState, this._config.debug ? lastEventRow.entity.entity_id : undefined].filter(Boolean).join(" · ")
-      : "לא נמצאו אירועים";
     return html`
       <section class="ahc__summary-grid" aria-label="סיכום פעילות">
         <article class="ahc__metric">
@@ -346,15 +343,6 @@ export class ActivityHistoryCard extends LitElement {
           </div>
           <span class="ahc__metric-icon" aria-hidden="true">●</span>
         </article>
-        <article class="ahc__metric">
-          <div class="ahc__metric-copy">
-            <span class="ahc__metric-label">אירוע אחרון</span>
-            <span class="ahc__metric-value">${summary?.lastEvent ? formatTime(summary.lastEvent.start) : "אין"}</span>
-            <span class="ahc__metric-subtitle">${lastEventRow?.entity.name ?? lastEventSubtitle}</span>
-            ${lastEventRow ? html`<span class="ahc__metric-subtitle">${lastEventSubtitle}</span>` : nothing}
-          </div>
-          <span class="ahc__metric-icon" aria-hidden="true">♫</span>
-        </article>
       </section>
     `;
   }
@@ -385,6 +373,7 @@ export class ActivityHistoryCard extends LitElement {
           range,
           config: this._config,
           summary: this._summary ?? summarizeActivity(this._groups),
+          onSegmentClick: this._openSegmentPopover,
         });
     }
   }
@@ -410,6 +399,58 @@ export class ActivityHistoryCard extends LitElement {
       </section>
     `;
   }
+
+  private _renderSegmentPopover(): TemplateResult {
+    const popover = this._segmentPopover;
+    if (!popover) return html``;
+    const details = formatSegmentSummary(popover.row, popover.segment, this._config.debug === true);
+    return html`
+      <aside
+        class="ahc-popover"
+        data-placement=${popover.placement}
+        role="dialog"
+        aria-label="פרטי מקטע פעילות"
+        style=${`--ahc-popover-x:${popover.x}px; --ahc-popover-y:${popover.y}px`}
+      >
+        <button class="ahc-popover__close" type="button" aria-label="סגור" @click=${this._closeSegmentPopover}>×</button>
+        <h3 class="ahc-popover__title">${popover.row.entity.name}</h3>
+        <dl class="ahc-popover__dl">
+          ${details.map(([label, value]) => html`<dt class="ahc-popover__dt">${label}</dt><dd class="ahc-popover__dd">${value}</dd>`)}
+        </dl>
+      </aside>
+    `;
+  }
+
+  private _openSegmentPopover = (event: Event, entityId: string, segmentIndex: number): void => {
+    event.preventDefault();
+    event.stopPropagation();
+    const row = this._rows.find((item) => item.entity.entity_id === entityId);
+    const segment = row?.segments[segmentIndex];
+    const target = event.currentTarget instanceof Element ? event.currentTarget : undefined;
+    if (!row || !segment || !target) return;
+
+    const rect = target.getBoundingClientRect();
+    const point = positionPopover(rect, { width: window.innerWidth, height: window.innerHeight });
+    this._segmentPopover = {
+      row,
+      segment,
+      x: point.x,
+      y: point.y,
+      placement: point.placement,
+    };
+    document.addEventListener("pointerdown", this._onDocumentPointerDown);
+    document.addEventListener("keydown", this._onDocumentKeyDown);
+    this.requestUpdate();
+  };
+
+  private _closeSegmentPopover = (): void => {
+    this._segmentPopover = undefined;
+    document.removeEventListener("pointerdown", this._onDocumentPointerDown);
+    if (!this._fullscreen && !this._filterSheetOpen) {
+      document.removeEventListener("keydown", this._onDocumentKeyDown);
+    }
+    this.requestUpdate();
+  };
 
   private _renderEmptyState(reason: EmptyStateReason): TemplateResult {
     const states: Record<EmptyStateReason, { title: string; body: string; yaml: string }> = {
@@ -496,23 +537,32 @@ export class ActivityHistoryCard extends LitElement {
 
   private _renderInsights(): TemplateResult {
     const summary = this._summary;
+    const mostActive = summary?.mostActiveEntity;
+    const mostActiveArea = summary?.mostActiveArea;
+    const hasData = Boolean(summary && summary.eventCount > 0);
     return html`
       <aside class="ahc__insights" aria-label="תובנות חכמות">
         <h3 class="ahc__insights-title"><span>תובנות חכמות</span><span aria-hidden="true">✦</span></h3>
         <article class="ahc__insight-card">
           <span class="ahc__insight-kicker">הרכיב הפעיל ביותר</span>
-          <span class="ahc__insight-value">${summary?.mostActiveEntity?.entity.name ?? "אין נתונים"}</span>
-          <span class="ahc__insight-subtitle">${formatDuration(summary?.mostActiveEntity?.totalActiveMs ?? 0)}</span>
+          <span class="ahc__insight-value">${mostActive?.entity.name ?? "אין מספיק נתונים"}</span>
+          <span class="ahc__insight-subtitle">${mostActive ? `${formatDuration(mostActive.totalActiveMs)} · ${formatEntityLine(mostActive, this._config.debug === true)}` : "צריך היסטוריה פעילה בטווח"}</span>
         </article>
         <article class="ahc__insight-card">
           <span class="ahc__insight-kicker">האזור הפעיל ביותר</span>
-          <span class="ahc__insight-value">${summary?.mostActiveArea?.title ?? "אין נתונים"}</span>
-          <span class="ahc__insight-subtitle">${formatDuration(summary?.mostActiveArea?.totalActiveMs ?? 0)}</span>
+          <span class="ahc__insight-value">${mostActiveArea?.title ?? "אין מספיק נתונים"}</span>
+          <span class="ahc__insight-subtitle">${mostActiveArea ? `${formatDuration(mostActiveArea.totalActiveMs)} · ${mostActiveArea.subtitle ?? ""}` : "אין אזור עם פעילות משמעותית"}</span>
         </article>
         <article class="ahc__insight-card">
           <span class="ahc__insight-kicker">שעות שיא</span>
-          <span class="ahc__insight-value">${summary?.peakBucketLabel ?? "אין נתונים"}</span>
+          <span class="ahc__insight-value">${summary?.peakBucketLabel ?? "אין מספיק נתונים"}</span>
           <span class="ahc__insight-subtitle">לפי משך פעילות</span>
+          <span class="ahc__spark" aria-hidden="true">${[35, 48, 62, 44, 72, 54, 38].map((value) => html`<i style="--bar:${hasData ? value : 12}%"></i>`)}</span>
+        </article>
+        <article class="ahc__insight-card">
+          <span class="ahc__insight-kicker">דפוס שימוש קצר</span>
+          <span class="ahc__insight-value">${hasData ? `${summary?.activeEntityCount ?? 0} רכיבים` : "אין מספיק נתונים"}</span>
+          <span class="ahc__insight-subtitle">${hasData ? `נרשמו ${summary?.eventCount ?? 0} אירועים בטווח הנוכחי` : "נסה טווח זמן ארוך יותר או ודא שה-Recorder פעיל"}</span>
         </article>
       </aside>
     `;
@@ -982,6 +1032,10 @@ export class ActivityHistoryCard extends LitElement {
 
   private _onDocumentKeyDown = (event: KeyboardEvent): void => {
     if (event.key !== "Escape") return;
+    if (this._segmentPopover) {
+      this._closeSegmentPopover();
+      return;
+    }
     if (this._filterSheetOpen) {
       this._closeFilterSheet();
       return;
@@ -989,6 +1043,12 @@ export class ActivityHistoryCard extends LitElement {
     if (this._fullscreen) {
       void this._toggleFullscreen();
     }
+  };
+
+  private _onDocumentPointerDown = (event: PointerEvent): void => {
+    const path = event.composedPath();
+    if (path.some((item) => item instanceof HTMLElement && item.classList.contains("ahc-popover"))) return;
+    if (this._segmentPopover) this._closeSegmentPopover();
   };
 
   private _onFullscreenChange = (): void => {
