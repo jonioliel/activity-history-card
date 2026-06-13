@@ -1,5 +1,9 @@
 import { LitElement, html, nothing, type TemplateResult } from "lit";
-import { CATEGORY_LABELS_HE, DEFAULT_CONFIG, DOMAIN_LABELS_HE } from "./defaults";
+import {
+  CATEGORY_LABELS_HE,
+  DEFAULT_CONFIG,
+  DOMAIN_LABELS_HE,
+} from "./defaults";
 import { formatEntityLine, formatSegmentSummary } from "./display-text";
 import { resolveEntityMetasWithDiagnostics } from "./entity-resolver";
 import { filterRows, groupRows } from "./filters";
@@ -9,11 +13,16 @@ import { formatDuration, formatTime, isRtl, resolveTimeRange } from "./format";
 import { intervalizeHistory } from "./intervalize";
 import { getMockEntities, getMockHistory } from "./mock-data";
 import { positionPopover } from "./popover-position";
-import { normalizeRefreshIntervalSeconds, shouldRefreshFromHassSetter, type HistoryRefreshReason } from "./refresh-policy";
+import {
+  normalizeRefreshIntervalSeconds,
+  shouldRefreshFromHassSetter,
+  type HistoryRefreshReason,
+} from "./refresh-policy";
 import { renderCorrelationPlaceholder } from "./renderers/correlation-renderer";
 import { renderDetailPlaceholder } from "./renderers/detail-renderer";
 import { renderHeatmapPlaceholder } from "./renderers/heatmap-renderer";
 import { renderSwimlaneTimeline } from "./renderers/swimlane-renderer";
+import { curateRows, formatCurationSummary } from "./row-curation";
 import { activityHistoryCardStyles } from "./styles";
 import { summarizeActivity } from "./summary";
 import "./activity-history-card-editor";
@@ -24,6 +33,7 @@ import type {
   FilterState,
   HistoryStateRecord,
   HomeAssistant,
+  RowCurationDiagnostics,
   StateMode,
   TimePreset,
   TimeRange,
@@ -38,7 +48,8 @@ type EmptyStateReason =
   | "no_resolved_entities"
   | "no_history_returned"
   | "history_unusable"
-  | "all_entities_filtered";
+  | "all_entities_filtered"
+  | "no_meaningful_activity";
 
 interface SegmentPopoverState {
   row: TimelineRow;
@@ -69,6 +80,7 @@ export class ActivityHistoryCard extends LitElement {
   private _config!: ActivityHistoryCardConfig;
   private _hass?: HomeAssistant;
   private _rows: TimelineRow[] = [];
+  private _visibleRows: TimelineRow[] = [];
   private _groups: TimelineGroup[] = [];
   private _summary?: ActivitySummary;
   private _loading = false;
@@ -79,6 +91,8 @@ export class ActivityHistoryCard extends LitElement {
   private _fullscreen = false;
   private _filterSheetOpen = false;
   private _usingMockData = false;
+  private _showAllRows = false;
+  private _curation?: RowCurationDiagnostics;
   private _fetchToken = 0;
   private _lastFetchKey = "";
   private _hasFetchedOnce = false;
@@ -88,7 +102,10 @@ export class ActivityHistoryCard extends LitElement {
   private _lastHistoryFetchAt = 0;
   private _refreshTimer?: number;
   private _inFlightHistoryRequest?: Promise<void>;
-  private _historyCache = new Map<string, Record<string, HistoryStateRecord[]>>();
+  private _historyCache = new Map<
+    string,
+    Record<string, HistoryStateRecord[]>
+  >();
   private _unsubscribeHistory?: () => void;
 
   private _filter: FilterState = {
@@ -102,7 +119,9 @@ export class ActivityHistoryCard extends LitElement {
 
   setConfig(config: ActivityHistoryCardConfig): void {
     if (!config || config.type !== "custom:activity-history-card") {
-      throw new Error("Invalid card type. Expected custom:activity-history-card");
+      throw new Error(
+        "Invalid card type. Expected custom:activity-history-card",
+      );
     }
 
     const timePreset = this._initialTimePreset(config);
@@ -133,9 +152,12 @@ export class ActivityHistoryCard extends LitElement {
 
     this._lastFetchKey = "";
     this._lastResolvedEntityKey = "";
+    this._showAllRows = false;
     this._historyCache.clear();
     this._syncRefreshTimer();
-    this._requestHistoryRefresh(this._hasFetchedOnce ? "config" : "initial", { force: true });
+    this._requestHistoryRefresh(this._hasFetchedOnce ? "config" : "initial", {
+      force: true,
+    });
   }
 
   set hass(hass: HomeAssistant) {
@@ -148,7 +170,9 @@ export class ActivityHistoryCard extends LitElement {
       refreshIntervalSeconds: this._refreshIntervalSeconds(),
     });
     if (shouldRefresh) {
-      this._requestHistoryRefresh(this._hasFetchedOnce ? "interval" : "initial");
+      this._requestHistoryRefresh(
+        this._hasFetchedOnce ? "interval" : "initial",
+      );
     } else {
       this.requestUpdate();
     }
@@ -168,13 +192,19 @@ export class ActivityHistoryCard extends LitElement {
   }
 
   getCardSize(): number {
-    const rowCount = this._rows.length || (this._config?.entities?.length ?? 3);
+    const rowCount =
+      this._visibleRows.length ||
+      this._rows.length ||
+      (this._config?.entities?.length ?? 3);
     return Math.min(18, Math.max(5, Math.ceil(rowCount * 0.7) + 4));
   }
 
   getGridOptions() {
     return {
-      columns: this._config?.display_mode === "panel" || this._fullscreen ? "full" : 12,
+      columns:
+        this._config?.display_mode === "panel" || this._fullscreen
+          ? "full"
+          : 12,
       min_columns: 6,
       rows: this._config?.display_mode === "panel" || this._fullscreen ? 12 : 8,
       min_rows: 5,
@@ -185,22 +215,37 @@ export class ActivityHistoryCard extends LitElement {
     if (!this._config) return html``;
 
     const lang = this._hass?.locale?.language ?? this._hass?.language;
-    const rtl = isRtl(this._config.direction ?? this._config.rtl ?? "auto", lang);
+    const rtl = isRtl(
+      this._config.direction ?? this._config.rtl ?? "auto",
+      lang,
+    );
     const classes = [
       "ahc",
       this._config.display_mode === "panel" ? "ahc--panel" : "",
-      this._fullscreen || this._config.display_mode === "fullscreen" ? "ahc--fullscreen" : "",
+      this._fullscreen || this._config.display_mode === "fullscreen"
+        ? "ahc--fullscreen"
+        : "",
       this._filterSheetOpen ? "ahc--sheet-open" : "",
       this._usingMockData ? "ahc--mock" : "",
       this._backgroundLoading ? "ahc--background-loading" : "",
-      this._rows.length > 70 ? "ahc--ultra-dense" : this._rows.length > 30 ? "ahc--dense" : "",
+      this._visibleRows.length > 70
+        ? "ahc--ultra-dense"
+        : this._visibleRows.length > 30
+          ? "ahc--dense"
+          : "",
     ]
       .filter(Boolean)
       .join(" ");
 
     return html`
-      <ha-card class=${classes} dir=${rtl ? "rtl" : "ltr"} tabindex=${this._fullscreen ? "0" : "-1"} aria-busy=${this._initialLoad ? "true" : "false"}>
-        ${this._renderHeader()} ${this._renderFilters()} ${this._renderSummary()}
+      <ha-card
+        class=${classes}
+        dir=${rtl ? "rtl" : "ltr"}
+        tabindex=${this._fullscreen ? "0" : "-1"}
+        aria-busy=${this._initialLoad ? "true" : "false"}
+      >
+        ${this._renderHeader()} ${this._renderFilters()}
+        ${this._renderSummary()}
         ${this._config.debug ? this._renderDiagnostics() : nothing}
         ${this._renderBody()}
         ${this._segmentPopover ? this._renderSegmentPopover() : nothing}
@@ -212,7 +257,9 @@ export class ActivityHistoryCard extends LitElement {
   private _renderBody(): TemplateResult {
     const showInsights = this._config.show_insights !== false;
     return html`
-      <div class=${showInsights ? "ahc__body" : "ahc__body ahc__body--no-insights"}>
+      <div
+        class=${showInsights ? "ahc__body" : "ahc__body ahc__body--no-insights"}
+      >
         <main class="ahc__main">${this._renderMainContent()}</main>
         ${showInsights ? this._renderInsights() : nothing}
       </div>
@@ -233,21 +280,37 @@ export class ActivityHistoryCard extends LitElement {
                   @click=${this._toggleFullscreen}
                   aria-pressed=${this._fullscreen ? "true" : "false"}
                 >
-                  <span aria-hidden="true">${this._fullscreen ? "×" : "⛶"}</span>
+                  <span aria-hidden="true"
+                    >${this._fullscreen ? "×" : "⛶"}</span
+                  >
                   <span>${this._fullscreen ? "צא ממסך מלא" : "מסך מלא"}</span>
                 </button>
               `}
-          <button class="ahc__button ahc__button--ghost" type="button" @click=${this._manualRefresh} ?disabled=${this._initialLoad || this._backgroundLoading}>
+          <button
+            class="ahc__button ahc__button--ghost"
+            type="button"
+            @click=${this._manualRefresh}
+            ?disabled=${this._initialLoad || this._backgroundLoading}
+          >
             <span aria-hidden="true">↻</span><span>רענן</span>
           </button>
-          ${this._backgroundLoading ? html`<span class="ahc__refresh-indicator" role="status">מעדכן...</span>` : nothing}
+          ${this._backgroundLoading
+            ? html`<span class="ahc__refresh-indicator" role="status"
+                >מעדכן...</span
+              >`
+            : nothing}
         </div>
         <div class="ahc__title-block">
           <div class="ahc__title-row">
-            <span class="ahc__icon-badge" aria-hidden="true"><ha-icon icon="mdi:chart-timeline-variant"></ha-icon></span>
-            <h2 class="ahc__title">${this._config.title ?? DEFAULT_CONFIG.title}</h2>
+            <span class="ahc__icon-badge" aria-hidden="true"
+              ><ha-icon icon="mdi:chart-timeline-variant"></ha-icon
+            ></span>
+            <h2 class="ahc__title">
+              ${this._config.title ?? DEFAULT_CONFIG.title}
+            </h2>
           </div>
           <p class="ahc__subtitle">${subtitle}</p>
+          ${this._renderLastEventPill()}
         </div>
       </header>
     `;
@@ -262,26 +325,62 @@ export class ActivityHistoryCard extends LitElement {
       <div class="ahc-last-event">
         <span class="ahc-last-event__label">אירוע אחרון</span>
         <strong>${row.entity.name}</strong>
-        <span>${formatTime(event.start)} · ${CATEGORY_LABELS_HE[event.category]} · ${formatEntityLine(row, this._config.debug === true)}</span>
+        <span
+          >${formatTime(event.start)} · ${CATEGORY_LABELS_HE[event.category]} ·
+          ${formatEntityLine(row, this._config.debug === true)}</span
+        >
       </div>
     `;
   }
 
   private _renderFilters(): TemplateResult | typeof nothing {
     if (this._config.filters?.show === false) return nothing;
+    const curationSummary = formatCurationSummary(this._curation);
+    const canToggleSmartFilter = Boolean(
+      this._curation?.hiddenRows || this._showAllRows,
+    );
 
     return html`
       <section class="ahc__filters" aria-label="מסננים">
         <div class="ahc__filter-row ahc__filter-row--primary">
           <span class="ahc__filter-label">טווח זמן</span>
-          ${this._renderChip("24 שעות", this._filter.timePreset === "24h", () => this._setTimePreset("24h"))}
-          ${this._renderChip("7 ימים", this._filter.timePreset === "7d", () => this._setTimePreset("7d"))}
-          ${this._renderChip("מותאם", this._filter.timePreset === "custom", () => this._setTimePreset("custom"))}
+          ${this._renderChip("24 שעות", this._filter.timePreset === "24h", () =>
+            this._setTimePreset("24h"),
+          )}
+          ${this._renderChip("7 ימים", this._filter.timePreset === "7d", () =>
+            this._setTimePreset("7d"),
+          )}
+          ${this._renderChip(
+            "מותאם",
+            this._filter.timePreset === "custom",
+            () => this._setTimePreset("custom"),
+          )}
           <span class="ahc__filter-label">קבץ לפי</span>
           <div class="ahc__segmented" aria-label="קיבוץ לפי">
-            <button class="ahc__segmented-button" type="button" aria-pressed=${this._filter.groupBy === "area"} @click=${() => this._setGroupBy("area")}>אזור</button>
-            <button class="ahc__segmented-button" type="button" aria-pressed=${this._filter.groupBy === "domain"} @click=${() => this._setGroupBy("domain")}>סוג</button>
-            <button class="ahc__segmented-button" type="button" aria-pressed=${this._filter.groupBy === "none"} @click=${() => this._setGroupBy("none")}>ללא</button>
+            <button
+              class="ahc__segmented-button"
+              type="button"
+              aria-pressed=${this._filter.groupBy === "area"}
+              @click=${() => this._setGroupBy("area")}
+            >
+              אזור
+            </button>
+            <button
+              class="ahc__segmented-button"
+              type="button"
+              aria-pressed=${this._filter.groupBy === "domain"}
+              @click=${() => this._setGroupBy("domain")}
+            >
+              סוג
+            </button>
+            <button
+              class="ahc__segmented-button"
+              type="button"
+              aria-pressed=${this._filter.groupBy === "none"}
+              @click=${() => this._setGroupBy("none")}
+            >
+              ללא
+            </button>
           </div>
           <div class="ahc__search">
             <span class="ahc__search-icon" aria-hidden="true">⌕</span>
@@ -293,19 +392,100 @@ export class ActivityHistoryCard extends LitElement {
               @input=${this._onSearchInput}
             />
           </div>
-          <button class="ahc__button ahc__button--primary" type="button" @click=${this._openFilterSheet} aria-expanded=${this._filterSheetOpen ? "true" : "false"}>
+          <button
+            class="ahc__button ahc__button--primary"
+            type="button"
+            @click=${this._openFilterSheet}
+            aria-expanded=${this._filterSheetOpen ? "true" : "false"}
+          >
             <span aria-hidden="true">▾</span><span>סינון</span>
           </button>
+          ${canToggleSmartFilter
+            ? html`<button
+                class="ahc__button ahc__button--ghost"
+                type="button"
+                aria-pressed=${this._showAllRows ? "true" : "false"}
+                @click=${this._toggleShowAllRows}
+              >
+                ${this._showAllRows ? "סינון חכם" : "הצג הכל"}
+              </button>`
+            : nothing}
+          ${curationSummary
+            ? html`<span class="ahc-curation-note">${curationSummary}</span>`
+            : nothing}
         </div>
       </section>
     `;
   }
 
-  private _renderChip(label: string, pressed: boolean, onClick: () => void): TemplateResult {
-    return html`<button class="ahc__chip" type="button" aria-pressed=${pressed ? "true" : "false"} @click=${onClick}>${label}</button>`;
+  private _renderChip(
+    label: string,
+    pressed: boolean,
+    onClick: () => void,
+  ): TemplateResult {
+    return html`<button
+      class="ahc__chip"
+      type="button"
+      aria-pressed=${pressed ? "true" : "false"}
+      @click=${onClick}
+    >
+      ${label}
+    </button>`;
   }
 
   private _renderSummary(): TemplateResult | typeof nothing {
+    if (this._config.show_summary === false) return nothing;
+    const summary = this._summary;
+    const visibleCount = this._visibleRows.length || this._rows.length;
+    return html`
+      <section class="ahc__summary-grid" aria-label="סיכום פעילות">
+        <article class="ahc__metric">
+          <div class="ahc__metric-copy">
+            <span class="ahc__metric-label">פעילים עכשיו</span>
+            <span class="ahc__metric-value"
+              >${summary?.activeNowCount ?? 0}</span
+            >
+            <span class="ahc__metric-subtitle">רכיבים שפועלים כרגע</span>
+          </div>
+          <span class="ahc__metric-icon" aria-hidden="true">●</span>
+        </article>
+        <article class="ahc__metric">
+          <div class="ahc__metric-copy">
+            <span class="ahc__metric-label">רכיבים שפעלו</span>
+            <span class="ahc__metric-value"
+              >${summary?.activeEntityCount ?? 0}</span
+            >
+            <span class="ahc__metric-subtitle"
+              >מתוך ${visibleCount} רכיבים מוצגים</span
+            >
+          </div>
+          <span class="ahc__metric-icon" aria-hidden="true">▣</span>
+        </article>
+        <article class="ahc__metric">
+          <div class="ahc__metric-copy">
+            <span class="ahc__metric-label">אירועים</span>
+            <span class="ahc__metric-value">${summary?.eventCount ?? 0}</span>
+            <span class="ahc__metric-subtitle">שינויי מצב פעילים</span>
+          </div>
+          <span class="ahc__metric-icon" aria-hidden="true">⌁</span>
+        </article>
+        <article class="ahc__metric">
+          <div class="ahc__metric-copy">
+            <span class="ahc__metric-label">סה״כ שעות־רכיב</span>
+            <span class="ahc__metric-value ahc__metric-value--positive"
+              >${formatDuration(summary?.totalActiveMs ?? 0)}</span
+            >
+            <span class="ahc__metric-subtitle"
+              >סכום פעילות על פני כל הרכיבים</span
+            >
+          </div>
+          <span class="ahc__metric-icon" aria-hidden="true">◴</span>
+        </article>
+      </section>
+    `;
+  }
+
+  private _renderSummaryLegacy(): TemplateResult | typeof nothing {
     if (this._config.show_summary === false) return nothing;
     const summary = this._summary;
     const lastEventRow = summary?.lastEventRow;
@@ -315,7 +495,9 @@ export class ActivityHistoryCard extends LitElement {
         <article class="ahc__metric">
           <div class="ahc__metric-copy">
             <span class="ahc__metric-label">אירוע אחרון</span>
-            <span class="ahc__metric-value ahc__metric-value--compact">${lastEventRow?.entity.name ?? "אין"}</span>
+            <span class="ahc__metric-value ahc__metric-value--compact"
+              >${lastEventRow?.entity.name ?? "אין"}</span
+            >
             <span class="ahc__metric-subtitle">
               ${lastEvent && lastEventRow
                 ? `${formatTime(lastEvent.start)} · ${CATEGORY_LABELS_HE[lastEvent.category]} · ${formatEntityLine(lastEventRow, this._config.debug === true)}`
@@ -327,8 +509,12 @@ export class ActivityHistoryCard extends LitElement {
         <article class="ahc__metric">
           <div class="ahc__metric-copy">
             <span class="ahc__metric-label">סה״כ שעות־רכיב</span>
-            <span class="ahc__metric-value ahc__metric-value--positive">${formatDuration(summary?.totalActiveMs ?? 0)}</span>
-            <span class="ahc__metric-subtitle">סכום פעילות על פני כל הרכיבים</span>
+            <span class="ahc__metric-value ahc__metric-value--positive"
+              >${formatDuration(summary?.totalActiveMs ?? 0)}</span
+            >
+            <span class="ahc__metric-subtitle"
+              >סכום פעילות על פני כל הרכיבים</span
+            >
           </div>
           <span class="ahc__metric-icon" aria-hidden="true">◷</span>
         </article>
@@ -343,8 +529,12 @@ export class ActivityHistoryCard extends LitElement {
         <article class="ahc__metric">
           <div class="ahc__metric-copy">
             <span class="ahc__metric-label">פעילים עכשיו</span>
-            <span class="ahc__metric-value">${summary?.activeNowCount ?? 0}</span>
-            <span class="ahc__metric-subtitle">${summary?.activeEntityCount ?? 0} רכיבים פעלו בטווח</span>
+            <span class="ahc__metric-value"
+              >${summary?.activeNowCount ?? 0}</span
+            >
+            <span class="ahc__metric-subtitle"
+              >${summary?.activeEntityCount ?? 0} רכיבים פעלו בטווח</span
+            >
           </div>
           <span class="ahc__metric-icon" aria-hidden="true">●</span>
         </article>
@@ -357,10 +547,17 @@ export class ActivityHistoryCard extends LitElement {
       return this._renderInitialLoading();
     }
     if (this._error && !this._rows.length) {
-      return html`<div class="ahc-state-card"><div><h3 class="ahc-state-card__title">שגיאה בטעינת ההיסטוריה</h3><p>${this._error}</p></div></div>`;
+      return html`<div class="ahc-state-card">
+        <div>
+          <h3 class="ahc-state-card__title">שגיאה בטעינת ההיסטוריה</h3>
+          <p>${this._error}</p>
+        </div>
+      </div>`;
     }
     if (this._emptyReason || !this._groups.length) {
-      return this._renderEmptyState(this._emptyReason ?? "no_resolved_entities");
+      return this._renderEmptyState(
+        this._emptyReason ?? "no_resolved_entities",
+      );
     }
 
     const range = this._resolveRange();
@@ -378,13 +575,17 @@ export class ActivityHistoryCard extends LitElement {
           range,
           config: this._config,
           summary: this._summary ?? summarizeActivity(this._groups),
+          curation: this._curation,
           onSegmentClick: this._openSegmentPopover,
         });
     }
   }
 
   private _renderInitialLoading(): TemplateResult {
-    const message = !this._hass && !this._usingMockData ? "ממתין לחיבור Home Assistant." : "מושך היסטוריה מה-Recorder.";
+    const message =
+      !this._hass && !this._usingMockData
+        ? "ממתין לחיבור Home Assistant."
+        : "מושך היסטוריה מה-Recorder.";
     return html`
       <section class="ahc-loading" aria-label="טעינת היסטוריה" aria-busy="true">
         <div class="ahc-loading__copy">
@@ -396,7 +597,13 @@ export class ActivityHistoryCard extends LitElement {
             (_, groupIndex) => html`
               <div class="ahc-loading__group">
                 <span></span>
-                ${Array.from({ length: 5 }).map((__, rowIndex) => html`<i style="--delay:${groupIndex + rowIndex}; --width:${42 + ((groupIndex + rowIndex) % 4) * 12}%"></i>`)}
+                ${Array.from({ length: 5 }).map(
+                  (__, rowIndex) =>
+                    html`<i
+                      style="--delay:${groupIndex + rowIndex}; --width:${42 +
+                      ((groupIndex + rowIndex) % 4) * 12}%"
+                    ></i>`,
+                )}
               </div>
             `,
           )}
@@ -408,7 +615,11 @@ export class ActivityHistoryCard extends LitElement {
   private _renderSegmentPopover(): TemplateResult {
     const popover = this._segmentPopover;
     if (!popover) return html``;
-    const details = formatSegmentSummary(popover.row, popover.segment, this._config.debug === true);
+    const details = formatSegmentSummary(
+      popover.row,
+      popover.segment,
+      this._config.debug === true,
+    );
     return html`
       <aside
         class="ahc-popover"
@@ -417,25 +628,46 @@ export class ActivityHistoryCard extends LitElement {
         aria-label="פרטי מקטע פעילות"
         style=${`--ahc-popover-x:${popover.x}px; --ahc-popover-y:${popover.y}px`}
       >
-        <button class="ahc-popover__close" type="button" aria-label="סגור" @click=${this._closeSegmentPopover}>×</button>
+        <button
+          class="ahc-popover__close"
+          type="button"
+          aria-label="סגור"
+          @click=${this._closeSegmentPopover}
+        >
+          ×
+        </button>
         <h3 class="ahc-popover__title">${popover.row.entity.name}</h3>
         <dl class="ahc-popover__dl">
-          ${details.map(([label, value]) => html`<dt class="ahc-popover__dt">${label}</dt><dd class="ahc-popover__dd">${value}</dd>`)}
+          ${details.map(
+            ([label, value]) =>
+              html`<dt class="ahc-popover__dt">${label}</dt>
+                <dd class="ahc-popover__dd">${value}</dd>`,
+          )}
         </dl>
       </aside>
     `;
   }
 
-  private _openSegmentPopover = (event: Event, entityId: string, segmentIndex: number): void => {
+  private _openSegmentPopover = (
+    event: Event,
+    entityId: string,
+    segmentIndex: number,
+  ): void => {
     event.preventDefault();
     event.stopPropagation();
-    const row = this._rows.find((item) => item.entity.entity_id === entityId);
+    const row =
+      this._visibleRows.find((item) => item.entity.entity_id === entityId) ??
+      this._rows.find((item) => item.entity.entity_id === entityId);
     const segment = row?.segments[segmentIndex];
-    const target = event.currentTarget instanceof Element ? event.currentTarget : undefined;
+    const target =
+      event.currentTarget instanceof Element ? event.currentTarget : undefined;
     if (!row || !segment || !target) return;
 
     const rect = target.getBoundingClientRect();
-    const point = positionPopover(rect, { width: window.innerWidth, height: window.innerHeight });
+    const point = positionPopover(rect, {
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
     this._segmentPopover = {
       row,
       segment,
@@ -458,7 +690,10 @@ export class ActivityHistoryCard extends LitElement {
   };
 
   private _renderEmptyState(reason: EmptyStateReason): TemplateResult {
-    const states: Record<EmptyStateReason, { title: string; body: string; yaml: string }> = {
+    const states: Record<
+      EmptyStateReason,
+      { title: string; body: string; yaml: string }
+    > = {
       no_entities_selected: {
         title: "לא נבחרו רכיבים",
         body: "הפעל גילוי אוטומטי או הוסף רשימת entities ידנית. בלי אחד מהם הכרטיס לא יודע אילו רכיבים לטעון.",
@@ -484,10 +719,16 @@ export class ActivityHistoryCard extends LitElement {
         body: "יש נתונים, אבל המסננים הנוכחיים מסתירים הכל. נקה חיפוש, אזור, סוג ישות או מצב פעיל בלבד.",
         yaml: "type: custom:activity-history-card\nauto_discover: true\nfilters:\n  active_only: false",
       },
+      no_meaningful_activity: {
+        title: "לא נמצאה פעילות משמעותית",
+        body: "הכרטיס מצא רכיבים והיסטוריה, אבל הסינון החכם הסתיר שורות ריקות, טכניות או קצרות מאוד כדי לשמור על ציר זמן קריא.",
+        yaml: "type: custom:activity-history-card\nauto_discover: true\nsmart_filter: false",
+      },
     };
     const state = states[reason];
     const discoveryWarnings =
-      reason === "no_resolved_entities" && this._diagnostics?.discovery?.unavailableReasons.length
+      reason === "no_resolved_entities" &&
+      this._diagnostics?.discovery?.unavailableReasons.length
         ? this._diagnostics.discovery.unavailableReasons.join(", ")
         : "";
     return html`
@@ -495,8 +736,41 @@ export class ActivityHistoryCard extends LitElement {
         <div>
           <h3 class="ahc-state-card__title">${state.title}</h3>
           <p>${state.body}</p>
-          ${discoveryWarnings ? html`<p>אזהרת discovery: ${discoveryWarnings}. אם האזורים לא זמינים, נסה להגדיר entities ידנית או להפעיל debug.</p>` : nothing}
-          <pre class="ahc-state-card__yaml" dir="ltr"><code>${state.yaml}</code></pre>
+          ${discoveryWarnings
+            ? html`<p>
+                אזהרת discovery: ${discoveryWarnings}. אם האזורים לא זמינים, נסה
+                להגדיר entities ידנית או להפעיל debug.
+              </p>`
+            : nothing}
+          <pre
+            class="ahc-state-card__yaml"
+            dir="ltr"
+          ><code>${state.yaml}</code></pre>
+          ${reason === "no_meaningful_activity"
+            ? html`<div class="ahc-empty-actions">
+                <button
+                  class="ahc__button ahc__button--primary"
+                  type="button"
+                  @click=${this._toggleShowAllRows}
+                >
+                  הצג הכל
+                </button>
+                <button
+                  class="ahc__button ahc__button--ghost"
+                  type="button"
+                  @click=${() => this._setTimePreset("7d")}
+                >
+                  7 ימים
+                </button>
+                <button
+                  class="ahc__button ahc__button--ghost"
+                  type="button"
+                  @click=${this._openFilterSheet}
+                >
+                  פתח סינון
+                </button>
+              </div>`
+            : nothing}
         </div>
       </div>
     `;
@@ -505,36 +779,112 @@ export class ActivityHistoryCard extends LitElement {
   private _renderDiagnostics(): TemplateResult {
     const diagnostics = this._diagnostics;
     if (!diagnostics) {
-      return html`<details class="ahc-debug" aria-label="אבחון"><summary>Debug · ממתין לטעינת נתונים...</summary></details>`;
+      return html`<details class="ahc-debug" aria-label="אבחון">
+        <summary>Debug · ממתין לטעינת נתונים...</summary>
+      </details>`;
     }
 
     return html`
       <details class="ahc-debug" aria-label="אבחון">
         <summary class="ahc-debug__header">
           <strong>Debug</strong>
-          <span>${diagnostics.fetchReason ?? "loaded"} · ${diagnostics.cacheHit ? "cache hit" : "cache miss"}</span>
+          <span
+            >${diagnostics.fetchReason ?? "loaded"} ·
+            ${diagnostics.cacheHit ? "cache hit" : "cache miss"}</span
+          >
         </summary>
         <dl class="ahc-debug__grid">
-          <div><dt>רכיבים</dt><dd>${diagnostics.resolvedEntityCount}</dd></div>
-          <div><dt>רשומות</dt><dd>${diagnostics.historyRecordCount}</dd></div>
-          <div><dt>מקטעים</dt><dd>${diagnostics.timelineSegmentCount}</dd></div>
-          <div><dt>פעילים</dt><dd>${diagnostics.activeTimelineSegmentCount}</dd></div>
-          <div><dt>אחרי סינון</dt><dd>${diagnostics.filteredRowCount}</dd></div>
-          <div><dt>קבוצות</dt><dd>${diagnostics.renderedGroupCount}</dd></div>
-          <div><dt>attributes</dt><dd>${diagnostics.attributesRequested.withAttributes}/${diagnostics.attributesRequested.withoutAttributes}</dd></div>
-          <div><dt>registry</dt><dd>${diagnostics.discovery?.registryAvailable ? "זמין" : "fallback"}</dd></div>
-          <div><dt>refresh</dt><dd>${diagnostics.refreshIntervalSeconds ?? this._refreshIntervalSeconds()}s</dd></div>
-          <div><dt>duration</dt><dd>${diagnostics.fetchDurationMs ?? 0}ms</dd></div>
-          <div><dt>mode</dt><dd>${diagnostics.initialLoad ? "initial" : diagnostics.backgroundLoading ? "background" : "idle"}</dd></div>
+          <div>
+            <dt>רכיבים</dt>
+            <dd>${diagnostics.resolvedEntityCount}</dd>
+          </div>
+          <div>
+            <dt>רשומות</dt>
+            <dd>${diagnostics.historyRecordCount}</dd>
+          </div>
+          <div>
+            <dt>מקטעים</dt>
+            <dd>${diagnostics.timelineSegmentCount}</dd>
+          </div>
+          <div>
+            <dt>פעילים</dt>
+            <dd>${diagnostics.activeTimelineSegmentCount}</dd>
+          </div>
+          <div>
+            <dt>אחרי סינון</dt>
+            <dd>${diagnostics.filteredRowCount}</dd>
+          </div>
+          <div>
+            <dt>מוצגות</dt>
+            <dd>${diagnostics.curation?.visibleRows ?? 0}</dd>
+          </div>
+          <div>
+            <dt>הוסתרו חכם</dt>
+            <dd>${diagnostics.curation?.hiddenRows ?? 0}</dd>
+          </div>
+          <div>
+            <dt>קבוצות</dt>
+            <dd>${diagnostics.renderedGroupCount}</dd>
+          </div>
+          <div>
+            <dt>attributes</dt>
+            <dd>
+              ${diagnostics.attributesRequested.withAttributes}/${diagnostics
+                .attributesRequested.withoutAttributes}
+            </dd>
+          </div>
+          <div>
+            <dt>registry</dt>
+            <dd>
+              ${diagnostics.discovery?.registryAvailable ? "זמין" : "fallback"}
+            </dd>
+          </div>
+          <div>
+            <dt>refresh</dt>
+            <dd>
+              ${diagnostics.refreshIntervalSeconds ??
+              this._refreshIntervalSeconds()}s
+            </dd>
+          </div>
+          <div>
+            <dt>duration</dt>
+            <dd>${diagnostics.fetchDurationMs ?? 0}ms</dd>
+          </div>
+          <div>
+            <dt>mode</dt>
+            <dd>
+              ${diagnostics.initialLoad
+                ? "initial"
+                : diagnostics.backgroundLoading
+                  ? "background"
+                  : "idle"}
+            </dd>
+          </div>
         </dl>
         <p class="ahc-debug__meta" dir="ltr">
-          ${diagnostics.historyRange ? `${diagnostics.historyRange.start.toISOString()} → ${diagnostics.historyRange.end.toISOString()}` : "no range"}
+          ${diagnostics.historyRange
+            ? `${diagnostics.historyRange.start.toISOString()} → ${diagnostics.historyRange.end.toISOString()}`
+            : "no range"}
         </p>
-        <p class="ahc-debug__meta" dir="ltr">last fetch: ${diagnostics.lastFetchTime?.toISOString() ?? "never"}</p>
-        <p class="ahc-debug__meta" dir="ltr">history key: ${diagnostics.currentHistoryKey ?? "none"}</p>
-        <p class="ahc-debug__meta">מסננים: ${JSON.stringify(diagnostics.activeFilters)}</p>
+        <p class="ahc-debug__meta" dir="ltr">
+          last fetch: ${diagnostics.lastFetchTime?.toISOString() ?? "never"}
+        </p>
+        <p class="ahc-debug__meta" dir="ltr">
+          history key: ${diagnostics.currentHistoryKey ?? "none"}
+        </p>
+        <p class="ahc-debug__meta">
+          מסננים: ${JSON.stringify(diagnostics.activeFilters)}
+        </p>
+        ${diagnostics.curation
+          ? html`<p class="ahc-debug__meta" dir="ltr">
+              curation: ${JSON.stringify(diagnostics.curation.hiddenByReason)}
+            </p>`
+          : nothing}
         ${diagnostics.discovery?.unavailableReasons.length
-          ? html`<p class="ahc-debug__meta">Registry warnings: ${diagnostics.discovery.unavailableReasons.join(", ")}</p>`
+          ? html`<p class="ahc-debug__meta">
+              Registry warnings:
+              ${diagnostics.discovery.unavailableReasons.join(", ")}
+            </p>`
           : nothing}
       </details>
     `;
@@ -547,27 +897,55 @@ export class ActivityHistoryCard extends LitElement {
     const hasData = Boolean(summary && summary.eventCount > 0);
     return html`
       <aside class="ahc__insights" aria-label="תובנות חכמות">
-        <h3 class="ahc__insights-title"><span>תובנות חכמות</span><span aria-hidden="true">✦</span></h3>
+        <h3 class="ahc__insights-title">
+          <span>תובנות חכמות</span><span aria-hidden="true">✦</span>
+        </h3>
         <article class="ahc__insight-card">
           <span class="ahc__insight-kicker">הרכיב הפעיל ביותר</span>
-          <span class="ahc__insight-value">${mostActive?.entity.name ?? "אין מספיק נתונים"}</span>
-          <span class="ahc__insight-subtitle">${mostActive ? `${formatDuration(mostActive.totalActiveMs)} · ${formatEntityLine(mostActive, this._config.debug === true)}` : "צריך היסטוריה פעילה בטווח"}</span>
+          <span class="ahc__insight-value"
+            >${mostActive?.entity.name ?? "אין מספיק נתונים"}</span
+          >
+          <span class="ahc__insight-subtitle"
+            >${mostActive
+              ? `${formatDuration(mostActive.totalActiveMs)} · ${formatEntityLine(mostActive, this._config.debug === true)}`
+              : "צריך היסטוריה פעילה בטווח"}</span
+          >
         </article>
         <article class="ahc__insight-card">
           <span class="ahc__insight-kicker">האזור הפעיל ביותר</span>
-          <span class="ahc__insight-value">${mostActiveArea?.title ?? "אין מספיק נתונים"}</span>
-          <span class="ahc__insight-subtitle">${mostActiveArea ? `${formatDuration(mostActiveArea.totalActiveMs)} · ${mostActiveArea.subtitle ?? ""}` : "אין אזור עם פעילות משמעותית"}</span>
+          <span class="ahc__insight-value"
+            >${mostActiveArea?.title ?? "אין מספיק נתונים"}</span
+          >
+          <span class="ahc__insight-subtitle"
+            >${mostActiveArea
+              ? `${formatDuration(mostActiveArea.totalActiveMs)} · ${mostActiveArea.subtitle ?? ""}`
+              : "אין אזור עם פעילות משמעותית"}</span
+          >
         </article>
         <article class="ahc__insight-card">
           <span class="ahc__insight-kicker">שעות שיא</span>
-          <span class="ahc__insight-value">${summary?.peakBucketLabel ?? "אין מספיק נתונים"}</span>
+          <span class="ahc__insight-value"
+            >${summary?.peakBucketLabel ?? "אין מספיק נתונים"}</span
+          >
           <span class="ahc__insight-subtitle">לפי משך פעילות</span>
-          <span class="ahc__spark" aria-hidden="true">${[35, 48, 62, 44, 72, 54, 38].map((value) => html`<i style="--bar:${hasData ? value : 12}%"></i>`)}</span>
+          <span class="ahc__spark" aria-hidden="true"
+            >${[35, 48, 62, 44, 72, 54, 38].map(
+              (value) => html`<i style="--bar:${hasData ? value : 12}%"></i>`,
+            )}</span
+          >
         </article>
         <article class="ahc__insight-card">
           <span class="ahc__insight-kicker">דפוס שימוש קצר</span>
-          <span class="ahc__insight-value">${hasData ? `${summary?.activeEntityCount ?? 0} רכיבים` : "אין מספיק נתונים"}</span>
-          <span class="ahc__insight-subtitle">${hasData ? `נרשמו ${summary?.eventCount ?? 0} אירועים בטווח הנוכחי` : "נסה טווח זמן ארוך יותר או ודא שה-Recorder פעיל"}</span>
+          <span class="ahc__insight-value"
+            >${hasData
+              ? `${summary?.activeEntityCount ?? 0} רכיבים`
+              : "אין מספיק נתונים"}</span
+          >
+          <span class="ahc__insight-subtitle"
+            >${hasData
+              ? `נרשמו ${summary?.eventCount ?? 0} אירועים בטווח הנוכחי`
+              : "נסה טווח זמן ארוך יותר או ודא שה-Recorder פעיל"}</span
+          >
         </article>
       </aside>
     `;
@@ -576,86 +954,212 @@ export class ActivityHistoryCard extends LitElement {
   private _renderFilterSheet(): TemplateResult {
     const areas = this._availableAreas();
     const domains = this._availableDomains();
-    const selectedRows = filterRows(this._rows, this._filter);
+    const selectedRows = this._visibleRows;
 
     return html`
-      <div class="ahc-filter-sheet-backdrop" @click=${this._closeFilterSheet}></div>
-      <section class="ahc-filter-sheet" role="dialog" aria-modal="true" aria-label="סינון מתקדם">
+      <div
+        class="ahc-filter-sheet-backdrop"
+        @click=${this._closeFilterSheet}
+      ></div>
+      <section
+        class="ahc-filter-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-label="סינון מתקדם"
+      >
         <div class="ahc-filter-sheet__handle" aria-hidden="true"></div>
         <header class="ahc-filter-sheet__header">
-          <button class="ahc__button ahc__button--ghost" type="button" @click=${this._closeFilterSheet} aria-label="סגור">×</button>
+          <button
+            class="ahc__button ahc__button--ghost"
+            type="button"
+            @click=${this._closeFilterSheet}
+            aria-label="סגור"
+          >
+            ×
+          </button>
           <h3 class="ahc-filter-sheet__title">סינון מתקדם</h3>
         </header>
 
         <div class="ahc-filter-section">
-          <div class="ahc-filter-section__title"><span>טווח זמן</span><span aria-hidden="true">◷</span></div>
+          <div class="ahc-filter-section__title">
+            <span>טווח זמן</span><span aria-hidden="true">◷</span>
+          </div>
           <div class="ahc-filter-section__chips">
-            ${this._renderChip("24 שעות", this._filter.timePreset === "24h", () => this._setTimePreset("24h"))}
-            ${this._renderChip("7 ימים", this._filter.timePreset === "7d", () => this._setTimePreset("7d"))}
-            ${this._renderChip("טווח מותאם", this._filter.timePreset === "custom", () => this._setTimePreset("custom"))}
+            ${this._renderChip(
+              "24 שעות",
+              this._filter.timePreset === "24h",
+              () => this._setTimePreset("24h"),
+            )}
+            ${this._renderChip("7 ימים", this._filter.timePreset === "7d", () =>
+              this._setTimePreset("7d"),
+            )}
+            ${this._renderChip(
+              "טווח מותאם",
+              this._filter.timePreset === "custom",
+              () => this._setTimePreset("custom"),
+            )}
           </div>
         </div>
 
         <div class="ahc-filter-section">
-          <div class="ahc-filter-section__title"><span>אזורים</span><span aria-hidden="true">▦</span></div>
+          <div class="ahc-filter-section__title">
+            <span>אזורים</span><span aria-hidden="true">▦</span>
+          </div>
           <div class="ahc-filter-section__chips">
-            ${this._renderChip("כל האזורים", !this._filter.areas.length, () => this._setAreas([]))}
-            ${areas.map((area) => this._renderChip(area, this._filter.areas.includes(area), () => this._toggleArea(area)))}
+            ${this._renderChip("כל האזורים", !this._filter.areas.length, () =>
+              this._setAreas([]),
+            )}
+            ${areas.map((area) =>
+              this._renderChip(area, this._filter.areas.includes(area), () =>
+                this._toggleArea(area),
+              ),
+            )}
           </div>
         </div>
 
         <div class="ahc-filter-section">
-          <div class="ahc-filter-section__title"><span>סוגי רכיבים</span><span aria-hidden="true">▦</span></div>
+          <div class="ahc-filter-section__title">
+            <span>סוגי רכיבים</span><span aria-hidden="true">▦</span>
+          </div>
           <div class="ahc-filter-section__chips">
-            ${this._renderChip("כל הסוגים", !this._filter.domains.length, () => this._setDomains([]))}
-            ${domains.map((domain) => this._renderChip(DOMAIN_LABELS_HE[domain] ?? domain, this._filter.domains.includes(domain), () => this._toggleDomain(domain)))}
+            ${this._renderChip("כל הסוגים", !this._filter.domains.length, () =>
+              this._setDomains([]),
+            )}
+            ${domains.map((domain) =>
+              this._renderChip(
+                DOMAIN_LABELS_HE[domain] ?? domain,
+                this._filter.domains.includes(domain),
+                () => this._toggleDomain(domain),
+              ),
+            )}
           </div>
         </div>
 
         <div class="ahc-filter-section">
-          <div class="ahc-filter-section__title"><span>מצבים</span><span aria-hidden="true">⌁</span></div>
-          <button class="ahc-filter-option" type="button" aria-pressed=${this._filter.stateMode === "active_only"} @click=${() => this._setStateMode("active_only")}>
+          <div class="ahc-filter-section__title">
+            <span>מצבים</span><span aria-hidden="true">⌁</span>
+          </div>
+          <button
+            class="ahc-filter-option"
+            type="button"
+            aria-pressed=${this._filter.stateMode === "active_only"}
+            @click=${() => this._setStateMode("active_only")}
+          >
             <span>רק פעילים</span><small>הצג רכיבים שהיו פעילים בטווח</small>
           </button>
-          <button class="ahc-filter-option" type="button" aria-pressed=${this._filter.stateMode === "all"} @click=${() => this._setStateMode("all")}>
+          <button
+            class="ahc-filter-option"
+            type="button"
+            aria-pressed=${this._filter.stateMode === "all"}
+            @click=${() => this._setStateMode("all")}
+          >
             <span>כל המצבים</span><small>הצג גם זמני כבוי ולא זמין</small>
           </button>
-          <button class="ahc-filter-option" type="button" aria-pressed=${this._filter.stateMode === "currently_active"} @click=${() => this._setStateMode("currently_active")}>
+          <button
+            class="ahc-filter-option"
+            type="button"
+            aria-pressed=${this._filter.stateMode === "currently_active"}
+            @click=${() => this._setStateMode("currently_active")}
+          >
             <span>פעילים עכשיו</span><small>התמקד ברכיבים שפועלים כעת</small>
           </button>
         </div>
 
         <div class="ahc-filter-section">
-          <div class="ahc-filter-section__title"><span>קבוצות וחיפוש</span><span aria-hidden="true">▤</span></div>
+          <div class="ahc-filter-section__title">
+            <span>תצוגה חכמה</span
+            ><span>${this._curation?.visibleRows ?? selectedRows.length}</span>
+          </div>
+          <button
+            class="ahc-filter-option"
+            type="button"
+            aria-pressed=${this._showAllRows ? "true" : "false"}
+            @click=${this._toggleShowAllRows}
+          >
+            <span>${this._showAllRows ? "הפעל סינון חכם" : "הצג הכל"}</span>
+            <small
+              >${formatCurationSummary(this._curation) ||
+              "הסתר שורות ריקות, טכניות וקצרות מאוד"}</small
+            >
+          </button>
+        </div>
+
+        <div class="ahc-filter-section">
+          <div class="ahc-filter-section__title">
+            <span>קבוצות וחיפוש</span><span aria-hidden="true">▤</span>
+          </div>
           <div class="ahc-filter-section__chips">
-            ${this._renderChip("קבץ לפי אזור", this._filter.groupBy === "area", () => this._setGroupBy("area"))}
-            ${this._renderChip("קבץ לפי סוג", this._filter.groupBy === "domain", () => this._setGroupBy("domain"))}
-            ${this._renderChip("ללא קיבוץ", this._filter.groupBy === "none", () => this._setGroupBy("none"))}
+            ${this._renderChip(
+              "קבץ לפי אזור",
+              this._filter.groupBy === "area",
+              () => this._setGroupBy("area"),
+            )}
+            ${this._renderChip(
+              "קבץ לפי סוג",
+              this._filter.groupBy === "domain",
+              () => this._setGroupBy("domain"),
+            )}
+            ${this._renderChip(
+              "ללא קיבוץ",
+              this._filter.groupBy === "none",
+              () => this._setGroupBy("none"),
+            )}
           </div>
           <div class="ahc__search ahc__search--sheet">
             <span class="ahc__search-icon" aria-hidden="true">⌕</span>
-            <input class="ahc__search-input" type="search" .value=${this._filter.search} placeholder="חיפוש רכיב או אזור" @input=${this._onSearchInput} />
+            <input
+              class="ahc__search-input"
+              type="search"
+              .value=${this._filter.search}
+              placeholder="חיפוש רכיב או אזור"
+              @input=${this._onSearchInput}
+            />
           </div>
         </div>
 
         <div class="ahc-filter-section">
-          <div class="ahc-filter-section__title"><span>רכיבים נבחרים</span><span>${selectedRows.length}</span></div>
+          <div class="ahc-filter-section__title">
+            <span>רכיבים נבחרים</span><span>${selectedRows.length}</span>
+          </div>
           <div class="ahc-entity-list">
             ${selectedRows.slice(0, 32).map(
               (row) => html`
                 <span class="ahc-entity-list__item">
                   <span>${row.entity.name}</span>
-                  <small>${[row.entity.area, DOMAIN_LABELS_HE[row.entity.domain] ?? row.entity.domain].filter(Boolean).join(" · ")}</small>
+                  <small
+                    >${[
+                      row.entity.area,
+                      DOMAIN_LABELS_HE[row.entity.domain] ?? row.entity.domain,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}</small
+                  >
                 </span>
               `,
             )}
-            ${selectedRows.length > 32 ? html`<span class="ahc-entity-list__more">ועוד ${selectedRows.length - 32} רכיבים</span>` : nothing}
+            ${selectedRows.length > 32
+              ? html`<span class="ahc-entity-list__more"
+                  >ועוד ${selectedRows.length - 32} רכיבים</span
+                >`
+              : nothing}
           </div>
         </div>
 
         <footer class="ahc-filter-sheet__footer">
-          <button class="ahc__button ahc__button--ghost" type="button" @click=${this._clearFilters}>נקה סינון</button>
-          <button class="ahc__button ahc__button--primary" type="button" @click=${this._closeFilterSheet}>החל סינון</button>
+          <button
+            class="ahc__button ahc__button--ghost"
+            type="button"
+            @click=${this._clearFilters}
+          >
+            נקה סינון
+          </button>
+          <button
+            class="ahc__button ahc__button--primary"
+            type="button"
+            @click=${this._closeFilterSheet}
+          >
+            החל סינון
+          </button>
         </footer>
       </section>
     `;
@@ -675,7 +1179,10 @@ export class ActivityHistoryCard extends LitElement {
     this.requestUpdate();
   };
 
-  private _requestHistoryRefresh(reason: HistoryRefreshReason, options: { force?: boolean } = {}): void {
+  private _requestHistoryRefresh(
+    reason: HistoryRefreshReason,
+    options: { force?: boolean } = {},
+  ): void {
     if (!this._config) return;
     if (this._inFlightHistoryRequest && !options.force) return;
 
@@ -688,7 +1195,10 @@ export class ActivityHistoryCard extends LitElement {
     });
   }
 
-  private async _fetchAndRender(reason: HistoryRefreshReason, force: boolean): Promise<void> {
+  private async _fetchAndRender(
+    reason: HistoryRefreshReason,
+    force: boolean,
+  ): Promise<void> {
     if (!this._config) return;
 
     const startedAt = Date.now();
@@ -728,34 +1238,59 @@ export class ActivityHistoryCard extends LitElement {
       start: range.start.toISOString(),
       end: range.end.toISOString(),
       entityIds: entities.map((entity) => entity.entity_id),
-      withAttributes: requestPlan.withAttributes.map((entity) => entity.entity_id),
-      withoutAttributes: requestPlan.withoutAttributes.map((entity) => entity.entity_id),
+      withAttributes: requestPlan.withAttributes.map(
+        (entity) => entity.entity_id,
+      ),
+      withoutAttributes: requestPlan.withoutAttributes.map(
+        (entity) => entity.entity_id,
+      ),
       includeLabels: this._config.include_labels ?? [],
       excludeLabels: this._config.exclude_labels ?? [],
       significant: this._config.significant_changes_only,
       minimal: this._config.minimal_response,
     });
-    const bypassCache = force && ["manual", "timer", "interval", "config"].includes(reason);
-    const entitySetChanged = Boolean(this._lastResolvedEntityKey && this._lastResolvedEntityKey !== entityKey);
-    const fetchReason = entitySetChanged && reason === "interval" ? "entities" : reason;
-    const finishDiagnostics = (cacheHit: boolean, historyRecordCount: number, discovery = resolved.diagnostics): void => {
+    const bypassCache =
+      force && ["manual", "timer", "interval", "config"].includes(reason);
+    const entitySetChanged = Boolean(
+      this._lastResolvedEntityKey && this._lastResolvedEntityKey !== entityKey,
+    );
+    const fetchReason =
+      entitySetChanged && reason === "interval" ? "entities" : reason;
+    const finishDiagnostics = (
+      cacheHit: boolean,
+      historyRecordCount: number,
+      discovery = resolved.diagnostics,
+    ): void => {
       this._lastResolvedEntityKey = entityKey;
       this._lastHistoryFetchAt = Date.now();
       this._hasFetchedOnce = true;
-      this._setPostLoadState(historyRecordCount, range, requestPlan, cacheHit, useMockData, discovery, {
-        reason: fetchReason,
-        key,
-        durationMs: Date.now() - startedAt,
-      });
+      this._setPostLoadState(
+        historyRecordCount,
+        range,
+        requestPlan,
+        cacheHit,
+        useMockData,
+        discovery,
+        {
+          reason: fetchReason,
+          key,
+          durationMs: Date.now() - startedAt,
+        },
+      );
       this._syncRefreshTimer();
     };
 
     if (!entities.length) {
       this._usingMockData = false;
       this._rows = [];
+      this._visibleRows = [];
       this._groups = [];
       this._summary = summarizeActivity([]);
-      this._emptyReason = this._config.auto_discover === false && !(this._config.entities?.length) ? "no_entities_selected" : "no_resolved_entities";
+      this._curation = curateRows([], this._config).diagnostics;
+      this._emptyReason =
+        this._config.auto_discover === false && !this._config.entities?.length
+          ? "no_entities_selected"
+          : "no_resolved_entities";
       this._setDiagnostics({
         resolvedEntityCount: 0,
         historyRecordCount: 0,
@@ -769,6 +1304,7 @@ export class ActivityHistoryCard extends LitElement {
         cacheHit: false,
         mockData: useMockData,
         discovery: resolved.diagnostics,
+        curation: this._curation,
         lastFetchTime: new Date(),
         fetchDurationMs: Date.now() - startedAt,
         fetchReason,
@@ -793,7 +1329,13 @@ export class ActivityHistoryCard extends LitElement {
       const cached = this._historyCache.get(key);
       if (cached) {
         const historyRecordCount = countHistoryRecords(cached);
-        this._rows = intervalizeHistory(cached, entities, range, this._config, this._hass?.states ?? {});
+        this._rows = intervalizeHistory(
+          cached,
+          entities,
+          range,
+          this._config,
+          this._hass?.states ?? {},
+        );
         finishDiagnostics(true, historyRecordCount);
         this._initialLoad = false;
         this._loading = false;
@@ -807,20 +1349,35 @@ export class ActivityHistoryCard extends LitElement {
     try {
       let history = bypassCache ? undefined : this._historyCache.get(key);
       if (!history) {
-        history = useMockData ? getMockHistory(range) : await fetchHistory(this._hass as HomeAssistant, entities, range, this._config);
+        history = useMockData
+          ? getMockHistory(range)
+          : await fetchHistory(
+              this._hass as HomeAssistant,
+              entities,
+              range,
+              this._config,
+            );
         this._historyCache.set(key, history);
       }
       if (token !== this._fetchToken) return;
       const historyRecordCount = countHistoryRecords(history);
-      this._rows = intervalizeHistory(history, entities, range, this._config, this._hass?.states ?? {});
+      this._rows = intervalizeHistory(
+        history,
+        entities,
+        range,
+        this._config,
+        this._hass?.states ?? {},
+      );
       finishDiagnostics(false, historyRecordCount);
       this._lastFetchKey = key;
       this._rebuildGroups();
     } catch (error) {
       this._error = error instanceof Error ? error.message : String(error);
       if (!this._rows.length) {
+        this._visibleRows = [];
         this._groups = [];
         this._summary = summarizeActivity([]);
+        this._curation = curateRows([], this._config).diagnostics;
         this._emptyReason = undefined;
       }
     } finally {
@@ -835,11 +1392,29 @@ export class ActivityHistoryCard extends LitElement {
 
   private _rebuildGroups(): void {
     const filtered = filterRows(this._rows, this._filter);
-    this._groups = groupRows(filtered, this._filter.groupBy);
-    this._summary = summarizeActivity(this._groups);
+    const curated = curateRows(filtered, this._config, {
+      showAll: this._showAllRows,
+      groupBy: this._filter.groupBy,
+    });
+    this._visibleRows = curated.rows;
+    this._curation = curated.diagnostics;
+    this._groups = groupRows(curated.rows, this._filter.groupBy).filter(
+      (group) =>
+        this._config.hide_empty_groups === false || group.rows.length > 0,
+    );
+    const summaryGroups =
+      this._config.summary_scope === "all"
+        ? groupRows(filtered, this._filter.groupBy)
+        : this._groups;
+    this._summary = summarizeActivity(summaryGroups);
     if (this._rows.length && !filtered.length) {
       this._emptyReason = "all_entities_filtered";
-    } else if (this._emptyReason === "all_entities_filtered") {
+    } else if (filtered.length && !curated.rows.length) {
+      this._emptyReason = "no_meaningful_activity";
+    } else if (
+      this._emptyReason === "all_entities_filtered" ||
+      this._emptyReason === "no_meaningful_activity"
+    ) {
       this._emptyReason = undefined;
     }
     if (this._diagnostics) {
@@ -847,6 +1422,7 @@ export class ActivityHistoryCard extends LitElement {
         ...this._diagnostics,
         filteredRowCount: filtered.length,
         renderedGroupCount: this._groups.length,
+        curation: curated.diagnostics,
         activeFilters: { ...this._filter },
       });
     }
@@ -862,8 +1438,15 @@ export class ActivityHistoryCard extends LitElement {
     discovery: ActivityDiagnostics["discovery"],
     fetchMeta: { reason: string; key: string; durationMs: number },
   ): void {
-    const timelineSegmentCount = this._rows.reduce((sum, row) => sum + row.segments.length, 0);
-    const activeTimelineSegmentCount = this._rows.reduce((sum, row) => sum + row.segments.filter((segment) => segment.active).length, 0);
+    const timelineSegmentCount = this._rows.reduce(
+      (sum, row) => sum + row.segments.length,
+      0,
+    );
+    const activeTimelineSegmentCount = this._rows.reduce(
+      (sum, row) =>
+        sum + row.segments.filter((segment) => segment.active).length,
+      0,
+    );
 
     if (historyRecordCount === 0 && activeTimelineSegmentCount === 0) {
       this._emptyReason = "no_history_returned";
@@ -889,6 +1472,7 @@ export class ActivityHistoryCard extends LitElement {
       cacheHit,
       mockData,
       discovery,
+      curation: this._curation,
       lastFetchTime: new Date(this._lastHistoryFetchAt || Date.now()),
       fetchDurationMs: fetchMeta.durationMs,
       fetchReason: fetchMeta.reason,
@@ -916,16 +1500,34 @@ export class ActivityHistoryCard extends LitElement {
   }
 
   private _refreshIntervalSeconds(): number {
-    return normalizeRefreshIntervalSeconds(this._config?.refresh_interval_seconds);
+    return normalizeRefreshIntervalSeconds(
+      this._config?.refresh_interval_seconds,
+    );
   }
 
   private _resolveRange(): TimeRange {
     const end = this._roundedNow();
     if (this._filter.timePreset === "24h") {
-      return resolveTimeRange({ ...this._config, start_time: undefined, end_time: end.toISOString(), hours_to_show: 24 }, end);
+      return resolveTimeRange(
+        {
+          ...this._config,
+          start_time: undefined,
+          end_time: end.toISOString(),
+          hours_to_show: 24,
+        },
+        end,
+      );
     }
     if (this._filter.timePreset === "7d") {
-      return resolveTimeRange({ ...this._config, start_time: undefined, end_time: end.toISOString(), hours_to_show: 24 * 7 }, end);
+      return resolveTimeRange(
+        {
+          ...this._config,
+          start_time: undefined,
+          end_time: end.toISOString(),
+          hours_to_show: 24 * 7,
+        },
+        end,
+      );
     }
     return resolveTimeRange(this._config, end);
   }
@@ -936,11 +1538,19 @@ export class ActivityHistoryCard extends LitElement {
   }
 
   private _availableDomains(): string[] {
-    return [...new Set(this._rows.map((row) => row.entity.domain))].filter(Boolean).sort();
+    return [...new Set(this._rows.map((row) => row.entity.domain))]
+      .filter(Boolean)
+      .sort();
   }
 
   private _availableAreas(): string[] {
-    return [...new Set(this._rows.map((row) => row.entity.area).filter((area): area is string => Boolean(area)))].sort();
+    return [
+      ...new Set(
+        this._rows
+          .map((row) => row.entity.area)
+          .filter((area): area is string => Boolean(area)),
+      ),
+    ].sort();
   }
 
   private _onSearchInput = (event: Event): void => {
@@ -950,7 +1560,9 @@ export class ActivityHistoryCard extends LitElement {
   };
 
   private _toggleArea(area: string): void {
-    const areas = this._filter.areas.includes(area) ? this._filter.areas.filter((item) => item !== area) : [...this._filter.areas, area];
+    const areas = this._filter.areas.includes(area)
+      ? this._filter.areas.filter((item) => item !== area)
+      : [...this._filter.areas, area];
     this._setAreas(areas);
   }
 
@@ -960,7 +1572,9 @@ export class ActivityHistoryCard extends LitElement {
   }
 
   private _toggleDomain(domain: string): void {
-    const domains = this._filter.domains.includes(domain) ? this._filter.domains.filter((item) => item !== domain) : [...this._filter.domains, domain];
+    const domains = this._filter.domains.includes(domain)
+      ? this._filter.domains.filter((item) => item !== domain)
+      : [...this._filter.domains, domain];
     this._setDomains(domains);
   }
 
@@ -989,6 +1603,7 @@ export class ActivityHistoryCard extends LitElement {
   private _clearFilters = (): void => {
     const previousTimePreset = this._filter.timePreset;
     const nextTimePreset = this._initialTimePreset(this._config);
+    this._showAllRows = false;
     this._filter = {
       search: "",
       areas: [],
@@ -1002,6 +1617,11 @@ export class ActivityHistoryCard extends LitElement {
       this._lastFetchKey = "";
       this._requestHistoryRefresh("range", { force: true });
     }
+  };
+
+  private _toggleShowAllRows = (): void => {
+    this._showAllRows = !this._showAllRows;
+    this._rebuildGroups();
   };
 
   private _manualRefresh = (): void => {
@@ -1024,7 +1644,10 @@ export class ActivityHistoryCard extends LitElement {
       await this.updateComplete;
       (this.renderRoot.querySelector(".ahc") as HTMLElement | null)?.focus();
     } else {
-      document.removeEventListener("fullscreenchange", this._onFullscreenChange);
+      document.removeEventListener(
+        "fullscreenchange",
+        this._onFullscreenChange,
+      );
       if (!this._filterSheetOpen) {
         document.removeEventListener("keydown", this._onDocumentKeyDown);
       }
@@ -1052,14 +1675,23 @@ export class ActivityHistoryCard extends LitElement {
 
   private _onDocumentPointerDown = (event: PointerEvent): void => {
     const path = event.composedPath();
-    if (path.some((item) => item instanceof HTMLElement && item.classList.contains("ahc-popover"))) return;
+    if (
+      path.some(
+        (item) =>
+          item instanceof HTMLElement && item.classList.contains("ahc-popover"),
+      )
+    )
+      return;
     if (this._segmentPopover) this._closeSegmentPopover();
   };
 
   private _onFullscreenChange = (): void => {
     if (!document.fullscreenElement && this._fullscreen) {
       this._fullscreen = false;
-      document.removeEventListener("fullscreenchange", this._onFullscreenChange);
+      document.removeEventListener(
+        "fullscreenchange",
+        this._onFullscreenChange,
+      );
       if (!this._filterSheetOpen) {
         document.removeEventListener("keydown", this._onDocumentKeyDown);
       }
@@ -1079,11 +1711,18 @@ export class ActivityHistoryCard extends LitElement {
   }
 }
 
-function countHistoryRecords(history: Record<string, HistoryStateRecord[]>): number {
-  return Object.values(history).reduce((sum, records) => sum + records.length, 0);
+function countHistoryRecords(
+  history: Record<string, HistoryStateRecord[]>,
+): number {
+  return Object.values(history).reduce(
+    (sum, records) => sum + records.length,
+    0,
+  );
 }
 
-function buildEntityKey(rows: TimelineRow[] | Array<{ entity_id: string }>): string {
+function buildEntityKey(
+  rows: TimelineRow[] | Array<{ entity_id: string }>,
+): string {
   return rows
     .map((row) => ("entity" in row ? row.entity.entity_id : row.entity_id))
     .sort()

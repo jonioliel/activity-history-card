@@ -3,18 +3,18 @@
  * Copyright 2019 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const V = globalThis, le = V.ShadowRoot && (V.ShadyCSS === void 0 || V.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, de = Symbol(), _e = /* @__PURE__ */ new WeakMap();
-let Fe = class {
-  constructor(e, a, i) {
-    if (this._$cssResult$ = !0, i !== de) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
-    this.cssText = e, this.t = a;
+const Y = globalThis, ue = Y.ShadowRoot && (Y.ShadyCSS === void 0 || Y.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, _e = Symbol(), fe = /* @__PURE__ */ new WeakMap();
+let je = class {
+  constructor(e, i, a) {
+    if (this._$cssResult$ = !0, a !== _e) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
+    this.cssText = e, this.t = i;
   }
   get styleSheet() {
     let e = this.o;
-    const a = this.t;
-    if (le && e === void 0) {
-      const i = a !== void 0 && a.length === 1;
-      i && (e = _e.get(a)), e === void 0 && ((this.o = e = new CSSStyleSheet()).replaceSync(this.cssText), i && _e.set(a, e));
+    const i = this.t;
+    if (ue && e === void 0) {
+      const a = i !== void 0 && i.length === 1;
+      a && (e = fe.get(i)), e === void 0 && ((this.o = e = new CSSStyleSheet()).replaceSync(this.cssText), a && fe.set(i, e));
     }
     return e;
   }
@@ -22,33 +22,33 @@ let Fe = class {
     return this.cssText;
   }
 };
-const et = (t) => new Fe(typeof t == "string" ? t : t + "", void 0, de), Ie = (t, ...e) => {
-  const a = t.length === 1 ? t[0] : e.reduce((i, s, r) => i + ((n) => {
-    if (n._$cssResult$ === !0) return n.cssText;
-    if (typeof n == "number") return n;
-    throw Error("Value passed to 'css' function must be a 'css' function result: " + n + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
-  })(s) + t[r + 1], t[0]);
-  return new Fe(a, t, de);
-}, tt = (t, e) => {
-  if (le) t.adoptedStyleSheets = e.map((a) => a instanceof CSSStyleSheet ? a : a.styleSheet);
-  else for (const a of e) {
-    const i = document.createElement("style"), s = V.litNonce;
-    s !== void 0 && i.setAttribute("nonce", s), i.textContent = a.cssText, t.appendChild(i);
+const ot = (t) => new je(typeof t == "string" ? t : t + "", void 0, _e), qe = (t, ...e) => {
+  const i = t.length === 1 ? t[0] : e.reduce((a, s, n) => a + ((r) => {
+    if (r._$cssResult$ === !0) return r.cssText;
+    if (typeof r == "number") return r;
+    throw Error("Value passed to 'css' function must be a 'css' function result: " + r + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
+  })(s) + t[n + 1], t[0]);
+  return new je(i, t, _e);
+}, ct = (t, e) => {
+  if (ue) t.adoptedStyleSheets = e.map((i) => i instanceof CSSStyleSheet ? i : i.styleSheet);
+  else for (const i of e) {
+    const a = document.createElement("style"), s = Y.litNonce;
+    s !== void 0 && a.setAttribute("nonce", s), a.textContent = i.cssText, t.appendChild(a);
   }
-}, ge = le ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((e) => {
-  let a = "";
-  for (const i of e.cssRules) a += i.cssText;
-  return et(a);
+}, be = ue ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((e) => {
+  let i = "";
+  for (const a of e.cssRules) i += a.cssText;
+  return ot(i);
 })(t) : t;
 /**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const { is: it, defineProperty: at, getOwnPropertyDescriptor: st, getOwnPropertyNames: rt, getOwnPropertySymbols: nt, getPrototypeOf: ot } = Object, Z = globalThis, me = Z.trustedTypes, ct = me ? me.emptyScript : "", lt = Z.reactiveElementPolyfillSupport, U = (t, e) => t, oe = { toAttribute(t, e) {
+const { is: lt, defineProperty: dt, getOwnPropertyDescriptor: ht, getOwnPropertyNames: ut, getOwnPropertySymbols: _t, getPrototypeOf: pt } = Object, Q = globalThis, ve = Q.trustedTypes, gt = ve ? ve.emptyScript : "", mt = Q.reactiveElementPolyfillSupport, U = (t, e) => t, le = { toAttribute(t, e) {
   switch (e) {
     case Boolean:
-      t = t ? ct : null;
+      t = t ? gt : null;
       break;
     case Object:
     case Array:
@@ -56,86 +56,86 @@ const { is: it, defineProperty: at, getOwnPropertyDescriptor: st, getOwnProperty
   }
   return t;
 }, fromAttribute(t, e) {
-  let a = t;
+  let i = t;
   switch (e) {
     case Boolean:
-      a = t !== null;
+      i = t !== null;
       break;
     case Number:
-      a = t === null ? null : Number(t);
+      i = t === null ? null : Number(t);
       break;
     case Object:
     case Array:
       try {
-        a = JSON.parse(t);
+        i = JSON.parse(t);
       } catch {
-        a = null;
+        i = null;
       }
   }
-  return a;
-} }, Ne = (t, e) => !it(t, e), fe = { attribute: !0, type: String, converter: oe, reflect: !1, useDefault: !1, hasChanged: Ne };
-Symbol.metadata ??= Symbol("metadata"), Z.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
-let T = class extends HTMLElement {
+  return i;
+} }, Ge = (t, e) => !lt(t, e), ye = { attribute: !0, type: String, converter: le, reflect: !1, useDefault: !1, hasChanged: Ge };
+Symbol.metadata ??= Symbol("metadata"), Q.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
+let M = class extends HTMLElement {
   static addInitializer(e) {
     this._$Ei(), (this.l ??= []).push(e);
   }
   static get observedAttributes() {
     return this.finalize(), this._$Eh && [...this._$Eh.keys()];
   }
-  static createProperty(e, a = fe) {
-    if (a.state && (a.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(e) && ((a = Object.create(a)).wrapped = !0), this.elementProperties.set(e, a), !a.noAccessor) {
-      const i = Symbol(), s = this.getPropertyDescriptor(e, i, a);
-      s !== void 0 && at(this.prototype, e, s);
+  static createProperty(e, i = ye) {
+    if (i.state && (i.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(e) && ((i = Object.create(i)).wrapped = !0), this.elementProperties.set(e, i), !i.noAccessor) {
+      const a = Symbol(), s = this.getPropertyDescriptor(e, a, i);
+      s !== void 0 && dt(this.prototype, e, s);
     }
   }
-  static getPropertyDescriptor(e, a, i) {
-    const { get: s, set: r } = st(this.prototype, e) ?? { get() {
-      return this[a];
-    }, set(n) {
-      this[a] = n;
+  static getPropertyDescriptor(e, i, a) {
+    const { get: s, set: n } = ht(this.prototype, e) ?? { get() {
+      return this[i];
+    }, set(r) {
+      this[i] = r;
     } };
-    return { get: s, set(n) {
-      const c = s?.call(this);
-      r?.call(this, n), this.requestUpdate(e, c, i);
+    return { get: s, set(r) {
+      const o = s?.call(this);
+      n?.call(this, r), this.requestUpdate(e, o, a);
     }, configurable: !0, enumerable: !0 };
   }
   static getPropertyOptions(e) {
-    return this.elementProperties.get(e) ?? fe;
+    return this.elementProperties.get(e) ?? ye;
   }
   static _$Ei() {
     if (this.hasOwnProperty(U("elementProperties"))) return;
-    const e = ot(this);
+    const e = pt(this);
     e.finalize(), e.l !== void 0 && (this.l = [...e.l]), this.elementProperties = new Map(e.elementProperties);
   }
   static finalize() {
     if (this.hasOwnProperty(U("finalized"))) return;
     if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(U("properties"))) {
-      const a = this.properties, i = [...rt(a), ...nt(a)];
-      for (const s of i) this.createProperty(s, a[s]);
+      const i = this.properties, a = [...ut(i), ..._t(i)];
+      for (const s of a) this.createProperty(s, i[s]);
     }
     const e = this[Symbol.metadata];
     if (e !== null) {
-      const a = litPropertyMetadata.get(e);
-      if (a !== void 0) for (const [i, s] of a) this.elementProperties.set(i, s);
+      const i = litPropertyMetadata.get(e);
+      if (i !== void 0) for (const [a, s] of i) this.elementProperties.set(a, s);
     }
     this._$Eh = /* @__PURE__ */ new Map();
-    for (const [a, i] of this.elementProperties) {
-      const s = this._$Eu(a, i);
-      s !== void 0 && this._$Eh.set(s, a);
+    for (const [i, a] of this.elementProperties) {
+      const s = this._$Eu(i, a);
+      s !== void 0 && this._$Eh.set(s, i);
     }
     this.elementStyles = this.finalizeStyles(this.styles);
   }
   static finalizeStyles(e) {
-    const a = [];
+    const i = [];
     if (Array.isArray(e)) {
-      const i = new Set(e.flat(1 / 0).reverse());
-      for (const s of i) a.unshift(ge(s));
-    } else e !== void 0 && a.push(ge(e));
-    return a;
+      const a = new Set(e.flat(1 / 0).reverse());
+      for (const s of a) i.unshift(be(s));
+    } else e !== void 0 && i.push(be(e));
+    return i;
   }
-  static _$Eu(e, a) {
-    const i = a.attribute;
-    return i === !1 ? void 0 : typeof i == "string" ? i : typeof e == "string" ? e.toLowerCase() : void 0;
+  static _$Eu(e, i) {
+    const a = i.attribute;
+    return a === !1 ? void 0 : typeof a == "string" ? a : typeof e == "string" ? e.toLowerCase() : void 0;
   }
   constructor() {
     super(), this._$Ep = void 0, this.isUpdatePending = !1, this.hasUpdated = !1, this._$Em = null, this._$Ev();
@@ -150,13 +150,13 @@ let T = class extends HTMLElement {
     this._$EO?.delete(e);
   }
   _$E_() {
-    const e = /* @__PURE__ */ new Map(), a = this.constructor.elementProperties;
-    for (const i of a.keys()) this.hasOwnProperty(i) && (e.set(i, this[i]), delete this[i]);
+    const e = /* @__PURE__ */ new Map(), i = this.constructor.elementProperties;
+    for (const a of i.keys()) this.hasOwnProperty(a) && (e.set(a, this[a]), delete this[a]);
     e.size > 0 && (this._$Ep = e);
   }
   createRenderRoot() {
     const e = this.shadowRoot ?? this.attachShadow(this.constructor.shadowRootOptions);
-    return tt(e, this.constructor.elementStyles), e;
+    return ct(e, this.constructor.elementStyles), e;
   }
   connectedCallback() {
     this.renderRoot ??= this.createRenderRoot(), this.enableUpdating(!0), this._$EO?.forEach((e) => e.hostConnected?.());
@@ -166,42 +166,42 @@ let T = class extends HTMLElement {
   disconnectedCallback() {
     this._$EO?.forEach((e) => e.hostDisconnected?.());
   }
-  attributeChangedCallback(e, a, i) {
-    this._$AK(e, i);
+  attributeChangedCallback(e, i, a) {
+    this._$AK(e, a);
   }
-  _$ET(e, a) {
-    const i = this.constructor.elementProperties.get(e), s = this.constructor._$Eu(e, i);
-    if (s !== void 0 && i.reflect === !0) {
-      const r = (i.converter?.toAttribute !== void 0 ? i.converter : oe).toAttribute(a, i.type);
-      this._$Em = e, r == null ? this.removeAttribute(s) : this.setAttribute(s, r), this._$Em = null;
+  _$ET(e, i) {
+    const a = this.constructor.elementProperties.get(e), s = this.constructor._$Eu(e, a);
+    if (s !== void 0 && a.reflect === !0) {
+      const n = (a.converter?.toAttribute !== void 0 ? a.converter : le).toAttribute(i, a.type);
+      this._$Em = e, n == null ? this.removeAttribute(s) : this.setAttribute(s, n), this._$Em = null;
     }
   }
-  _$AK(e, a) {
-    const i = this.constructor, s = i._$Eh.get(e);
+  _$AK(e, i) {
+    const a = this.constructor, s = a._$Eh.get(e);
     if (s !== void 0 && this._$Em !== s) {
-      const r = i.getPropertyOptions(s), n = typeof r.converter == "function" ? { fromAttribute: r.converter } : r.converter?.fromAttribute !== void 0 ? r.converter : oe;
+      const n = a.getPropertyOptions(s), r = typeof n.converter == "function" ? { fromAttribute: n.converter } : n.converter?.fromAttribute !== void 0 ? n.converter : le;
       this._$Em = s;
-      const c = n.fromAttribute(a, r.type);
-      this[s] = c ?? this._$Ej?.get(s) ?? c, this._$Em = null;
+      const o = r.fromAttribute(i, n.type);
+      this[s] = o ?? this._$Ej?.get(s) ?? o, this._$Em = null;
     }
   }
-  requestUpdate(e, a, i, s = !1, r) {
+  requestUpdate(e, i, a, s = !1, n) {
     if (e !== void 0) {
-      const n = this.constructor;
-      if (s === !1 && (r = this[e]), i ??= n.getPropertyOptions(e), !((i.hasChanged ?? Ne)(r, a) || i.useDefault && i.reflect && r === this._$Ej?.get(e) && !this.hasAttribute(n._$Eu(e, i)))) return;
-      this.C(e, a, i);
+      const r = this.constructor;
+      if (s === !1 && (n = this[e]), a ??= r.getPropertyOptions(e), !((a.hasChanged ?? Ge)(n, i) || a.useDefault && a.reflect && n === this._$Ej?.get(e) && !this.hasAttribute(r._$Eu(e, a)))) return;
+      this.C(e, i, a);
     }
     this.isUpdatePending === !1 && (this._$ES = this._$EP());
   }
-  C(e, a, { useDefault: i, reflect: s, wrapped: r }, n) {
-    i && !(this._$Ej ??= /* @__PURE__ */ new Map()).has(e) && (this._$Ej.set(e, n ?? a ?? this[e]), r !== !0 || n !== void 0) || (this._$AL.has(e) || (this.hasUpdated || i || (a = void 0), this._$AL.set(e, a)), s === !0 && this._$Em !== e && (this._$Eq ??= /* @__PURE__ */ new Set()).add(e));
+  C(e, i, { useDefault: a, reflect: s, wrapped: n }, r) {
+    a && !(this._$Ej ??= /* @__PURE__ */ new Map()).has(e) && (this._$Ej.set(e, r ?? i ?? this[e]), n !== !0 || r !== void 0) || (this._$AL.has(e) || (this.hasUpdated || a || (i = void 0), this._$AL.set(e, i)), s === !0 && this._$Em !== e && (this._$Eq ??= /* @__PURE__ */ new Set()).add(e));
   }
   async _$EP() {
     this.isUpdatePending = !0;
     try {
       await this._$ES;
-    } catch (a) {
-      Promise.reject(a);
+    } catch (i) {
+      Promise.reject(i);
     }
     const e = this.scheduleUpdate();
     return e != null && await e, !this.isUpdatePending;
@@ -213,28 +213,28 @@ let T = class extends HTMLElement {
     if (!this.isUpdatePending) return;
     if (!this.hasUpdated) {
       if (this.renderRoot ??= this.createRenderRoot(), this._$Ep) {
-        for (const [s, r] of this._$Ep) this[s] = r;
+        for (const [s, n] of this._$Ep) this[s] = n;
         this._$Ep = void 0;
       }
-      const i = this.constructor.elementProperties;
-      if (i.size > 0) for (const [s, r] of i) {
-        const { wrapped: n } = r, c = this[s];
-        n !== !0 || this._$AL.has(s) || c === void 0 || this.C(s, void 0, r, c);
+      const a = this.constructor.elementProperties;
+      if (a.size > 0) for (const [s, n] of a) {
+        const { wrapped: r } = n, o = this[s];
+        r !== !0 || this._$AL.has(s) || o === void 0 || this.C(s, void 0, n, o);
       }
     }
     let e = !1;
-    const a = this._$AL;
+    const i = this._$AL;
     try {
-      e = this.shouldUpdate(a), e ? (this.willUpdate(a), this._$EO?.forEach((i) => i.hostUpdate?.()), this.update(a)) : this._$EM();
-    } catch (i) {
-      throw e = !1, this._$EM(), i;
+      e = this.shouldUpdate(i), e ? (this.willUpdate(i), this._$EO?.forEach((a) => a.hostUpdate?.()), this.update(i)) : this._$EM();
+    } catch (a) {
+      throw e = !1, this._$EM(), a;
     }
-    e && this._$AE(a);
+    e && this._$AE(i);
   }
   willUpdate(e) {
   }
   _$AE(e) {
-    this._$EO?.forEach((a) => a.hostUpdated?.()), this.hasUpdated || (this.hasUpdated = !0, this.firstUpdated(e)), this.updated(e);
+    this._$EO?.forEach((i) => i.hostUpdated?.()), this.hasUpdated || (this.hasUpdated = !0, this.firstUpdated(e)), this.updated(e);
   }
   _$EM() {
     this._$AL = /* @__PURE__ */ new Map(), this.isUpdatePending = !1;
@@ -249,84 +249,84 @@ let T = class extends HTMLElement {
     return !0;
   }
   update(e) {
-    this._$Eq &&= this._$Eq.forEach((a) => this._$ET(a, this[a])), this._$EM();
+    this._$Eq &&= this._$Eq.forEach((i) => this._$ET(i, this[i])), this._$EM();
   }
   updated(e) {
   }
   firstUpdated(e) {
   }
 };
-T.elementStyles = [], T.shadowRootOptions = { mode: "open" }, T[U("elementProperties")] = /* @__PURE__ */ new Map(), T[U("finalized")] = /* @__PURE__ */ new Map(), lt?.({ ReactiveElement: T }), (Z.reactiveElementVersions ??= []).push("2.1.2");
+M.elementStyles = [], M.shadowRootOptions = { mode: "open" }, M[U("elementProperties")] = /* @__PURE__ */ new Map(), M[U("finalized")] = /* @__PURE__ */ new Map(), mt?.({ ReactiveElement: M }), (Q.reactiveElementVersions ??= []).push("2.1.2");
 /**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const he = globalThis, be = (t) => t, X = he.trustedTypes, ve = X ? X.createPolicy("lit-html", { createHTML: (t) => t }) : void 0, Ue = "$lit$", $ = `lit$${Math.random().toFixed(9).slice(2)}$`, Be = "?" + $, dt = `<${Be}>`, E = document, B = () => E.createComment(""), j = (t) => t === null || typeof t != "object" && typeof t != "function", ue = Array.isArray, ht = (t) => ue(t) || typeof t?.[Symbol.iterator] == "function", te = `[ 	
-\f\r]`, N = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, ye = /-->/g, xe = />/g, S = RegExp(`>|${te}(?:([^\\s"'>=/]+)(${te}*=${te}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), we = /'/g, $e = /"/g, je = /^(?:script|style|textarea|title)$/i, ut = (t) => (e, ...a) => ({ _$litType$: t, strings: e, values: a }), p = ut(1), D = Symbol.for("lit-noChange"), g = Symbol.for("lit-nothing"), ke = /* @__PURE__ */ new WeakMap(), C = E.createTreeWalker(E, 129);
-function qe(t, e) {
-  if (!ue(t) || !t.hasOwnProperty("raw")) throw Error("invalid template strings array");
-  return ve !== void 0 ? ve.createHTML(e) : e;
+const pe = globalThis, we = (t) => t, Z = pe.trustedTypes, xe = Z ? Z.createPolicy("lit-html", { createHTML: (t) => t }) : void 0, Ke = "$lit$", A = `lit$${Math.random().toFixed(9).slice(2)}$`, We = "?" + A, ft = `<${We}>`, z = document, j = () => z.createComment(""), q = (t) => t === null || typeof t != "object" && typeof t != "function", ge = Array.isArray, bt = (t) => ge(t) || typeof t?.[Symbol.iterator] == "function", ie = `[ 	
+\f\r]`, I = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, $e = /-->/g, ke = />/g, R = RegExp(`>|${ie}(?:([^\\s"'>=/]+)(${ie}*=${ie}*(?:[^ 	
+\f\r"'\`<>=]|("|')|))|$)`, "g"), Ae = /'/g, Se = /"/g, Ve = /^(?:script|style|textarea|title)$/i, vt = (t) => (e, ...i) => ({ _$litType$: t, strings: e, values: i }), _ = vt(1), D = Symbol.for("lit-noChange"), g = Symbol.for("lit-nothing"), Re = /* @__PURE__ */ new WeakMap(), C = z.createTreeWalker(z, 129);
+function Ye(t, e) {
+  if (!ge(t) || !t.hasOwnProperty("raw")) throw Error("invalid template strings array");
+  return xe !== void 0 ? xe.createHTML(e) : e;
 }
-const pt = (t, e) => {
-  const a = t.length - 1, i = [];
-  let s, r = e === 2 ? "<svg>" : e === 3 ? "<math>" : "", n = N;
-  for (let c = 0; c < a; c++) {
-    const o = t[c];
-    let l, d, u = -1, h = 0;
-    for (; h < o.length && (n.lastIndex = h, d = n.exec(o), d !== null); ) h = n.lastIndex, n === N ? d[1] === "!--" ? n = ye : d[1] !== void 0 ? n = xe : d[2] !== void 0 ? (je.test(d[2]) && (s = RegExp("</" + d[2], "g")), n = S) : d[3] !== void 0 && (n = S) : n === S ? d[0] === ">" ? (n = s ?? N, u = -1) : d[1] === void 0 ? u = -2 : (u = n.lastIndex - d[2].length, l = d[1], n = d[3] === void 0 ? S : d[3] === '"' ? $e : we) : n === $e || n === we ? n = S : n === ye || n === xe ? n = N : (n = S, s = void 0);
-    const _ = n === S && t[c + 1].startsWith("/>") ? " " : "";
-    r += n === N ? o + dt : u >= 0 ? (i.push(l), o.slice(0, u) + Ue + o.slice(u) + $ + _) : o + $ + (u === -2 ? c : _);
+const yt = (t, e) => {
+  const i = t.length - 1, a = [];
+  let s, n = e === 2 ? "<svg>" : e === 3 ? "<math>" : "", r = I;
+  for (let o = 0; o < i; o++) {
+    const c = t[o];
+    let l, d, h = -1, u = 0;
+    for (; u < c.length && (r.lastIndex = u, d = r.exec(c), d !== null); ) u = r.lastIndex, r === I ? d[1] === "!--" ? r = $e : d[1] !== void 0 ? r = ke : d[2] !== void 0 ? (Ve.test(d[2]) && (s = RegExp("</" + d[2], "g")), r = R) : d[3] !== void 0 && (r = R) : r === R ? d[0] === ">" ? (r = s ?? I, h = -1) : d[1] === void 0 ? h = -2 : (h = r.lastIndex - d[2].length, l = d[1], r = d[3] === void 0 ? R : d[3] === '"' ? Se : Ae) : r === Se || r === Ae ? r = R : r === $e || r === ke ? r = I : (r = R, s = void 0);
+    const p = r === R && t[o + 1].startsWith("/>") ? " " : "";
+    n += r === I ? c + ft : h >= 0 ? (a.push(l), c.slice(0, h) + Ke + c.slice(h) + A + p) : c + A + (h === -2 ? o : p);
   }
-  return [qe(t, r + (t[a] || "<?>") + (e === 2 ? "</svg>" : e === 3 ? "</math>" : "")), i];
+  return [Ye(t, n + (t[i] || "<?>") + (e === 2 ? "</svg>" : e === 3 ? "</math>" : "")), a];
 };
-class q {
-  constructor({ strings: e, _$litType$: a }, i) {
+class G {
+  constructor({ strings: e, _$litType$: i }, a) {
     let s;
     this.parts = [];
-    let r = 0, n = 0;
-    const c = e.length - 1, o = this.parts, [l, d] = pt(e, a);
-    if (this.el = q.createElement(l, i), C.currentNode = this.el.content, a === 2 || a === 3) {
-      const u = this.el.content.firstChild;
-      u.replaceWith(...u.childNodes);
+    let n = 0, r = 0;
+    const o = e.length - 1, c = this.parts, [l, d] = yt(e, i);
+    if (this.el = G.createElement(l, a), C.currentNode = this.el.content, i === 2 || i === 3) {
+      const h = this.el.content.firstChild;
+      h.replaceWith(...h.childNodes);
     }
-    for (; (s = C.nextNode()) !== null && o.length < c; ) {
+    for (; (s = C.nextNode()) !== null && c.length < o; ) {
       if (s.nodeType === 1) {
-        if (s.hasAttributes()) for (const u of s.getAttributeNames()) if (u.endsWith(Ue)) {
-          const h = d[n++], _ = s.getAttribute(u).split($), f = /([.?@])?(.*)/.exec(h);
-          o.push({ type: 1, index: r, name: f[2], strings: _, ctor: f[1] === "." ? gt : f[1] === "?" ? mt : f[1] === "@" ? ft : Q }), s.removeAttribute(u);
-        } else u.startsWith($) && (o.push({ type: 6, index: r }), s.removeAttribute(u));
-        if (je.test(s.tagName)) {
-          const u = s.textContent.split($), h = u.length - 1;
-          if (h > 0) {
-            s.textContent = X ? X.emptyScript : "";
-            for (let _ = 0; _ < h; _++) s.append(u[_], B()), C.nextNode(), o.push({ type: 2, index: ++r });
-            s.append(u[h], B());
+        if (s.hasAttributes()) for (const h of s.getAttributeNames()) if (h.endsWith(Ke)) {
+          const u = d[r++], p = s.getAttribute(h).split(A), f = /([.?@])?(.*)/.exec(u);
+          c.push({ type: 1, index: n, name: f[2], strings: p, ctor: f[1] === "." ? xt : f[1] === "?" ? $t : f[1] === "@" ? kt : ee }), s.removeAttribute(h);
+        } else h.startsWith(A) && (c.push({ type: 6, index: n }), s.removeAttribute(h));
+        if (Ve.test(s.tagName)) {
+          const h = s.textContent.split(A), u = h.length - 1;
+          if (u > 0) {
+            s.textContent = Z ? Z.emptyScript : "";
+            for (let p = 0; p < u; p++) s.append(h[p], j()), C.nextNode(), c.push({ type: 2, index: ++n });
+            s.append(h[u], j());
           }
         }
-      } else if (s.nodeType === 8) if (s.data === Be) o.push({ type: 2, index: r });
+      } else if (s.nodeType === 8) if (s.data === We) c.push({ type: 2, index: n });
       else {
-        let u = -1;
-        for (; (u = s.data.indexOf($, u + 1)) !== -1; ) o.push({ type: 7, index: r }), u += $.length - 1;
+        let h = -1;
+        for (; (h = s.data.indexOf(A, h + 1)) !== -1; ) c.push({ type: 7, index: n }), h += A.length - 1;
       }
-      r++;
+      n++;
     }
   }
-  static createElement(e, a) {
-    const i = E.createElement("template");
-    return i.innerHTML = e, i;
+  static createElement(e, i) {
+    const a = z.createElement("template");
+    return a.innerHTML = e, a;
   }
 }
-function P(t, e, a = t, i) {
+function P(t, e, i = t, a) {
   if (e === D) return e;
-  let s = i !== void 0 ? a._$Co?.[i] : a._$Cl;
-  const r = j(e) ? void 0 : e._$litDirective$;
-  return s?.constructor !== r && (s?._$AO?.(!1), r === void 0 ? s = void 0 : (s = new r(t), s._$AT(t, a, i)), i !== void 0 ? (a._$Co ??= [])[i] = s : a._$Cl = s), s !== void 0 && (e = P(t, s._$AS(t, e.values), s, i)), e;
+  let s = a !== void 0 ? i._$Co?.[a] : i._$Cl;
+  const n = q(e) ? void 0 : e._$litDirective$;
+  return s?.constructor !== n && (s?._$AO?.(!1), n === void 0 ? s = void 0 : (s = new n(t), s._$AT(t, i, a)), a !== void 0 ? (i._$Co ??= [])[a] = s : i._$Cl = s), s !== void 0 && (e = P(t, s._$AS(t, e.values), s, a)), e;
 }
-class _t {
-  constructor(e, a) {
-    this._$AV = [], this._$AN = void 0, this._$AD = e, this._$AM = a;
+class wt {
+  constructor(e, i) {
+    this._$AV = [], this._$AN = void 0, this._$AD = e, this._$AM = i;
   }
   get parentNode() {
     return this._$AM.parentNode;
@@ -335,34 +335,34 @@ class _t {
     return this._$AM._$AU;
   }
   u(e) {
-    const { el: { content: a }, parts: i } = this._$AD, s = (e?.creationScope ?? E).importNode(a, !0);
+    const { el: { content: i }, parts: a } = this._$AD, s = (e?.creationScope ?? z).importNode(i, !0);
     C.currentNode = s;
-    let r = C.nextNode(), n = 0, c = 0, o = i[0];
-    for (; o !== void 0; ) {
-      if (n === o.index) {
+    let n = C.nextNode(), r = 0, o = 0, c = a[0];
+    for (; c !== void 0; ) {
+      if (r === c.index) {
         let l;
-        o.type === 2 ? l = new K(r, r.nextSibling, this, e) : o.type === 1 ? l = new o.ctor(r, o.name, o.strings, this, e) : o.type === 6 && (l = new bt(r, this, e)), this._$AV.push(l), o = i[++c];
+        c.type === 2 ? l = new K(n, n.nextSibling, this, e) : c.type === 1 ? l = new c.ctor(n, c.name, c.strings, this, e) : c.type === 6 && (l = new At(n, this, e)), this._$AV.push(l), c = a[++o];
       }
-      n !== o?.index && (r = C.nextNode(), n++);
+      r !== c?.index && (n = C.nextNode(), r++);
     }
-    return C.currentNode = E, s;
+    return C.currentNode = z, s;
   }
   p(e) {
-    let a = 0;
-    for (const i of this._$AV) i !== void 0 && (i.strings !== void 0 ? (i._$AI(e, i, a), a += i.strings.length - 2) : i._$AI(e[a])), a++;
+    let i = 0;
+    for (const a of this._$AV) a !== void 0 && (a.strings !== void 0 ? (a._$AI(e, a, i), i += a.strings.length - 2) : a._$AI(e[i])), i++;
   }
 }
 class K {
   get _$AU() {
     return this._$AM?._$AU ?? this._$Cv;
   }
-  constructor(e, a, i, s) {
-    this.type = 2, this._$AH = g, this._$AN = void 0, this._$AA = e, this._$AB = a, this._$AM = i, this.options = s, this._$Cv = s?.isConnected ?? !0;
+  constructor(e, i, a, s) {
+    this.type = 2, this._$AH = g, this._$AN = void 0, this._$AA = e, this._$AB = i, this._$AM = a, this.options = s, this._$Cv = s?.isConnected ?? !0;
   }
   get parentNode() {
     let e = this._$AA.parentNode;
-    const a = this._$AM;
-    return a !== void 0 && e?.nodeType === 11 && (e = a.parentNode), e;
+    const i = this._$AM;
+    return i !== void 0 && e?.nodeType === 11 && (e = i.parentNode), e;
   }
   get startNode() {
     return this._$AA;
@@ -370,8 +370,8 @@ class K {
   get endNode() {
     return this._$AB;
   }
-  _$AI(e, a = this) {
-    e = P(this, e, a), j(e) ? e === g || e == null || e === "" ? (this._$AH !== g && this._$AR(), this._$AH = g) : e !== this._$AH && e !== D && this._(e) : e._$litType$ !== void 0 ? this.$(e) : e.nodeType !== void 0 ? this.T(e) : ht(e) ? this.k(e) : this._(e);
+  _$AI(e, i = this) {
+    e = P(this, e, i), q(e) ? e === g || e == null || e === "" ? (this._$AH !== g && this._$AR(), this._$AH = g) : e !== this._$AH && e !== D && this._(e) : e._$litType$ !== void 0 ? this.$(e) : e.nodeType !== void 0 ? this.T(e) : bt(e) ? this.k(e) : this._(e);
   }
   O(e) {
     return this._$AA.parentNode.insertBefore(e, this._$AB);
@@ -380,63 +380,63 @@ class K {
     this._$AH !== e && (this._$AR(), this._$AH = this.O(e));
   }
   _(e) {
-    this._$AH !== g && j(this._$AH) ? this._$AA.nextSibling.data = e : this.T(E.createTextNode(e)), this._$AH = e;
+    this._$AH !== g && q(this._$AH) ? this._$AA.nextSibling.data = e : this.T(z.createTextNode(e)), this._$AH = e;
   }
   $(e) {
-    const { values: a, _$litType$: i } = e, s = typeof i == "number" ? this._$AC(e) : (i.el === void 0 && (i.el = q.createElement(qe(i.h, i.h[0]), this.options)), i);
-    if (this._$AH?._$AD === s) this._$AH.p(a);
+    const { values: i, _$litType$: a } = e, s = typeof a == "number" ? this._$AC(e) : (a.el === void 0 && (a.el = G.createElement(Ye(a.h, a.h[0]), this.options)), a);
+    if (this._$AH?._$AD === s) this._$AH.p(i);
     else {
-      const r = new _t(s, this), n = r.u(this.options);
-      r.p(a), this.T(n), this._$AH = r;
+      const n = new wt(s, this), r = n.u(this.options);
+      n.p(i), this.T(r), this._$AH = n;
     }
   }
   _$AC(e) {
-    let a = ke.get(e.strings);
-    return a === void 0 && ke.set(e.strings, a = new q(e)), a;
+    let i = Re.get(e.strings);
+    return i === void 0 && Re.set(e.strings, i = new G(e)), i;
   }
   k(e) {
-    ue(this._$AH) || (this._$AH = [], this._$AR());
-    const a = this._$AH;
-    let i, s = 0;
-    for (const r of e) s === a.length ? a.push(i = new K(this.O(B()), this.O(B()), this, this.options)) : i = a[s], i._$AI(r), s++;
-    s < a.length && (this._$AR(i && i._$AB.nextSibling, s), a.length = s);
+    ge(this._$AH) || (this._$AH = [], this._$AR());
+    const i = this._$AH;
+    let a, s = 0;
+    for (const n of e) s === i.length ? i.push(a = new K(this.O(j()), this.O(j()), this, this.options)) : a = i[s], a._$AI(n), s++;
+    s < i.length && (this._$AR(a && a._$AB.nextSibling, s), i.length = s);
   }
-  _$AR(e = this._$AA.nextSibling, a) {
-    for (this._$AP?.(!1, !0, a); e !== this._$AB; ) {
-      const i = be(e).nextSibling;
-      be(e).remove(), e = i;
+  _$AR(e = this._$AA.nextSibling, i) {
+    for (this._$AP?.(!1, !0, i); e !== this._$AB; ) {
+      const a = we(e).nextSibling;
+      we(e).remove(), e = a;
     }
   }
   setConnected(e) {
     this._$AM === void 0 && (this._$Cv = e, this._$AP?.(e));
   }
 }
-class Q {
+class ee {
   get tagName() {
     return this.element.tagName;
   }
   get _$AU() {
     return this._$AM._$AU;
   }
-  constructor(e, a, i, s, r) {
-    this.type = 1, this._$AH = g, this._$AN = void 0, this.element = e, this.name = a, this._$AM = s, this.options = r, i.length > 2 || i[0] !== "" || i[1] !== "" ? (this._$AH = Array(i.length - 1).fill(new String()), this.strings = i) : this._$AH = g;
+  constructor(e, i, a, s, n) {
+    this.type = 1, this._$AH = g, this._$AN = void 0, this.element = e, this.name = i, this._$AM = s, this.options = n, a.length > 2 || a[0] !== "" || a[1] !== "" ? (this._$AH = Array(a.length - 1).fill(new String()), this.strings = a) : this._$AH = g;
   }
-  _$AI(e, a = this, i, s) {
-    const r = this.strings;
-    let n = !1;
-    if (r === void 0) e = P(this, e, a, 0), n = !j(e) || e !== this._$AH && e !== D, n && (this._$AH = e);
+  _$AI(e, i = this, a, s) {
+    const n = this.strings;
+    let r = !1;
+    if (n === void 0) e = P(this, e, i, 0), r = !q(e) || e !== this._$AH && e !== D, r && (this._$AH = e);
     else {
-      const c = e;
-      let o, l;
-      for (e = r[0], o = 0; o < r.length - 1; o++) l = P(this, c[i + o], a, o), l === D && (l = this._$AH[o]), n ||= !j(l) || l !== this._$AH[o], l === g ? e = g : e !== g && (e += (l ?? "") + r[o + 1]), this._$AH[o] = l;
+      const o = e;
+      let c, l;
+      for (e = n[0], c = 0; c < n.length - 1; c++) l = P(this, o[a + c], i, c), l === D && (l = this._$AH[c]), r ||= !q(l) || l !== this._$AH[c], l === g ? e = g : e !== g && (e += (l ?? "") + n[c + 1]), this._$AH[c] = l;
     }
-    n && !s && this.j(e);
+    r && !s && this.j(e);
   }
   j(e) {
     e === g ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
   }
 }
-class gt extends Q {
+class xt extends ee {
   constructor() {
     super(...arguments), this.type = 3;
   }
@@ -444,7 +444,7 @@ class gt extends Q {
     this.element[this.name] = e === g ? void 0 : e;
   }
 }
-class mt extends Q {
+class $t extends ee {
   constructor() {
     super(...arguments), this.type = 4;
   }
@@ -452,22 +452,22 @@ class mt extends Q {
     this.element.toggleAttribute(this.name, !!e && e !== g);
   }
 }
-class ft extends Q {
-  constructor(e, a, i, s, r) {
-    super(e, a, i, s, r), this.type = 5;
+class kt extends ee {
+  constructor(e, i, a, s, n) {
+    super(e, i, a, s, n), this.type = 5;
   }
-  _$AI(e, a = this) {
-    if ((e = P(this, e, a, 0) ?? g) === D) return;
-    const i = this._$AH, s = e === g && i !== g || e.capture !== i.capture || e.once !== i.once || e.passive !== i.passive, r = e !== g && (i === g || s);
-    s && this.element.removeEventListener(this.name, this, i), r && this.element.addEventListener(this.name, this, e), this._$AH = e;
+  _$AI(e, i = this) {
+    if ((e = P(this, e, i, 0) ?? g) === D) return;
+    const a = this._$AH, s = e === g && a !== g || e.capture !== a.capture || e.once !== a.once || e.passive !== a.passive, n = e !== g && (a === g || s);
+    s && this.element.removeEventListener(this.name, this, a), n && this.element.addEventListener(this.name, this, e), this._$AH = e;
   }
   handleEvent(e) {
     typeof this._$AH == "function" ? this._$AH.call(this.options?.host ?? this.element, e) : this._$AH.handleEvent(e);
   }
 }
-class bt {
-  constructor(e, a, i) {
-    this.element = e, this.type = 6, this._$AN = void 0, this._$AM = a, this.options = i;
+class At {
+  constructor(e, i, a) {
+    this.element = e, this.type = 6, this._$AN = void 0, this._$AM = i, this.options = a;
   }
   get _$AU() {
     return this._$AM._$AU;
@@ -476,14 +476,14 @@ class bt {
     P(this, e);
   }
 }
-const vt = he.litHtmlPolyfillSupport;
-vt?.(q, K), (he.litHtmlVersions ??= []).push("3.3.3");
-const yt = (t, e, a) => {
-  const i = a?.renderBefore ?? e;
-  let s = i._$litPart$;
+const St = pe.litHtmlPolyfillSupport;
+St?.(G, K), (pe.litHtmlVersions ??= []).push("3.3.3");
+const Rt = (t, e, i) => {
+  const a = i?.renderBefore ?? e;
+  let s = a._$litPart$;
   if (s === void 0) {
-    const r = a?.renderBefore ?? null;
-    i._$litPart$ = s = new K(e.insertBefore(B(), r), r, void 0, a ?? {});
+    const n = i?.renderBefore ?? null;
+    a._$litPart$ = s = new K(e.insertBefore(j(), n), n, void 0, i ?? {});
   }
   return s._$AI(t), s;
 };
@@ -492,8 +492,8 @@ const yt = (t, e, a) => {
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const pe = globalThis;
-class H extends T {
+const me = globalThis;
+class H extends M {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
   }
@@ -502,8 +502,8 @@ class H extends T {
     return this.renderOptions.renderBefore ??= e.firstChild, e;
   }
   update(e) {
-    const a = this.render();
-    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(e), this._$Do = yt(a, this.renderRoot, this.renderOptions);
+    const i = this.render();
+    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(e), this._$Do = Rt(i, this.renderRoot, this.renderOptions);
   }
   connectedCallback() {
     super.connectedCallback(), this._$Do?.setConnected(!0);
@@ -515,11 +515,11 @@ class H extends T {
     return D;
   }
 }
-H._$litElement$ = !0, H.finalized = !0, pe.litElementHydrateSupport?.({ LitElement: H });
-const xt = pe.litElementPolyfillSupport;
-xt?.({ LitElement: H });
-(pe.litElementVersions ??= []).push("4.2.2");
-const wt = {
+H._$litElement$ = !0, H.finalized = !0, me.litElementHydrateSupport?.({ LitElement: H });
+const Ct = me.litElementPolyfillSupport;
+Ct?.({ LitElement: H });
+(me.litElementVersions ??= []).push("4.2.2");
+const Et = {
   light: ["on"],
   switch: ["on"],
   fan: ["on"],
@@ -531,11 +531,11 @@ const wt = {
   vacuum: ["cleaning", "returning"],
   cover: ["opening", "closing"],
   lock: ["locking", "unlocking"]
-}, $t = {
+}, zt = {
   climate: {
     hvac_action: ["cooling", "heating", "drying", "fan"]
   }
-}, k = {
+}, x = {
   title: "היסטוריית פעילות חכמה",
   auto_discover: !0,
   debug: !1,
@@ -553,7 +553,18 @@ const wt = {
   refresh_interval_seconds: 300,
   min_duration_seconds: 20,
   merge_gap_seconds: 15,
-  max_visible_rows: 48,
+  max_visible_rows: 60,
+  smart_filter: !0,
+  hide_empty_rows: !0,
+  hide_empty_groups: !0,
+  min_row_active_seconds: 30,
+  max_rows_per_group: 12,
+  max_total_rows: 60,
+  show_technical_entities: !1,
+  show_config_entities: !1,
+  show_diagnostic_entities: !1,
+  show_entity_id_when_name_missing: !1,
+  summary_scope: "visible",
   collapse_groups: !1,
   timeline_height: "min(62svh, 680px)",
   mobile_breakpoint: 760
@@ -569,7 +580,7 @@ const wt = {
   humidifier: "לחות",
   vacuum: "שואבים",
   lock: "מנעולים"
-}, Y = [
+}, J = [
   "light",
   "switch",
   "climate",
@@ -586,170 +597,210 @@ const wt = {
   closing: "נסגר",
   idle: "המתנה",
   unknown: "לא ידוע"
-}, kt = ["ar", "fa", "he", "iw", "ur"];
+}, Tt = ["ar", "fa", "he", "iw", "ur"];
 function F(t) {
   return t.includes(".") ? t.split(".")[0] ?? t : t;
 }
-function ie(t, e = /* @__PURE__ */ new Date()) {
+function ae(t, e = /* @__PURE__ */ new Date()) {
   if (t.start_time) {
-    const r = new Date(t.start_time), n = t.end_time ? new Date(t.end_time) : e;
-    return { start: r, end: n };
+    const n = new Date(t.start_time), r = t.end_time ? new Date(t.end_time) : e;
+    return { start: n, end: r };
   }
-  const a = t.hours_to_show ?? 24, i = t.end_time ? new Date(t.end_time) : e;
-  return { start: new Date(i.getTime() - a * 60 * 60 * 1e3), end: i };
+  const i = t.hours_to_show ?? 24, a = t.end_time ? new Date(t.end_time) : e;
+  return { start: new Date(a.getTime() - i * 60 * 60 * 1e3), end: a };
 }
-function At(t, e) {
+function Mt(t, e) {
   if (t === !0 || t === "rtl") return !0;
   if (t === !1 || t === "ltr") return !1;
-  const a = (e || document.documentElement.lang || navigator.language || "").toLowerCase();
-  return kt.some((i) => a === i || a.startsWith(`${i}-`));
+  const i = (e || document.documentElement.lang || navigator.language || "").toLowerCase();
+  return Tt.some(
+    (a) => i === a || i.startsWith(`${a}-`)
+  );
 }
-function M(t) {
+function E(t) {
   if (!Number.isFinite(t) || t <= 0) return "0 דק׳";
-  const e = Math.round(t / 6e4), a = Math.floor(e / 60), i = e % 60;
-  return a && i ? `${a}:${String(i).padStart(2, "0")} שעות` : a ? `${a} שעות` : `${i} דק׳`;
+  const e = Math.round(t / 6e4), i = Math.floor(e / 60), a = e % 60;
+  return i && a ? `${i}:${String(a).padStart(2, "0")} שעות` : i ? `${i} שעות` : `${a} דק׳`;
 }
-function x(t) {
-  return new Intl.DateTimeFormat("he-IL", { hour: "2-digit", minute: "2-digit" }).format(t);
+function $(t) {
+  return new Intl.DateTimeFormat("he-IL", {
+    hour: "2-digit",
+    minute: "2-digit"
+  }).format(t);
 }
-function St(t, e, a) {
-  return Math.min(a, Math.max(e, t));
+function Ht(t, e, i) {
+  return Math.min(i, Math.max(e, t));
 }
-function J(t, e) {
-  const a = e.end.getTime() - e.start.getTime();
-  return a <= 0 ? 0 : St((t.getTime() - e.start.getTime()) / a * 100, 0, 100);
+function X(t, e) {
+  const i = e.end.getTime() - e.start.getTime();
+  return i <= 0 ? 0 : Ht(
+    (t.getTime() - e.start.getTime()) / i * 100,
+    0,
+    100
+  );
 }
-function Ke(t) {
+function Je(t) {
   const [, e = t] = t.split(".");
   return e.replace(/_/g, " ");
 }
-function ae(t, e = !1) {
-  return t ? [t.entity.area, L[t.entity.domain] ?? t.entity.domain, e ? t.entity.entity_id : void 0].filter(Boolean).join(" · ") : "אין מספיק נתונים";
+function se(t, e = !1) {
+  return t ? [
+    t.entity.area,
+    L[t.entity.domain] ?? t.entity.domain,
+    e ? t.entity.entity_id : void 0
+  ].filter(Boolean).join(" · ") : "אין מספיק נתונים";
 }
-function Ct(t, e, a = !1) {
-  const i = [
+function Dt(t, e, i = !1) {
+  const a = [
     ["רכיב", t.entity.name],
     ["אזור", t.entity.area ?? "ללא אזור"],
     ["סוג", L[t.entity.domain] ?? t.entity.domain],
     ["מצב", O[e.category] ?? e.state],
-    ["התחלה", x(e.start)],
-    ["סיום", x(e.end)],
-    ["משך", M(e.durationMs)]
+    ["התחלה", $(e.start)],
+    ["סיום", $(e.end)],
+    ["משך", E(e.durationMs)]
   ];
-  return a && i.push(["entity_id", t.entity.entity_id]), i;
+  return i && a.push(["entity_id", t.entity.entity_id]), a;
 }
-const Ae = /* @__PURE__ */ new WeakMap();
-async function Et(t, e) {
-  const a = t.entities ?? [], i = e ? await Ht(e) : Mt(), s = a.map((c) => typeof c == "string" ? { entity: c } : c);
-  let r = !1;
+const Ce = /* @__PURE__ */ new WeakMap();
+async function Pt(t, e) {
+  const i = t.entities ?? [], a = e ? await Nt(e) : It(), s = i.map(
+    (o) => typeof o == "string" ? { entity: o } : o
+  );
+  let n = !1;
   if (!s.length && e && t.auto_discover !== !1) {
-    const c = zt(t, e, i);
-    r = c.fallbackUsed, s.push(...c.entities);
+    const o = Lt(t, e, a);
+    n = o.fallbackUsed, s.push(...o.entities);
   }
   return {
-    entities: s.filter((c) => c.entity && !c.hidden).map((c) => Rt(c, t, e, i)).filter((c) => !!c).filter((c) => We(c.labels ?? [], t, i.labels)),
-    diagnostics: Dt(i, r, t)
+    entities: s.filter((o) => o.entity && !o.hidden).map((o) => Ot(o, t, e, a)).filter((o) => !!o).filter(
+      (o) => Ze(o.labels ?? [], t, a.labels)
+    ),
+    diagnostics: Bt(a, n, t)
   };
 }
-function zt(t, e, a) {
-  const i = t.domains?.length ? t.domains : Y, s = z(t.exclude_domains ?? []), r = z(t.areas ?? []), n = [];
-  if (a.entities.length) {
-    const c = Ce(a.areas, "area_id"), o = Ce(a.devices, "id");
-    for (const l of a.entities) {
-      if (l.disabled_by || l.hidden_by || !e.states[l.entity_id] || Ge(l)) continue;
+function Lt(t, e, i) {
+  const a = t.domains?.length ? t.domains : J, s = T(t.exclude_domains ?? []), n = T(t.areas ?? []), r = [];
+  if (i.entities.length) {
+    const o = ze(i.areas, "area_id"), c = ze(i.devices, "id");
+    for (const l of i.entities) {
+      if (l.disabled_by || l.hidden_by || !e.states[l.entity_id] || !Xe(l, t, !1)) continue;
       const d = F(l.entity_id);
-      if (s.has(v(d)) || i.length && !i.includes(d) || !ce(l.entity_id, t)) continue;
-      const u = l.device_id ? o.get(l.device_id) : void 0;
-      if (u?.disabled_by) continue;
-      const h = l.area_id || u?.area_id || void 0;
-      if (!h) continue;
-      const _ = c.get(h), f = _?.name ?? h;
-      if (r.size && !r.has(v(h)) && !r.has(v(f))) continue;
-      const b = Ve(l.labels, u?.labels, _?.labels);
-      We(b, t, a.labels) && n.push({
+      if (s.has(w(d)) || a.length && !a.includes(d) || !de(l.entity_id, t)) continue;
+      const h = l.device_id ? c.get(l.device_id) : void 0;
+      if (h?.disabled_by) continue;
+      const u = l.area_id || h?.area_id || void 0;
+      if (!u) continue;
+      const p = o.get(u), f = p?.name ?? u;
+      if (n.size && !n.has(w(u)) && !n.has(w(f)))
+        continue;
+      const y = Qe(l.labels, h?.labels, p?.labels);
+      Ze(y, t, i.labels) && r.push({
         entity: l.entity_id,
         area: f,
         domain: d
       });
     }
-    return { entities: n, fallbackUsed: !1 };
+    return { entities: r, fallbackUsed: !1 };
   }
-  for (const [c, o] of Object.entries(e.states)) {
-    const l = F(c);
-    if (s.has(v(l)) || i.length && !i.includes(l) || !ce(c, t)) continue;
-    const d = y(o.attributes.area) ?? y(o.attributes.area_id);
-    d && (r.size && !r.has(v(d)) || n.push({ entity: c, area: d, domain: l }));
+  for (const [o, c] of Object.entries(e.states)) {
+    const l = F(o);
+    if (s.has(w(l)) || a.length && !a.includes(l) || !de(o, t)) continue;
+    const d = b(c.attributes.area) ?? b(c.attributes.area_id);
+    d && (n.size && !n.has(w(d)) || r.push({ entity: o, area: d, domain: l }));
   }
-  return { entities: n, fallbackUsed: !0 };
+  return { entities: r, fallbackUsed: !0 };
 }
-function Rt(t, e, a, i) {
-  const s = a?.states[t.entity], r = i.entities.find((I) => I.entity_id === t.entity);
-  if (r?.disabled_by || r?.hidden_by || r && Ge(r)) return;
-  const n = r?.device_id ? i.devices.find((I) => I.id === r.device_id) : void 0;
-  if (n?.disabled_by) return;
-  const c = t.area ? void 0 : r?.area_id || n?.area_id || void 0, o = t.area ?? Pt(c, i) ?? y(s?.attributes?.area) ?? y(s?.attributes?.area_id);
-  if (e.areas?.length && (!o || !Lt(o, c, e.areas))) return;
-  const l = t.domain ?? F(t.entity);
-  if (!Tt(t.entity, l, e)) return;
-  const d = Ve(
-    r?.labels,
+function Ot(t, e, i, a) {
+  const s = i?.states[t.entity], n = a.entities.find(
+    (N) => N.entity_id === t.entity
+  ), r = Gt(t.entity, e);
+  if (n?.disabled_by || n?.hidden_by || n && !Xe(n, e, r))
+    return;
+  const o = n?.device_id ? a.devices.find((N) => N.id === n.device_id) : void 0;
+  if (o?.disabled_by) return;
+  const c = t.area ? void 0 : n?.area_id || o?.area_id || void 0, l = t.area ?? Ut(c, a) ?? b(s?.attributes?.area) ?? b(s?.attributes?.area_id);
+  if (e.areas?.length && (!l || !jt(l, c, e.areas)))
+    return;
+  const d = t.domain ?? F(t.entity);
+  if (!Ft(t.entity, d, e)) return;
+  const h = Qe(
     n?.labels,
-    c ? i.areas.find((I) => I.area_id === c)?.labels : void 0
-  ), u = s ? a?.formatEntityName?.(s) : void 0, h = s?.attributes?.friendly_name, _ = y(t.name), f = y(r?.name) ?? y(r?.original_name), b = y(n?.name_by_user) ?? y(n?.name), R = y(u), m = y(h), A = Ke(t.entity), ee = _ ?? Ft(R ?? m ?? f ?? A, b, t.entity, l);
+    o?.labels,
+    c ? a.areas.find((N) => N.area_id === c)?.labels : void 0
+  ), u = s ? i?.formatEntityName?.(s) : void 0, p = s?.attributes?.friendly_name, f = b(t.name), y = b(n?.name) ?? b(n?.original_name), v = b(o?.name_by_user) ?? b(o?.name), m = b(u), S = b(p), te = Je(t.entity), rt = f ?? Kt(
+    m ?? S ?? y ?? te,
+    v,
+    t.entity,
+    d
+  );
   return {
     entity_id: t.entity,
-    name: ee,
-    area: o,
+    name: rt,
+    area: l,
     area_id: c,
-    domain: l,
-    icon: t.icon ?? y(s?.attributes?.icon),
-    labels: d,
+    domain: d,
+    icon: t.icon ?? b(s?.attributes?.icon),
+    labels: h,
+    entity_category: b(n?.entity_category),
+    device_id: b(n?.device_id),
+    device_name: v,
+    device_manufacturer: b(o?.manufacturer),
+    device_model: b(o?.model),
+    hidden_by: b(n?.hidden_by),
+    disabled_by: b(n?.disabled_by),
     config: t
   };
 }
-function Tt(t, e, a) {
-  return a.domains?.length && !z(a.domains).has(v(e)) || z(a.exclude_domains ?? []).has(v(e)) ? !1 : ce(t, a);
+function Ft(t, e, i) {
+  return i.domains?.length && !T(i.domains).has(w(e)) || T(i.exclude_domains ?? []).has(w(e)) ? !1 : de(t, i);
 }
-function ce(t, e) {
-  const a = e.include_entity_globs ?? [], i = [...e.exclude_entities ?? [], ...e.exclude_entity_globs ?? []];
-  return !(a.length && !a.some((s) => Se(s).test(t)) || i.length && i.some((s) => Se(s).test(t)));
+function de(t, e) {
+  const i = e.include_entity_globs ?? [], a = [
+    ...e.exclude_entities ?? [],
+    ...e.exclude_entity_globs ?? []
+  ];
+  return !(i.length && !i.some((s) => Ee(s).test(t)) || a.length && a.some((s) => Ee(s).test(t)));
 }
-function Ge(t) {
-  return t.entity_category === "config" || t.entity_category === "diagnostic";
+function Xe(t, e, i) {
+  return i ? !0 : t.entity_category === "config" ? e.show_config_entities === !0 : t.entity_category === "diagnostic" ? e.show_diagnostic_entities === !0 : !0;
 }
-function We(t, e, a) {
-  const i = Ot(t, a), s = z(e.include_labels ?? []), r = z(e.exclude_labels ?? []);
-  return !(r.size && [...r].some((n) => i.has(n)) || s.size && ![...s].some((n) => i.has(n)));
+function Ze(t, e, i) {
+  const a = qt(t, i), s = T(e.include_labels ?? []), n = T(e.exclude_labels ?? []);
+  return !(n.size && [...n].some((r) => a.has(r)) || s.size && ![...s].some((r) => a.has(r)));
 }
-async function Ht(t) {
-  const e = Ae.get(t);
+async function Nt(t) {
+  const e = Ce.get(t);
   if (e) return e;
-  const a = Promise.all([
-    G(t, "config/area_registry/list"),
-    G(t, "config/device_registry/list"),
-    G(t, "config/entity_registry/list"),
-    G(t, "config/label_registry/list")
-  ]).then(([i, s, r, n]) => ({
-    areas: i.items,
+  const i = Promise.all([
+    W(t, "config/area_registry/list"),
+    W(t, "config/device_registry/list"),
+    W(t, "config/entity_registry/list"),
+    W(t, "config/label_registry/list")
+  ]).then(([a, s, n, r]) => ({
+    areas: a.items,
     devices: s.items,
-    entities: r.items,
-    labels: n.items,
-    areaRegistryAvailable: i.available,
+    entities: n.items,
+    labels: r.items,
+    areaRegistryAvailable: a.available,
     deviceRegistryAvailable: s.available,
-    entityRegistryAvailable: r.available,
-    labelRegistryAvailable: n.available
+    entityRegistryAvailable: n.available,
+    labelRegistryAvailable: r.available
   }));
-  return Ae.set(t, a), a;
+  return Ce.set(t, i), i;
 }
-async function G(t, e) {
+async function W(t, e) {
   try {
-    const a = await t.callWS({ type: e });
-    return { items: Array.isArray(a) ? a : [], available: Array.isArray(a) };
+    const i = await t.callWS({ type: e });
+    return {
+      items: Array.isArray(i) ? i : [],
+      available: Array.isArray(i)
+    };
   } catch {
     return { items: [], available: !1 };
   }
 }
-function Mt() {
+function It() {
   return {
     areas: [],
     devices: [],
@@ -761,9 +812,9 @@ function Mt() {
     labelRegistryAvailable: !1
   };
 }
-function Dt(t, e, a) {
-  const i = [];
-  return t.areaRegistryAvailable || i.push("area_registry_unavailable"), t.entityRegistryAvailable || i.push("entity_registry_unavailable"), t.deviceRegistryAvailable || i.push("device_registry_unavailable"), (a.include_labels?.length || a.exclude_labels?.length) && !t.labelRegistryAvailable && i.push("label_registry_unavailable"), {
+function Bt(t, e, i) {
+  const a = [];
+  return t.areaRegistryAvailable || a.push("area_registry_unavailable"), t.entityRegistryAvailable || a.push("entity_registry_unavailable"), t.deviceRegistryAvailable || a.push("device_registry_unavailable"), (i.include_labels?.length || i.exclude_labels?.length) && !t.labelRegistryAvailable && a.push("label_registry_unavailable"), {
     registryAvailable: t.areaRegistryAvailable || t.entityRegistryAvailable || t.deviceRegistryAvailable,
     areaRegistryAvailable: t.areaRegistryAvailable,
     entityRegistryAvailable: t.entityRegistryAvailable,
@@ -773,55 +824,62 @@ function Dt(t, e, a) {
     areaCount: t.areas.length,
     labelCount: t.labels.length,
     fallbackUsed: e,
-    unavailableReasons: i
+    unavailableReasons: a
   };
 }
-function Pt(t, e) {
+function Ut(t, e) {
   if (t)
-    return e.areas.find((a) => a.area_id === t)?.name ?? t;
+    return e.areas.find((i) => i.area_id === t)?.name ?? t;
 }
-function Lt(t, e, a) {
-  const i = z(a);
-  return i.has(v(t)) || !!(e && i.has(v(e)));
+function jt(t, e, i) {
+  const a = T(i);
+  return a.has(w(t)) || !!(e && a.has(w(e)));
 }
-function Ot(t, e) {
-  const a = new Map(e.map((s) => [s.label_id, s.name])), i = /* @__PURE__ */ new Set();
+function qt(t, e) {
+  const i = new Map(
+    e.map((s) => [s.label_id, s.name])
+  ), a = /* @__PURE__ */ new Set();
   for (const s of t) {
-    i.add(v(s));
-    const r = a.get(s);
-    r && i.add(v(r));
+    a.add(w(s));
+    const n = i.get(s);
+    n && a.add(w(n));
   }
-  return i;
+  return a;
 }
-function Ve(...t) {
+function Qe(...t) {
   return [...new Set(t.flatMap((e) => e ?? []))];
 }
-function Se(t) {
+function Ee(t) {
   const e = t.replace(/[|\\{}()[\]^$+?.]/g, "\\$&").replace(/\*/g, ".*");
   return new RegExp(`^${e}$`);
 }
-function Ce(t, e) {
-  return new Map(t.map((a) => [a[e], a]));
+function ze(t, e) {
+  return new Map(t.map((i) => [i[e], i]));
 }
-function z(t) {
-  return new Set(t.map(v).filter(Boolean));
+function T(t) {
+  return new Set(t.map(w).filter(Boolean));
 }
-function v(t) {
+function Gt(t, e) {
+  return (e.entities ?? []).some(
+    (i) => typeof i == "string" ? i === t : i.entity === t
+  );
+}
+function w(t) {
   return t.trim().toLowerCase();
 }
-function y(t) {
+function b(t) {
   return typeof t == "string" && t.trim() ? t.trim() : void 0;
 }
-function Ft(t, e, a, i) {
+function Kt(t, e, i, a) {
   if (!e || !t) return t;
-  const s = v(t), r = v(e);
-  return !s || !r || s.includes(r) || r.includes(s) ? t : i === "switch" && (Nt(t) || It(t) || t === Ke(a)) ? `${e} - ${t}` : t;
+  const s = w(t), n = w(e);
+  return !s || !n || s.includes(n) || n.includes(s) ? t : a === "switch" && (Vt(t) || Wt(t) || t === Je(i)) ? `${e} - ${t}` : t;
 }
-function It(t) {
+function Wt(t) {
   const e = t.trim();
   return e.length <= 16 && /^[a-z0-9][a-z0-9 ._()/+-]*$/i.test(e);
 }
-function Nt(t) {
+function Vt(t) {
   return (/* @__PURE__ */ new Set([
     "power",
     "switch",
@@ -839,43 +897,63 @@ function Nt(t) {
     "הפעלה",
     "כיבוי",
     "דולק"
-  ])).has(v(t));
+  ])).has(w(t));
 }
-function Ee(t, e) {
-  const a = e.search.trim().toLowerCase();
-  return t.filter((i) => {
-    const { entity: s } = i;
-    if (e.areas.length && (!s.area || !e.areas.includes(s.area)) || e.domains.length && !e.domains.includes(s.domain) || a && ![s.entity_id, s.name, s.area, s.domain].filter(Boolean).join(" ").toLowerCase().includes(a) || e.stateMode === "active_only" && i.totalActiveMs <= 0) return !1;
+function Yt(t, e) {
+  const i = e.search.trim().toLowerCase();
+  return t.filter((a) => {
+    const { entity: s } = a;
+    if (e.areas.length && (!s.area || !e.areas.includes(s.area)) || e.domains.length && !e.domains.includes(s.domain) || i && ![
+      s.entity_id,
+      s.name,
+      s.area,
+      s.domain
+    ].filter(Boolean).join(" ").toLowerCase().includes(i) || e.stateMode === "active_only" && a.totalActiveMs <= 0)
+      return !1;
     if (e.stateMode === "currently_active") {
-      const r = Date.now();
-      if (!i.segments.some((n) => n.active && n.start.getTime() <= r && n.end.getTime() >= r - 9e4)) return !1;
+      const n = Date.now();
+      if (!a.segments.some(
+        (r) => r.active && r.start.getTime() <= n && r.end.getTime() >= n - 9e4
+      ))
+        return !1;
     }
     return !0;
   });
 }
-function Ut(t, e) {
+function Te(t, e) {
   if (e === "none" || e === "entity")
-    return [ze("all", "כל הרכיבים", t)];
-  const a = /* @__PURE__ */ new Map();
-  for (const i of t) {
-    const s = e === "area" ? i.entity.area || "ללא אזור" : i.entity.domain || "other", r = a.get(s) ?? [];
-    r.push(i), a.set(s, r);
+    return [Me("all", "כל הרכיבים", t)];
+  const i = /* @__PURE__ */ new Map();
+  for (const a of t) {
+    const s = e === "area" ? a.entity.area || "ללא אזור" : a.entity.domain || "other", n = i.get(s) ?? [];
+    n.push(a), i.set(s, n);
   }
-  return [...a.entries()].map(([i, s]) => ze(i, e === "domain" ? L[i] ?? i : i, s)).sort((i, s) => s.totalActiveMs - i.totalActiveMs || s.rows.length - i.rows.length || i.title.localeCompare(s.title, "he"));
+  return [...i.entries()].map(
+    ([a, s]) => Me(
+      a,
+      e === "domain" ? L[a] ?? a : a,
+      s
+    )
+  ).sort(
+    (a, s) => s.totalActiveMs - a.totalActiveMs || s.rows.length - a.rows.length || a.title.localeCompare(s.title, "he")
+  );
 }
-function ze(t, e, a) {
-  const i = [...a].sort(
-    (r, n) => n.totalActiveMs - r.totalActiveMs || n.eventCount - r.eventCount || +!!(n.currentCategory && n.currentCategory !== "off" && n.currentCategory !== "unknown") - +!!(r.currentCategory && r.currentCategory !== "off" && r.currentCategory !== "unknown") || r.entity.name.localeCompare(n.entity.name, "he")
-  ), s = i.reduce((r, n) => r + n.totalActiveMs, 0);
+function Me(t, e, i) {
+  const a = [...i].sort(
+    (n, r) => r.totalActiveMs - n.totalActiveMs || r.eventCount - n.eventCount || +!!(r.currentCategory && r.currentCategory !== "off" && r.currentCategory !== "unknown") - +!!(n.currentCategory && n.currentCategory !== "off" && n.currentCategory !== "unknown") || n.entity.name.localeCompare(r.entity.name, "he")
+  ), s = a.reduce(
+    (n, r) => n + r.totalActiveMs,
+    0
+  );
   return {
     id: t,
     title: e,
-    subtitle: `${i.length} רכיבים`,
-    rows: i,
+    subtitle: `${a.length} רכיבים`,
+    rows: a,
     totalActiveMs: s
   };
 }
-function Bt(t) {
+function Jt(t) {
   return JSON.stringify({
     mock: t.mock,
     start: t.start,
@@ -889,166 +967,195 @@ function Bt(t) {
     minimal: t.minimal
   });
 }
-function Re(t) {
+function He(t) {
   return t.config?.attributes?.length || t.config?.active_attributes && Object.keys(t.config.active_attributes).length ? !0 : ["climate", "humidifier", "water_heater"].includes(t.domain);
 }
-async function jt(t, e, a, i) {
-  const { withAttributes: s, withoutAttributes: r } = Ye(e), n = await Promise.all([
-    r.length ? Te(t, r, a, i, !0) : Promise.resolve({}),
-    s.length ? Te(t, s, a, i, !1) : Promise.resolve({})
+async function Xt(t, e, i, a) {
+  const { withAttributes: s, withoutAttributes: n } = et(e), r = await Promise.all([
+    n.length ? De(t, n, i, a, !0) : Promise.resolve({}),
+    s.length ? De(t, s, i, a, !1) : Promise.resolve({})
   ]);
-  return Object.assign({}, ...n);
+  return Object.assign({}, ...r);
 }
-function Ye(t) {
+function et(t) {
   return {
-    withAttributes: t.filter(Re),
-    withoutAttributes: t.filter((e) => !Re(e))
+    withAttributes: t.filter(He),
+    withoutAttributes: t.filter((e) => !He(e))
   };
 }
-async function Te(t, e, a, i, s) {
-  const r = e.map((c) => c.entity_id), n = await t.callWS({
+async function De(t, e, i, a, s) {
+  const n = e.map((o) => o.entity_id), r = await t.callWS({
     type: "history/history_during_period",
-    entity_ids: r,
-    start_time: a.start.toISOString(),
-    end_time: a.end.toISOString(),
-    minimal_response: i.minimal_response ?? !0,
-    significant_changes_only: i.significant_changes_only ?? !0,
+    entity_ids: n,
+    start_time: i.start.toISOString(),
+    end_time: i.end.toISOString(),
+    minimal_response: a.minimal_response ?? !0,
+    significant_changes_only: a.significant_changes_only ?? !0,
     no_attributes: s
   });
-  return qt(n, r);
+  return Zt(r, n);
 }
-function qt(t, e) {
-  const a = {};
+function Zt(t, e) {
+  const i = {};
   if (Array.isArray(t))
-    return t.forEach((i, s) => {
-      if (!Array.isArray(i)) return;
-      const r = e[s], n = He(i, r), c = n[0]?.entity_id ?? r;
-      c && (a[c] = n);
-    }), a;
+    return t.forEach((a, s) => {
+      if (!Array.isArray(a)) return;
+      const n = e[s], r = Pe(a, n), o = r[0]?.entity_id ?? n;
+      o && (i[o] = r);
+    }), i;
   if (t && typeof t == "object")
-    for (const [i, s] of Object.entries(t))
-      Array.isArray(s) && (a[i] = He(s, i));
-  return a;
+    for (const [a, s] of Object.entries(
+      t
+    ))
+      Array.isArray(s) && (i[a] = Pe(s, a));
+  return i;
 }
-function He(t, e) {
-  let a = e;
-  return t.map((i) => {
-    if (!i || typeof i != "object") return;
-    const s = i, r = w(s.entity_id) ?? a;
-    r && (a = r);
-    const n = w(s.last_changed) ?? w(s.lc) ?? w(s.last_updated) ?? w(s.lu), c = w(s.state) ?? w(s.s);
-    if (!r || !c || !n) return;
-    const o = Me(s.attributes) ?? Me(s.a), l = {
-      entity_id: r,
-      state: c,
-      last_changed: n
+function Pe(t, e) {
+  let i = e;
+  return t.map((a) => {
+    if (!a || typeof a != "object") return;
+    const s = a, n = k(s.entity_id) ?? i;
+    n && (i = n);
+    const r = k(s.last_changed) ?? k(s.lc) ?? k(s.last_updated) ?? k(s.lu), o = k(s.state) ?? k(s.s);
+    if (!n || !o || !r) return;
+    const c = Le(s.attributes) ?? Le(s.a), l = {
+      entity_id: n,
+      state: o,
+      last_changed: r
     };
-    o && (l.attributes = o);
-    const d = w(s.last_updated) ?? w(s.lu);
+    c && (l.attributes = c);
+    const d = k(s.last_updated) ?? k(s.lu);
     return d && (l.last_updated = d), l;
-  }).filter((i) => i !== void 0);
+  }).filter((a) => a !== void 0);
 }
-function w(t) {
+function k(t) {
   return typeof t == "string" ? t : void 0;
 }
-function Me(t) {
+function Le(t) {
   return t && typeof t == "object" && !Array.isArray(t) ? t : void 0;
 }
-function De(t, e, a, i, s = {}) {
-  return e.map((r) => {
-    const n = Kt(t[r.entity_id] ?? [], s[r.entity_id], a, r.entity_id).filter((d) => d.state != null && d.last_changed).sort((d, u) => new Date(d.last_changed).getTime() - new Date(u.last_changed).getTime()), c = Vt(n), o = Wt(c, r, a, i), l = o.filter((d) => d.active);
+function Oe(t, e, i, a, s = {}) {
+  return e.map((n) => {
+    const r = Qt(
+      t[n.entity_id] ?? [],
+      s[n.entity_id],
+      i,
+      n.entity_id
+    ).filter((d) => d.state != null && d.last_changed).sort(
+      (d, h) => new Date(d.last_changed).getTime() - new Date(h.last_changed).getTime()
+    ), o = ii(r), c = ti(o, n, i, a), l = c.filter((d) => d.active);
     return {
-      entity: r,
-      segments: o,
-      totalActiveMs: l.reduce((d, u) => d + u.durationMs, 0),
+      entity: n,
+      segments: c,
+      totalActiveMs: l.reduce(
+        (d, h) => d + h.durationMs,
+        0
+      ),
       eventCount: l.length,
-      currentState: o.at(-1)?.state,
-      currentCategory: o.at(-1)?.category
+      currentState: c.at(-1)?.state,
+      currentCategory: c.at(-1)?.category
     };
   });
 }
-function Kt(t, e, a, i) {
+function Qt(t, e, i, a) {
   const s = [...t];
   if (!e) return s;
-  const r = new Date(e.last_changed || e.last_updated).getTime(), n = Number.isFinite(r) ? Math.min(Math.max(r, a.start.getTime()), a.end.getTime()) : a.start.getTime(), c = s.filter((o) => o.entity_id === i).sort((o, l) => new Date(o.last_changed).getTime() - new Date(l.last_changed).getTime()).at(-1);
-  return (!c || new Date(c.last_changed).getTime() < n || c.state !== e.state) && s.push({
-    entity_id: i,
+  const n = new Date(
+    e.last_changed || e.last_updated
+  ).getTime(), r = Number.isFinite(n) ? Math.min(
+    Math.max(n, i.start.getTime()),
+    i.end.getTime()
+  ) : i.start.getTime(), o = s.filter((c) => c.entity_id === a).sort(
+    (c, l) => new Date(c.last_changed).getTime() - new Date(l.last_changed).getTime()
+  ).at(-1);
+  return (!o || new Date(o.last_changed).getTime() < r || o.state !== e.state) && s.push({
+    entity_id: a,
     state: e.state,
     attributes: e.attributes,
-    last_changed: new Date(n).toISOString(),
+    last_changed: new Date(r).toISOString(),
     last_updated: e.last_updated
   }), s;
 }
-function Gt(t, e, a) {
-  if (e === "unknown" || e === "unavailable") return { category: "unknown", active: !1 };
-  const i = t.domain || F(t.entity_id), r = t.config?.active_states ?? wt[i] ?? ["on"], n = t.config?.active_attributes ?? $t[i] ?? {};
-  if (i === "climate" && !t.config?.active_states) {
-    const o = a?.hvac_action;
-    if (typeof o == "string" && o.trim()) {
-      const l = n.hvac_action ?? [];
-      return { category: se(i, o), active: l.includes(o) };
+function ei(t, e, i) {
+  if (e === "unknown" || e === "unavailable")
+    return { category: "unknown", active: !1 };
+  const a = t.domain || F(t.entity_id), n = t.config?.active_states ?? Et[a] ?? ["on"], r = t.config?.active_attributes ?? zt[a] ?? {};
+  if (a === "climate" && !t.config?.active_states) {
+    const c = i?.hvac_action;
+    if (typeof c == "string" && c.trim()) {
+      const l = r.hvac_action ?? [];
+      return {
+        category: ne(a, c),
+        active: l.includes(c)
+      };
     }
   }
-  for (const [o, l] of Object.entries(n)) {
-    const d = a?.[o];
+  for (const [c, l] of Object.entries(r)) {
+    const d = i?.[c];
     if (typeof d == "string" && l.includes(d))
-      return { category: se(i, d), active: !0 };
+      return { category: ne(a, d), active: !0 };
   }
-  const c = r.includes(e);
-  return { category: se(i, e), active: c };
+  const o = n.includes(e);
+  return { category: ne(a, e), active: o };
 }
-function Wt(t, e, a, i) {
+function ti(t, e, i, a) {
   if (!t.length) return [];
-  const s = [], r = a.start.getTime(), n = a.end.getTime();
-  for (let o = 0; o < t.length; o += 1) {
-    const l = t[o];
+  const s = [], n = i.start.getTime(), r = i.end.getTime();
+  for (let c = 0; c < t.length; c += 1) {
+    const l = t[c];
     if (!l) continue;
-    const d = t[o + 1], u = new Date(l.last_changed).getTime(), h = d ? new Date(d.last_changed).getTime() : n, _ = Math.max(u, r), f = Math.min(h, n);
-    if (f <= _) continue;
-    const b = Gt(e, l.state, l.attributes), R = f - _;
+    const d = t[c + 1], h = new Date(l.last_changed).getTime(), u = d ? new Date(d.last_changed).getTime() : r, p = Math.max(h, n), f = Math.min(u, r);
+    if (f <= p) continue;
+    const y = ei(
+      e,
+      l.state,
+      l.attributes
+    ), v = f - p;
     s.push({
       entity_id: e.entity_id,
       state: l.state,
-      category: b.category,
-      active: b.active,
-      start: new Date(_),
+      category: y.category,
+      active: y.active,
+      start: new Date(p),
       end: new Date(f),
-      durationMs: R,
+      durationMs: v,
       attributes: l.attributes
     });
   }
-  return Yt(s, i.merge_gap_seconds ?? 0).filter((o) => !o.active || !i.min_duration_seconds || o.durationMs >= i.min_duration_seconds * 1e3);
+  return ai(s, a.merge_gap_seconds ?? 0).filter(
+    (c) => !c.active || !a.min_duration_seconds || c.durationMs >= a.min_duration_seconds * 1e3
+  );
 }
-function Vt(t) {
+function ii(t) {
   const e = [];
-  for (const a of t) {
-    const i = e.at(-1);
-    i && i.state === a.state && Pe(i) === Pe(a) || e.push(a);
+  for (const i of t) {
+    const a = e.at(-1);
+    a && a.state === i.state && Fe(a) === Fe(i) || e.push(i);
   }
   return e;
 }
-function Pe(t) {
-  const e = t.attributes ?? {}, a = {
+function Fe(t) {
+  const e = t.attributes ?? {}, i = {
     hvac_action: e.hvac_action,
     temperature: e.temperature,
     current_temperature: e.current_temperature,
     media_title: e.media_title
   };
-  return JSON.stringify(a);
+  return JSON.stringify(i);
 }
-function Yt(t, e) {
+function ai(t, e) {
   if (!t.length) return t;
-  const a = Math.max(0, e) * 1e3, i = [];
+  const i = Math.max(0, e) * 1e3, a = [];
   for (const s of t) {
-    const r = i.at(-1);
-    r && r.entity_id === s.entity_id && r.category === s.category && r.state === s.state && s.start.getTime() - r.end.getTime() <= a ? (r.end = s.end, r.durationMs = r.end.getTime() - r.start.getTime()) : i.push({ ...s });
+    const n = a.at(-1);
+    n && n.entity_id === s.entity_id && n.category === s.category && n.state === s.state && s.start.getTime() - n.end.getTime() <= i ? (n.end = s.end, n.durationMs = n.end.getTime() - n.start.getTime()) : a.push({ ...s });
   }
-  return i;
+  return a;
 }
-function se(t, e) {
+function ne(t, e) {
   return e === "unknown" || e === "unavailable" ? "unknown" : ["off", "closed", "idle", "paused", "standby"].includes(e) ? e === "idle" ? "idle" : "off" : ["cool", "cooling"].includes(e) ? "cooling" : ["heat", "heating"].includes(e) ? "heating" : ["playing"].includes(e) ? "playing" : ["opening", "open"].includes(e) ? "opening" : ["closing"].includes(e) ? "closing" : t === "climate" && ["drying", "fan", "fan_only", "dry"].includes(e) ? "idle" : "on";
 }
-const Je = [
+const tt = [
   {
     entity_id: "light.living_room_main",
     name: "תאורת סלון",
@@ -1068,9 +1175,24 @@ const Je = [
     domain: "climate",
     icon: "❄",
     pattern: [
-      { startHour: -21, endHour: -18, state: "cool", attributes: { hvac_action: "cooling", current_temperature: 24 } },
-      { startHour: -12, endHour: -9, state: "cool", attributes: { hvac_action: "cooling", current_temperature: 23 } },
-      { startHour: -4, endHour: -0.5, state: "cool", attributes: { hvac_action: "cooling", current_temperature: 24 } }
+      {
+        startHour: -21,
+        endHour: -18,
+        state: "cool",
+        attributes: { hvac_action: "cooling", current_temperature: 24 }
+      },
+      {
+        startHour: -12,
+        endHour: -9,
+        state: "cool",
+        attributes: { hvac_action: "cooling", current_temperature: 23 }
+      },
+      {
+        startHour: -4,
+        endHour: -0.5,
+        state: "cool",
+        attributes: { hvac_action: "cooling", current_temperature: 24 }
+      }
     ]
   },
   {
@@ -1080,9 +1202,24 @@ const Je = [
     domain: "media_player",
     icon: "♫",
     pattern: [
-      { startHour: -18, endHour: -15.5, state: "playing", attributes: { media_title: "Morning mix" } },
-      { startHour: -8, endHour: -6.5, state: "playing", attributes: { media_title: "Evening playlist" } },
-      { startHour: -2.4, endHour: -1.2, state: "playing", attributes: { media_title: "Focus" } }
+      {
+        startHour: -18,
+        endHour: -15.5,
+        state: "playing",
+        attributes: { media_title: "Morning mix" }
+      },
+      {
+        startHour: -8,
+        endHour: -6.5,
+        state: "playing",
+        attributes: { media_title: "Evening playlist" }
+      },
+      {
+        startHour: -2.4,
+        endHour: -1.2,
+        state: "playing",
+        attributes: { media_title: "Focus" }
+      }
     ]
   },
   {
@@ -1149,8 +1286,18 @@ const Je = [
     domain: "climate",
     icon: "❄",
     pattern: [
-      { startHour: -10, endHour: -6.2, state: "cool", attributes: { hvac_action: "cooling", current_temperature: 23 } },
-      { startHour: -2.5, endHour: -0.2, state: "cool", attributes: { hvac_action: "cooling", current_temperature: 23 } }
+      {
+        startHour: -10,
+        endHour: -6.2,
+        state: "cool",
+        attributes: { hvac_action: "cooling", current_temperature: 23 }
+      },
+      {
+        startHour: -2.5,
+        endHour: -0.2,
+        state: "cool",
+        attributes: { hvac_action: "cooling", current_temperature: 23 }
+      }
     ]
   },
   {
@@ -1165,8 +1312,8 @@ const Je = [
     ]
   }
 ];
-function Jt() {
-  return Je.map((t) => ({
+function si() {
+  return tt.map((t) => ({
     entity_id: t.entity_id,
     name: t.name,
     area: t.area,
@@ -1175,57 +1322,94 @@ function Jt() {
     config: { entity: t.entity_id, name: t.name, area: t.area }
   }));
 }
-function Xt(t) {
-  const e = {}, a = t.end.getTime();
-  for (const i of Je) {
+function ni(t) {
+  const e = {}, i = t.end.getTime();
+  for (const a of tt) {
     const s = [
-      re(i.entity_id, "off", t.start.getTime(), void 0)
+      re(a.entity_id, "off", t.start.getTime(), void 0)
     ];
-    for (const r of i.pattern) {
-      const n = a + r.startHour * 36e5, c = a + r.endHour * 36e5;
-      c <= t.start.getTime() || n >= t.end.getTime() || (s.push(re(i.entity_id, r.state, Math.max(n, t.start.getTime()), r.attributes)), s.push(re(i.entity_id, "off", Math.min(c, t.end.getTime()), void 0)));
+    for (const n of a.pattern) {
+      const r = i + n.startHour * 36e5, o = i + n.endHour * 36e5;
+      o <= t.start.getTime() || r >= t.end.getTime() || (s.push(
+        re(
+          a.entity_id,
+          n.state,
+          Math.max(r, t.start.getTime()),
+          n.attributes
+        )
+      ), s.push(
+        re(
+          a.entity_id,
+          "off",
+          Math.min(o, t.end.getTime()),
+          void 0
+        )
+      ));
     }
-    e[i.entity_id] = s.sort((r, n) => new Date(r.last_changed).getTime() - new Date(n.last_changed).getTime()).filter((r, n, c) => n === 0 || r.last_changed !== c[n - 1]?.last_changed);
+    e[a.entity_id] = s.sort(
+      (n, r) => new Date(n.last_changed).getTime() - new Date(r.last_changed).getTime()
+    ).filter(
+      (n, r, o) => r === 0 || n.last_changed !== o[r - 1]?.last_changed
+    );
   }
   return e;
 }
-function re(t, e, a, i) {
+function re(t, e, i, a) {
   return {
     entity_id: t,
     state: e,
-    attributes: i,
-    last_changed: new Date(a).toISOString(),
-    last_updated: new Date(a).toISOString()
+    attributes: a,
+    last_changed: new Date(i).toISOString(),
+    last_updated: new Date(i).toISOString()
   };
 }
-function Zt(t, e, a = 320, i = 220) {
+function ri(t, e, i = 320, a = 220) {
   if (e.width <= 640)
-    return { x: 12, y: Math.max(12, e.height - i - 12), placement: "bottom" };
-  const s = 16, r = t.left + t.width / 2 - a / 2, n = t.top + t.height + 12, c = Le(r, s, e.width - a - s), o = Le(n, s, e.height - i - s);
-  return { x: c, y: o, placement: "floating" };
+    return {
+      x: 12,
+      y: Math.max(12, e.height - a - 12),
+      placement: "bottom"
+    };
+  const s = 16, n = t.left + t.width / 2 - i / 2, r = t.top + t.height + 12, o = Ne(n, s, e.width - i - s), c = Ne(r, s, e.height - a - s);
+  return { x: o, y: c, placement: "floating" };
 }
-function Le(t, e, a) {
-  return a < e ? e : Math.min(a, Math.max(e, t));
+function Ne(t, e, i) {
+  return i < e ? e : Math.min(i, Math.max(e, t));
 }
-function Xe(t) {
+function it(t) {
   return !Number.isFinite(t) || !t ? 300 : Math.max(30, Math.floor(t));
 }
-function Qt(t) {
+function oi(t) {
   if (!t.hasFetchedOnce) return !0;
   if (!t.live) return !1;
-  const e = Xe(t.refreshIntervalSeconds) * 1e3;
+  const e = it(t.refreshIntervalSeconds) * 1e3;
   return t.now - t.lastHistoryFetchAt >= e;
 }
-function ei() {
-  return p`<div class="ahc-state-card"><div><h3 class="ahc-state-card__title">קורלציות</h3><p>מצב קורלציה ויומן אירועים יפותח בשלב הבא.</p></div></div>`;
+function ci() {
+  return _`<div class="ahc-state-card">
+    <div>
+      <h3 class="ahc-state-card__title">קורלציות</h3>
+      <p>מצב קורלציה ויומן אירועים יפותח בשלב הבא.</p>
+    </div>
+  </div>`;
 }
-function ti() {
-  return p`<div class="ahc-state-card"><div><h3 class="ahc-state-card__title">פירוט רכיב</h3><p>מסך Drill-down לרכיב יפותח אחרי תצוגת Swimlane.</p></div></div>`;
+function li() {
+  return _`<div class="ahc-state-card">
+    <div>
+      <h3 class="ahc-state-card__title">פירוט רכיב</h3>
+      <p>מסך Drill-down לרכיב יפותח אחרי תצוגת Swimlane.</p>
+    </div>
+  </div>`;
 }
-function ii() {
-  return p`<div class="ahc-state-card"><div><h3 class="ahc-state-card__title">Heatmap</h3><p>מצב זה יפותח אחרי ה-MVP.</p></div></div>`;
+function di() {
+  return _`<div class="ahc-state-card">
+    <div>
+      <h3 class="ahc-state-card__title">Heatmap</h3>
+      <p>מצב זה יפותח אחרי ה-MVP.</p>
+    </div>
+  </div>`;
 }
-const Ze = {
+const at = {
   light: "mdi:lightbulb",
   switch: "mdi:toggle-switch",
   climate: "mdi:air-conditioner",
@@ -1236,7 +1420,7 @@ const Ze = {
   vacuum: "mdi:robot-vacuum",
   lock: "mdi:lock",
   binary_sensor: "mdi:motion-sensor"
-}, ai = [
+}, hi = [
   [/סלון|living/i, "mdi:sofa"],
   [/מטבח|kitchen/i, "mdi:countertop"],
   [/שינה|הורים|bed/i, "mdi:bed"],
@@ -1244,52 +1428,245 @@ const Ze = {
   [/מרפסת|גינה|garden|balcony/i, "mdi:flower"],
   [/כניסה|entry|door/i, "mdi:door"]
 ];
-function si(t) {
+function ui(t) {
   if (t.icon?.startsWith("mdi:") || t.icon && !t.icon.includes(":")) return t.icon;
   const e = t.domain || F(t.entity_id);
-  return Ze[e] ?? "mdi:circle-medium";
+  return at[e] ?? "mdi:circle-medium";
 }
-function ri(t) {
+function _i(t) {
   if (t.icon?.startsWith("mdi:") || t.icon && !t.icon.includes(":")) return t.icon;
-  const e = Ze[t.id];
-  return e || (ai.find(([i]) => i.test(t.title))?.[1] ?? "mdi:home-outline");
+  const e = at[t.id];
+  return e || (hi.find(([a]) => a.test(t.title))?.[1] ?? "mdi:home-outline");
 }
-function Qe(t, e) {
-  return t.startsWith("mdi:") ? p`<ha-icon class=${e} icon=${t}></ha-icon>` : p`<span class=${e} aria-hidden="true">${t}</span>`;
+function st(t, e) {
+  return t.startsWith("mdi:") ? _`<ha-icon class=${e} icon=${t}></ha-icon>` : _`<span class=${e} aria-hidden="true">${t}</span>`;
 }
-function ni(t, e = "ahc-entity-icon") {
-  return Qe(si(t), e);
+function pi(t, e = "ahc-entity-icon") {
+  return st(ui(t), e);
 }
-function oi(t, e = "ahc-group-icon") {
-  return Qe(ri(t), e);
+function gi(t, e = "ahc-group-icon") {
+  return st(_i(t), e);
 }
-function ci(t) {
-  return t > 70 ? "ultra-dense" : t > 30 ? "dense" : "normal";
-}
-function li(t, e) {
-  const a = t.reduce((c, o) => c + o.rows.length, 0);
-  let s = Number.isFinite(e) && e && e > 0 ? Math.floor(e) : a;
-  const r = [];
-  for (const c of t) {
-    if (s <= 0) {
-      r.push({ ...c, rows: [] });
-      continue;
-    }
-    const o = c.rows.slice(0, s);
-    s -= o.length, r.push({ ...c, rows: o });
+const mi = [
+  /(^|[\s._-])extra[\s._-]?dry($|[\s._-])/i,
+  /(^|[\s._-])half[\s._-]?load($|[\s._-])/i,
+  /(^|[\s._-])silence[\s._-]?on[\s._-]?demand($|[\s._-])/i,
+  /(^|[\s._-])vario[\s._-]?speed($|[\s._-])/i,
+  /(^|[\s._-])program($|[\s._-])/i,
+  /(^|[\s._-])remote[\s._-]?start($|[\s._-])/i,
+  /(^|[\s._-])child[\s._-]?lock($|[\s._-])/i,
+  /(^|[\s._-])power[\s._-]?switch($|[\s._-])/i,
+  /(^|[\s._-])firmware($|[\s._-])/i,
+  /(^|[\s._-])update($|[\s._-])/i,
+  /(^|[\s._-])diagnostic($|[\s._-])/i,
+  /(^|[\s._-])battery($|[\s._-])/i,
+  /(^|[\s._-])signal($|[\s._-])/i,
+  /(^|[\s._-])rssi($|[\s._-])/i,
+  /(^|[\s._-])router($|[\s._-])/i,
+  /(^|[\s._-])lan($|[\s._-])/i,
+  /(^|[\s._-])wlan($|[\s._-])/i,
+  /(^|[\s._-])uptime($|[\s._-])/i,
+  /(^|[\s._-])connection($|[\s._-])/i,
+  /(^|[\s._-])cloud($|[\s._-])/i,
+  /(^|[\s._-])bridge($|[\s._-])/i,
+  /(^|[\s._-])hub($|[\s._-])/i,
+  /(^|[\s._-])option($|[\s._-])/i,
+  /(^|[\s._-])setting($|[\s._-])/i
+], fi = /* @__PURE__ */ new Set([
+  "extra dry",
+  "half load",
+  "remote start",
+  "child lock",
+  "power",
+  "program"
+]);
+function oe(t, e, i = {}) {
+  const a = i.showAll === !0, s = e.smart_filter !== !1 && !a, n = /* @__PURE__ */ new Map(), r = $i(e), o = nt(e.min_row_active_seconds) ?? x.min_row_active_seconds, c = Be(e.max_rows_per_group) ?? x.max_rows_per_group, l = Be(e.max_total_rows) ?? x.max_total_rows;
+  let d = 0;
+  const h = [], u = [];
+  for (const f of t) {
+    const y = r.has(f.entity.entity_id);
+    y && (d += 1);
+    const v = s ? vi(f, e, y, o * 1e3) : void 0;
+    v ? (u.push(f), n.set(f.entity.entity_id, v)) : h.push(f);
   }
-  const n = r.reduce((c, o) => c + o.rows.length, 0);
+  const p = s ? yi(h, u, n, {
+    groupBy: i.groupBy ?? "area",
+    manualEntityIds: r,
+    maxRowsPerGroup: c,
+    maxTotalRows: l
+  }) : { rows: h, hiddenRows: u };
   return {
-    groups: r,
-    totalRowCount: a,
-    visibleRowCount: n,
-    hiddenRowCount: Math.max(0, a - n),
-    density: ci(n)
+    rows: p.rows,
+    hiddenRows: p.hiddenRows,
+    hiddenReasons: n,
+    diagnostics: xi({
+      totalRows: t.length,
+      visibleRows: p.rows.length,
+      hiddenRows: p.hiddenRows.length,
+      hiddenReasons: n,
+      smartFilter: s,
+      showAll: a,
+      manualRowsProtected: d,
+      maxRowsPerGroup: c,
+      maxTotalRows: l
+    })
   };
 }
-function di(t) {
-  const e = li(t.groups, t.config.max_visible_rows), a = pi(t.range), i = /* @__PURE__ */ new Date(), s = J(i, t.range), r = t.config.show_now_line !== !1 && i.getTime() >= t.range.start.getTime() && i.getTime() <= t.range.end.getTime() + 9e4;
-  return p`
+function bi(t) {
+  const e = [
+    t.entity.entity_id,
+    t.entity.name,
+    t.entity.device_name,
+    t.entity.device_manufacturer,
+    t.entity.device_model,
+    ...t.entity.labels ?? []
+  ].filter(Boolean).join(" ").toLowerCase();
+  if (mi.some((a) => a.test(e)))
+    return !0;
+  const i = ki(t.entity.name);
+  return t.entity.domain === "switch" && fi.has(i);
+}
+function he(t) {
+  if (!t || t.totalRows === t.visibleRows)
+    return "";
+  const e = [];
+  return t.hiddenEmptyRows && e.push(`${t.hiddenEmptyRows} ריקות`), t.hiddenTechnicalRows && e.push(`${t.hiddenTechnicalRows} טכניות`), (t.hiddenConfigRows || t.hiddenDiagnosticRows) && e.push(
+    `${t.hiddenConfigRows + t.hiddenDiagnosticRows} אבחון/הגדרה`
+  ), t.hiddenMinDurationRows && e.push(`${t.hiddenMinDurationRows} קצרות`), t.hiddenMaxRows && e.push(`${t.hiddenMaxRows} מעבר למגבלה`), `מוצג ${t.visibleRows} מתוך ${t.totalRows}${e.length ? ` · הוסתרו ${e.join(", ")}` : ""}`;
+}
+function vi(t, e, i, a) {
+  if (!i) {
+    if (t.entity.entity_category === "config" && e.show_config_entities !== !0)
+      return "config";
+    if (t.entity.entity_category === "diagnostic" && e.show_diagnostic_entities !== !0)
+      return "diagnostic";
+    if (e.show_technical_entities !== !0 && bi(t))
+      return "technical";
+    if ((e.hide_empty_rows ?? x.hide_empty_rows) !== !1 && t.totalActiveMs <= 0)
+      return "empty";
+    if (t.totalActiveMs > 0 && t.totalActiveMs < a)
+      return "min_duration";
+  }
+}
+function yi(t, e, i, a) {
+  const s = t.filter(
+    (h) => a.manualEntityIds.has(h.entity.entity_id)
+  ), n = t.filter(
+    (h) => !a.manualEntityIds.has(h.entity.entity_id)
+  ), r = /* @__PURE__ */ new Map();
+  for (const h of ce(n)) {
+    const u = wi(h, a.groupBy), p = r.get(u) ?? [];
+    if (p.length >= a.maxRowsPerGroup) {
+      e.push(h), i.set(h.entity.entity_id, "max_rows");
+      continue;
+    }
+    p.push(h), r.set(u, p);
+  }
+  const o = [...r.values()].flat(), c = new Set(
+    s.map((h) => h.entity.entity_id)
+  ), l = [
+    ...ce(s),
+    ...ce(o)
+  ], d = [];
+  for (const h of l) {
+    if (!c.has(h.entity.entity_id) && d.length >= a.maxTotalRows) {
+      e.push(h), i.set(h.entity.entity_id, "max_rows");
+      continue;
+    }
+    d.push(h);
+  }
+  return { rows: d, hiddenRows: e };
+}
+function ce(t) {
+  return [...t].sort(
+    (e, i) => i.totalActiveMs - e.totalActiveMs || i.eventCount - e.eventCount || Number(Ie(i)) - Number(Ie(e)) || e.entity.name.localeCompare(i.entity.name, "he")
+  );
+}
+function Ie(t) {
+  const e = Date.now();
+  return t.segments.some(
+    (i) => i.active && i.start.getTime() <= e && i.end.getTime() >= e - 9e4
+  );
+}
+function wi(t, e) {
+  return e === "domain" ? t.entity.domain || "other" : e === "none" || e === "entity" ? "all" : t.entity.area || "ללא אזור";
+}
+function xi(t) {
+  const e = {};
+  for (const i of t.hiddenReasons.values())
+    e[i] = (e[i] ?? 0) + 1;
+  return {
+    totalRows: t.totalRows,
+    visibleRows: t.visibleRows,
+    hiddenRows: t.hiddenRows,
+    hiddenEmptyRows: e.empty ?? 0,
+    hiddenTechnicalRows: e.technical ?? 0,
+    hiddenConfigRows: e.config ?? 0,
+    hiddenDiagnosticRows: e.diagnostic ?? 0,
+    hiddenMinDurationRows: e.min_duration ?? 0,
+    hiddenMaxRows: e.max_rows ?? 0,
+    hiddenByReason: e,
+    smartFilter: t.smartFilter,
+    showAll: t.showAll,
+    manualRowsProtected: t.manualRowsProtected,
+    maxRowsPerGroup: t.maxRowsPerGroup,
+    maxTotalRows: t.maxTotalRows
+  };
+}
+function $i(t) {
+  return new Set(
+    (t.entities ?? []).map(
+      (e) => typeof e == "string" ? e : e.entity
+    )
+  );
+}
+function nt(t) {
+  return typeof t == "number" && Number.isFinite(t) && t > 0 ? t : void 0;
+}
+function Be(t) {
+  const e = nt(t);
+  return e ? Math.floor(e) : void 0;
+}
+function ki(t) {
+  return t.trim().toLowerCase().replace(/\s+/g, " ");
+}
+function Ai(t) {
+  return t > 70 ? "ultra-dense" : t > 30 ? "dense" : "normal";
+}
+function Si(t, e) {
+  const i = t.reduce(
+    (o, c) => o + c.rows.length,
+    0
+  );
+  let s = Number.isFinite(e) && e && e > 0 ? Math.floor(e) : i;
+  const n = [];
+  for (const o of t) {
+    if (s <= 0) {
+      n.push({ ...o, rows: [] });
+      continue;
+    }
+    const c = o.rows.slice(0, s);
+    s -= c.length, n.push({ ...o, rows: c });
+  }
+  const r = n.reduce(
+    (o, c) => o + c.rows.length,
+    0
+  );
+  return {
+    groups: n,
+    totalRowCount: i,
+    visibleRowCount: r,
+    hiddenRowCount: Math.max(0, i - r),
+    density: Ai(r)
+  };
+}
+function Ri(t) {
+  const e = Si(
+    t.groups,
+    t.config.max_visible_rows
+  ), i = zi(t.range), a = he(t.curation), s = /* @__PURE__ */ new Date(), n = X(s, t.range), r = t.config.show_now_line !== !1 && s.getTime() >= t.range.start.getTime() && s.getTime() <= t.range.end.getTime() + 9e4;
+  return _`
     <section
       class=${`ahc-timeline-card ahc-timeline-card--${e.density}`}
       aria-label="ציר זמן פעילות"
@@ -1298,36 +1675,63 @@ function di(t) {
       <div class="ahc-timeline-toolbar">
         <h3 class="ahc-timeline-title">ציר זמן פעילות</h3>
         <span class="ahc__metric-subtitle">
-          ${x(t.range.start)} – ${x(t.range.end)}
+          ${$(t.range.start)} – ${$(t.range.end)}
           ${e.hiddenRowCount ? ` · מציג ${e.visibleRowCount} מתוך ${e.totalRowCount}` : ""}
         </span>
+        ${a ? _`<span class="ahc-curation-note">${a}</span>` : null}
       </div>
       <div class="ahc-timeline-scroll">
         <div class="ahc-timeline">
           <div class="ahc-timeline__axis" aria-hidden="true">
             <div class="ahc-timeline__axis-spacer">רכיב / אזור</div>
             <div class="ahc-timeline__ticks">
-              ${a.map(
-    (n) => p`<span class="ahc-timeline__tick" style="left:${n.percent}%">${n.label}</span>`
+              ${i.map(
+    (o) => _`<span
+                    class="ahc-timeline__tick"
+                    style="left:${o.percent}%"
+                    >${o.label}</span
+                  >`
   )}
             </div>
           </div>
           <div class="ahc-timeline__groups">
-            ${e.groups.map((n) => {
-    const c = hi(n, t.config);
-    return p`
-                <details class="ahc-group" aria-label=${n.title} ?open=${!c}>
+            ${e.groups.map((o) => {
+    const c = Ci(
+      o,
+      t.config
+    );
+    return _`
+                <details
+                  class="ahc-group"
+                  aria-label=${o.title}
+                  ?open=${!c}
+                >
                   <summary class="ahc-group__header">
-                    <span class="ahc-group__title">${oi(n)}<span>${n.title}</span></span>
-                    <span class="ahc-group__meta">${M(n.totalActiveMs)} • ${n.subtitle ?? ""}</span>
+                    <span class="ahc-group__title"
+                      >${gi(o)}<span
+                        >${o.title}</span
+                      ></span
+                    >
+                    <span class="ahc-group__meta"
+                      >${E(o.totalActiveMs)} •
+                      ${o.subtitle ?? ""}</span
+                    >
                   </summary>
-                  ${n.rows.map(
-      (o) => p`
+                  ${o.rows.map(
+      (l) => _`
                       <div class="ahc-row">
                         <div class="ahc-row__label">
-                          ${ni(o.entity)}
-                          <span class="ahc-row__name" title=${t.config.debug ? o.entity.entity_id : o.entity.name}>${o.entity.name}</span>
-                          ${o.currentCategory ? p`<span class="ahc-row__state-chip" data-state=${o.currentCategory}>${O[o.currentCategory]}</span>` : null}
+                          ${pi(l.entity)}
+                          <span
+                            class="ahc-row__name"
+                            title=${t.config.debug ? l.entity.entity_id : l.entity.name}
+                            >${l.entity.name}</span
+                          >
+                          ${l.currentCategory ? _`<span
+                                class="ahc-row__state-chip"
+                                data-state=${l.currentCategory}
+                                >${O[l.currentCategory]}</span
+                              >` : null}
                         </div>
                         <div class="ahc-row__track">
                           <svg
@@ -1335,32 +1739,53 @@ function di(t) {
                             viewBox="0 0 100 32"
                             preserveAspectRatio="none"
                             role="img"
-                            aria-label=${`ציר זמן עבור ${o.entity.name}`}
+                            aria-label=${`ציר זמן עבור ${l.entity.name}`}
                           >
-                            <line class="ahc-row__svg-track" x1="1" x2="99" y1="16" y2="16"></line>
-                            ${o.segments.map((l, d) => {
-        const u = J(l.start, t.range), h = J(l.end, t.range), _ = Math.max(0.35, h - u);
-        if (!l.active && l.category !== "unknown" && l.category !== "off" && l.category !== "idle") return null;
-        const f = `${o.entity.name}, ${O[l.category]}, ${x(l.start)} עד ${x(l.end)}, ${M(l.durationMs)}`;
-        return p`
+                            <line
+                              class="ahc-row__svg-track"
+                              x1="1"
+                              x2="99"
+                              y1="16"
+                              y2="16"
+                            ></line>
+                            ${l.segments.map((d, h) => {
+        const u = X(
+          d.start,
+          t.range
+        ), p = X(
+          d.end,
+          t.range
+        ), f = Math.max(0.65, p - u);
+        if (!d.active && d.category !== "unknown" && d.category !== "off" && d.category !== "idle")
+          return null;
+        const y = `${l.entity.name}, ${O[d.category]}, ${$(d.start)} עד ${$(d.end)}, ${E(d.durationMs)}`;
+        return _`
                                 <rect
-                                  class=${l.active ? "ahc-segment-svg" : "ahc-segment-svg ahc-segment-svg--inactive"}
-                                  data-category=${l.category}
-                                  data-active=${l.active ? "true" : "false"}
+                                  class=${d.active ? "ahc-segment-svg" : "ahc-segment-svg ahc-segment-svg--inactive"}
+                                  data-category=${d.category}
+                                  data-active=${d.active ? "true" : "false"}
                                   x=${u}
-                                  y=${l.active ? "9" : "12"}
-                                  width=${_}
-                                  height=${l.active ? "14" : "8"}
-                                  rx=${l.active ? "7" : "4"}
+                                  y=${d.active ? "9" : "12"}
+                                  width=${f}
+                                  height=${d.active ? "14" : "8"}
+                                  rx=${d.active ? "7" : "4"}
                                   tabindex="0"
                                   role="button"
-                                  aria-label=${f}
-                                  @click=${(b) => t.onSegmentClick?.(b, o.entity.entity_id, d)}
-                                  @keydown=${(b) => {
-          (b.key === "Enter" || b.key === " ") && (b.preventDefault(), t.onSegmentClick?.(b, o.entity.entity_id, d));
+                                  aria-label=${y}
+                                  @click=${(v) => t.onSegmentClick?.(
+          v,
+          l.entity.entity_id,
+          h
+        )}
+                                  @keydown=${(v) => {
+          (v.key === "Enter" || v.key === " ") && (v.preventDefault(), t.onSegmentClick?.(
+            v,
+            l.entity.entity_id,
+            h
+          ));
         }}
                                 >
-                                  <title>${f}</title>
+                                  <title>${y}</title>
                                 </rect>
                               `;
       })}
@@ -1369,24 +1794,28 @@ function di(t) {
                       </div>
                     `
     )}
-                  ${n.rows.length ? null : p`<div class="ahc-group__empty">אין שורות גלויות בקבוצה הזו</div>`}
+                  ${o.rows.length ? null : _`<div class="ahc-group__empty">
+                        אין שורות גלויות בקבוצה הזו
+                      </div>`}
                 </details>
               `;
   })}
           </div>
-          ${r ? p`<div class="ahc-now-line" style="left:${s}%"><span class="ahc-now-line__label">עכשיו</span></div>` : null}
+          ${r ? _`<div class="ahc-now-line" style="left:${n}%">
+                <span class="ahc-now-line__label">עכשיו</span>
+              </div>` : null}
         </div>
       </div>
-      ${t.config.show_legend === !1 ? null : ui()}
+      ${t.config.show_legend === !1 ? null : Ei()}
     </section>
   `;
 }
-function hi(t, e) {
-  const a = new Set(e.default_collapsed_groups ?? []);
-  return a.has(t.id) || a.has(t.title) ? !0 : !!(e.collapse_groups && t.totalActiveMs <= 0);
+function Ci(t, e) {
+  const i = new Set(e.default_collapsed_groups ?? []);
+  return i.has(t.id) || i.has(t.title) ? !0 : !!(e.collapse_groups && t.totalActiveMs <= 0);
 }
-function ui() {
-  return p`<div class="ahc-legend" aria-label="מקרא">
+function Ei() {
+  return _`<div class="ahc-legend" aria-label="מקרא">
     ${[
     ["on", "var(--ahc-on)"],
     ["cooling", "var(--ahc-cooling)"],
@@ -1396,18 +1825,27 @@ function ui() {
     ["off", "var(--ahc-off)"],
     ["unknown", "var(--ahc-unknown)"]
   ].map(
-    ([e, a]) => p`<span class="ahc-legend__item"><span class="ahc-legend__swatch" style="--swatch:${a}"></span>${O[e]}</span>`
+    ([e, i]) => _`<span class="ahc-legend__item"
+          ><span class="ahc-legend__swatch" style="--swatch:${i}"></span
+          >${O[e]}</span
+        >`
   )}
   </div>`;
 }
-function pi(t) {
-  const e = Math.max(1, (t.end.getTime() - t.start.getTime()) / 36e5), a = e <= 24 ? 3 : e <= 72 ? 6 : 24, i = [], s = new Date(t.start);
+function zi(t) {
+  const e = Math.max(
+    1,
+    (t.end.getTime() - t.start.getTime()) / 36e5
+  ), i = e <= 24 ? 3 : e <= 72 ? 6 : 24, a = [], s = new Date(t.start);
   for (s.setMinutes(0, 0, 0); s < t.end; )
-    s >= t.start && i.push({ label: x(s), percent: J(s, t) }), s.setHours(s.getHours() + a);
-  return i.push({ label: x(t.end), percent: 100 }), i;
+    s >= t.start && a.push({
+      label: $(s),
+      percent: X(s, t)
+    }), s.setHours(s.getHours() + i);
+  return a.push({ label: $(t.end), percent: 100 }), a;
 }
-const _i = Ie`
-/*
+const Ti = qe`
+  /*
   Activity History Card design baseline
   Target: Home Assistant Lovelace custom card, RTL-first, mobile-first capable.
 
@@ -1417,1694 +1855,1967 @@ const _i = Ie`
   - Prefer CSS logical properties in TS/templates too.
 */
 
-:host {
-  --ahc-radius-xs: 8px;
-  --ahc-radius-sm: 12px;
-  --ahc-radius-md: 18px;
-  --ahc-radius-lg: 24px;
-  --ahc-radius-xl: 32px;
-
-  --ahc-gap-xxs: 4px;
-  --ahc-gap-xs: 8px;
-  --ahc-gap-sm: 12px;
-  --ahc-gap-md: 16px;
-  --ahc-gap-lg: 24px;
-  --ahc-gap-xl: 32px;
-
-  --ahc-font-family: var(--primary-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif);
-  --ahc-card-bg: var(--ha-card-background, var(--card-background-color, #0f172a));
-  --ahc-page-bg: var(--lovelace-background, #020617);
-  --ahc-surface-1: color-mix(in srgb, var(--ahc-card-bg) 88%, #1e3a5f 12%);
-  --ahc-surface-2: color-mix(in srgb, var(--ahc-card-bg) 80%, #2563eb 8%, #0f172a 12%);
-  --ahc-surface-3: color-mix(in srgb, var(--ahc-card-bg) 72%, #38bdf8 7%, #0f172a 21%);
-  --ahc-border: color-mix(in srgb, var(--divider-color, #334155) 76%, #60a5fa 24%);
-  --ahc-border-soft: color-mix(in srgb, var(--divider-color, #334155) 55%, transparent 45%);
-  --ahc-shadow: 0 18px 60px rgba(0, 0, 0, 0.32);
-  --ahc-shadow-soft: 0 8px 26px rgba(0, 0, 0, 0.22);
-
-  --ahc-text: var(--primary-text-color, #f8fafc);
-  --ahc-muted: var(--secondary-text-color, #94a3b8);
-  --ahc-disabled: var(--disabled-text-color, #64748b);
-  --ahc-accent: var(--primary-color, #38bdf8);
-  --ahc-accent-strong: #0ea5e9;
-  --ahc-accent-soft: rgba(56, 189, 248, 0.16);
-  --ahc-focus: #93c5fd;
-
-  --ahc-on: var(--success-color, #22c55e);
-  --ahc-off: #64748b;
-  --ahc-cooling: #38bdf8;
-  --ahc-heating: #fb923c;
-  --ahc-playing: #a78bfa;
-  --ahc-opening: #facc15;
-  --ahc-closing: #cbd5e1;
-  --ahc-idle: #14b8a6;
-  --ahc-unknown: #94a3b8;
-
-  --ahc-track: rgba(148, 163, 184, 0.12);
-  --ahc-grid-line: rgba(148, 163, 184, 0.16);
-  --ahc-row-hover: rgba(56, 189, 248, 0.08);
-  --ahc-now: #60a5fa;
-  --ahc-label-width: clamp(280px, 17vw, 340px);
-
-  --ahc-chip-height: 40px;
-  --ahc-touch-target: 44px;
-  --ahc-mobile-breakpoint: 760px;
-
-  display: block;
-  font-family: var(--ahc-font-family);
-}
-
-:host([hidden]) {
-  display: none;
-}
-
-/* Root */
-.ahc {
-  direction: rtl;
-  box-sizing: border-box;
-  position: relative;
-  display: grid;
-  gap: var(--ahc-gap-sm);
-  padding: clamp(14px, 1.6vw, 22px);
-  color: var(--ahc-text);
-  background:
-    radial-gradient(circle at 92% 0%, rgba(14, 165, 233, 0.22), transparent 34%),
-    radial-gradient(circle at 4% 12%, rgba(124, 58, 237, 0.14), transparent 28%),
-    linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.90));
-  border: 1px solid var(--ahc-border);
-  border-radius: var(--ahc-radius-lg);
-  box-shadow: var(--ahc-shadow-soft);
-  overflow: hidden;
-  isolation: isolate;
-}
-
-.ahc *,
-.ahc *::before,
-.ahc *::after {
-  box-sizing: border-box;
-}
-
-.ahc[dir="ltr"] {
-  direction: ltr;
-}
-
-.ahc::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(90deg, rgba(255,255,255,0.035), transparent 18%, transparent 82%, rgba(255,255,255,0.025)),
-    linear-gradient(180deg, rgba(255,255,255,0.055), transparent 18%);
-  z-index: -1;
-}
-
-.ahc--panel {
-  min-height: min(100svh, 920px);
-  inline-size: 100%;
-}
-
-.ahc--fullscreen {
-  position: fixed;
-  inset: 0;
-  z-index: 2147483640;
-  min-height: 100svh;
-  border-radius: 0;
-  padding:
-    max(var(--ahc-gap-lg), env(safe-area-inset-top))
-    max(var(--ahc-gap-lg), env(safe-area-inset-right))
-    max(var(--ahc-gap-lg), env(safe-area-inset-bottom))
-    max(var(--ahc-gap-lg), env(safe-area-inset-left));
-  background: linear-gradient(145deg, #020617, #0f172a 45%, #0b1221);
-}
-
-/* Top bar */
-.ahc__topbar {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--ahc-gap-md);
-  align-items: start;
-  padding: 12px 14px;
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  border-radius: var(--ahc-radius-md);
-  background:
-    linear-gradient(90deg, rgba(15, 23, 42, 0.28), rgba(30, 64, 175, 0.10)),
-    rgba(2, 6, 23, 0.14);
-}
-
-.ahc__title-block {
-  display: grid;
-  grid-auto-flow: row;
-  gap: var(--ahc-gap-xs);
-  justify-items: end;
-  text-align: end;
-}
-
-.ahc__title-row {
-  display: inline-flex;
-  flex-direction: row-reverse;
-  align-items: center;
-  gap: var(--ahc-gap-sm);
-}
-
-.ahc__icon-badge {
-  display: inline-grid;
-  place-items: center;
-  min-inline-size: 48px;
-  min-block-size: 48px;
-  border-radius: var(--ahc-radius-md);
-  background: linear-gradient(180deg, rgba(56, 189, 248, 0.24), rgba(37, 99, 235, 0.20));
-  border: 1px solid rgba(56, 189, 248, 0.42);
-  color: var(--ahc-accent);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.11), 0 10px 28px rgba(14, 165, 233, 0.10);
-}
-
-.ahc__icon-badge ha-icon {
-  inline-size: 26px;
-  block-size: 26px;
-}
-
-.ahc__title {
-  margin: 0;
-  color: var(--ahc-text);
-  font-size: 1.75rem;
-  line-height: 1.15;
-  font-weight: 800;
-  letter-spacing: 0;
-}
-
-.ahc__subtitle {
-  margin: 0;
-  color: var(--ahc-muted);
-  font-size: 0.92rem;
-  line-height: 1.45;
-}
-
-.ahc-last-event {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  max-inline-size: min(560px, 100%);
-  min-block-size: 34px;
-  padding-block: 4px;
-  padding-inline: 10px;
-  border: 1px solid rgba(56, 189, 248, 0.22);
-  border-radius: 999px;
-  background: rgba(2, 6, 23, 0.24);
-  color: var(--ahc-muted);
-  font-size: 0.78rem;
-}
-
-.ahc-last-event strong,
-.ahc-last-event__label {
-  color: var(--ahc-text);
-  font-weight: 850;
-}
-
-.ahc__toolbar {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: flex-start;
-  gap: var(--ahc-gap-sm);
-  min-inline-size: min(460px, 100%);
-}
-
-.ahc__search {
-  position: relative;
-  inline-size: min(320px, 100%);
-}
-
-.ahc__search-input {
-  inline-size: 100%;
-  min-block-size: var(--ahc-touch-target);
-  border-radius: var(--ahc-radius-sm);
-  border: 1px solid var(--ahc-border-soft);
-  background: rgba(2, 6, 23, 0.42);
-  color: var(--ahc-text);
-  padding-block: 0;
-  padding-inline: 44px 16px;
-  outline: none;
-  text-align: start;
-  font: inherit;
-}
-
-.ahc__search-input::placeholder {
-  color: color-mix(in srgb, var(--ahc-muted) 82%, transparent 18%);
-}
-
-.ahc__search-icon {
-  position: absolute;
-  inset-block-start: 50%;
-  inset-inline-start: 14px;
-  transform: translateY(-50%);
-  color: var(--ahc-muted);
-  pointer-events: none;
-}
-
-.ahc[dir="rtl"] .ahc__search-input {
-  padding-inline: 16px 44px;
-}
-
-.ahc[dir="rtl"] .ahc__search-icon {
-  inset-inline-start: auto;
-  inset-inline-end: 14px;
-}
-
-/* Buttons and chips */
-.ahc__button,
-.ahc__chip,
-.ahc__segmented-button {
-  appearance: none;
-  min-block-size: var(--ahc-chip-height);
-  min-inline-size: var(--ahc-touch-target);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border: 1px solid var(--ahc-border-soft);
-  border-radius: var(--ahc-radius-sm);
-  background: rgba(15, 23, 42, 0.58);
-  color: var(--ahc-muted);
-  font: inherit;
-  font-size: 0.92rem;
-  line-height: 1;
-  padding-block: 0;
-  padding-inline: 16px;
-  cursor: pointer;
-  user-select: none;
-  transition: background 160ms ease, color 160ms ease, border-color 160ms ease, transform 160ms ease;
-}
-
-.ahc__button:hover,
-.ahc__chip:hover,
-.ahc__segmented-button:hover {
-  color: var(--ahc-text);
-  border-color: color-mix(in srgb, var(--ahc-accent) 46%, var(--ahc-border-soft));
-  background: rgba(30, 41, 59, 0.72);
-}
-
-.ahc__button:focus-visible,
-.ahc__chip:focus-visible,
-.ahc__segmented-button:focus-visible,
-.ahc__search-input:focus-visible,
-.ahc__row-action:focus-visible,
-.ahc-filter-option:focus-visible {
-  outline: 2px solid var(--ahc-focus);
-  outline-offset: 2px;
-}
-
-.ahc__chip[aria-pressed="true"],
-.ahc__segmented-button[aria-pressed="true"],
-.ahc__chip--active,
-.ahc__button--primary {
-  color: #e0f2fe;
-  border-color: rgba(56, 189, 248, 0.75);
-  background: linear-gradient(180deg, rgba(14, 165, 233, 0.30), rgba(37, 99, 235, 0.18));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 8px 22px rgba(14, 165, 233, 0.10);
-}
-
-.ahc__button--ghost {
-  background: rgba(2, 6, 23, 0.34);
-}
-
-.ahc__button:disabled {
-  cursor: progress;
-  opacity: 0.58;
-}
-
-.ahc__refresh-indicator {
-  display: inline-flex;
-  align-items: center;
-  min-block-size: var(--ahc-chip-height);
-  padding-inline: 12px;
-  border: 1px solid rgba(56, 189, 248, 0.24);
-  border-radius: var(--ahc-radius-sm);
-  background: rgba(14, 165, 233, 0.10);
-  color: #bae6fd;
-  font-size: 0.82rem;
-}
-
-.ahc__button-icon {
-  inline-size: 20px;
-  block-size: 20px;
-  flex: 0 0 auto;
-}
-
-.ahc__segmented {
-  display: inline-flex;
-  border: 1px solid var(--ahc-border-soft);
-  border-radius: var(--ahc-radius-sm);
-  overflow: hidden;
-  background: rgba(2, 6, 23, 0.30);
-}
-
-.ahc__segmented-button {
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  min-inline-size: 84px;
-}
-
-.ahc__segmented-button + .ahc__segmented-button {
-  border-inline-start: 1px solid var(--ahc-border-soft);
-}
-
-/* Filters */
-.ahc__filters {
-  display: flex;
-  align-items: center;
-  gap: var(--ahc-gap-xs);
-  padding: 10px;
-  border: 1px solid var(--ahc-border-soft);
-  border-radius: var(--ahc-radius-md);
-  background: rgba(15, 23, 42, 0.38);
-  overflow: hidden;
-}
-
-.ahc__filter-row {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  flex-wrap: nowrap;
-  gap: var(--ahc-gap-xs);
-  min-inline-size: 0;
-  inline-size: 100%;
-}
-
-.ahc__filter-row--compact {
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.ahc__filter-row--compact::-webkit-scrollbar {
-  display: none;
-}
-
-.ahc__filter-row--compact > * {
-  flex: 0 0 auto;
-}
-
-.ahc__filter-label {
-  color: var(--ahc-muted);
-  font-size: 0.82rem;
-  font-weight: 700;
-  margin-inline-end: 2px;
-}
-
-/* Summary */
-.ahc__summary-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0;
-  overflow: hidden;
-  border: 1px solid var(--ahc-border-soft);
-  border-radius: var(--ahc-radius-md);
-  background:
-    linear-gradient(180deg, rgba(30, 41, 59, 0.50), rgba(15, 23, 42, 0.54)),
-    rgba(2, 6, 23, 0.20);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.045);
-}
-
-.ahc__metric {
-  min-block-size: 88px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--ahc-gap-sm);
-  padding: 12px 16px;
-  border: 0;
-  border-inline-start: 1px solid rgba(148, 163, 184, 0.13);
-  background: transparent;
-  box-shadow: none;
-}
-
-.ahc__metric:first-child {
-  border-inline-start: 0;
-}
-
-.ahc__metric-copy {
-  min-inline-size: 0;
-  text-align: end;
-}
-
-.ahc__metric-label {
-  display: block;
-  color: var(--ahc-muted);
-  font-size: 0.82rem;
-  font-weight: 700;
-  margin-block-end: 4px;
-}
-
-.ahc__metric-value {
-  display: block;
-  color: var(--ahc-text);
-  font-size: 1.95rem;
-  line-height: 1.05;
-  font-weight: 850;
-  letter-spacing: 0;
-}
-
-.ahc__metric-value--compact {
-  font-size: 1.12rem;
-  line-height: 1.2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.ahc__metric-value--positive {
-  color: var(--ahc-on);
-}
-
-.ahc__metric-subtitle {
-  display: block;
-  color: var(--ahc-muted);
-  font-size: 0.78rem;
-  line-height: 1.35;
-  margin-block-start: 6px;
-}
-
-.ahc__metric-icon {
-  display: inline-grid;
-  place-items: center;
-  inline-size: 46px;
-  block-size: 46px;
-  border-radius: 14px;
-  border: 1px solid var(--ahc-border-soft);
-  background: rgba(2, 6, 23, 0.22);
-  color: var(--ahc-accent);
-}
-
-/* Layout body */
-.ahc__body {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(250px, 300px);
-  gap: var(--ahc-gap-md);
-  align-items: start;
-  max-inline-size: 1920px;
-}
-
-.ahc__body--no-insights {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.ahc__main {
-  min-inline-size: 0;
-  display: grid;
-  gap: var(--ahc-gap-md);
-}
-
-.ahc__insights {
-  display: grid;
-  gap: var(--ahc-gap-sm);
-  align-content: start;
-  padding: var(--ahc-gap-sm);
-  border: 1px solid var(--ahc-border-soft);
-  border-radius: var(--ahc-radius-md);
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.50), rgba(15, 23, 42, 0.52));
-}
-
-.ahc__insights-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ahc-gap-sm);
-  margin: 0 0 var(--ahc-gap-xs);
-  color: var(--ahc-text);
-  font-size: 1.05rem;
-  font-weight: 800;
-}
-
-.ahc__insight-card {
-  padding: 12px;
-  border: 1px solid var(--ahc-border-soft);
-  border-radius: var(--ahc-radius-md);
-  background: rgba(15, 23, 42, 0.52);
-}
-
-.ahc__insight-kicker {
-  display: block;
-  color: var(--ahc-muted);
-  font-size: 0.78rem;
-  font-weight: 700;
-  margin-block-end: 8px;
-}
-
-.ahc__insight-value {
-  display: block;
-  color: var(--ahc-text);
-  font-size: 1.12rem;
-  font-weight: 850;
-  overflow-wrap: anywhere;
-}
-
-.ahc__insight-subtitle {
-  display: block;
-  color: var(--ahc-muted);
-  font-size: 0.78rem;
-  margin-block-start: 6px;
-}
-
-.ahc__spark {
-  display: flex;
-  align-items: end;
-  gap: 5px;
-  block-size: 34px;
-  margin-block-start: 10px;
-}
-
-.ahc__spark i {
-  inline-size: 8px;
-  block-size: var(--bar, 20%);
-  min-block-size: 4px;
-  border-radius: 999px 999px 2px 2px;
-  background: linear-gradient(180deg, var(--ahc-accent), rgba(37, 99, 235, 0.38));
-}
-
-/* Timeline */
-.ahc-timeline-card {
-  min-inline-size: 0;
-  min-block-size: 420px;
-  border: 1px solid var(--ahc-border-soft);
-  border-radius: var(--ahc-radius-md);
-  background:
-    linear-gradient(180deg, rgba(30, 41, 59, 0.42), rgba(2, 6, 23, 0.30)),
-    radial-gradient(circle at 88% 12%, rgba(56, 189, 248, 0.10), transparent 32%);
-  overflow: hidden;
-}
-
-.ahc-timeline-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ahc-gap-sm);
-  min-block-size: 58px;
-  padding: 12px 16px;
-  border-block-end: 1px solid var(--ahc-border-soft);
-  background: rgba(15, 23, 42, 0.40);
-}
-
-.ahc-timeline-title {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--ahc-text);
-}
-
-.ahc-timeline-scroll {
-  inline-size: 100%;
-  max-block-size: var(--ahc-timeline-height, min(62svh, 680px));
-  overflow: auto;
-  overscroll-behavior-inline: contain;
-  scrollbar-color: rgba(56, 189, 248, 0.42) rgba(15, 23, 42, 0.30);
-}
-
-.ahc-timeline {
-  direction: ltr;
-  position: relative;
-  min-inline-size: 1040px;
-  padding: 0;
-}
-
-.ahc-timeline__axis {
-  position: sticky;
-  inset-block-start: 0;
-  z-index: 3;
-  display: grid;
-  grid-template-columns: var(--ahc-label-width) minmax(0, 1fr);
-  min-block-size: 48px;
-  background: rgba(15, 23, 42, 0.92);
-  backdrop-filter: blur(14px);
-  border-block-end: 1px solid var(--ahc-border-soft);
-}
-
-.ahc-timeline__axis-spacer {
-  position: sticky;
-  inset-inline-start: 0;
-  z-index: 4;
-  direction: rtl;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding-inline: var(--ahc-gap-md);
-  color: var(--ahc-muted);
-  font-size: 0.8rem;
-}
-
-.ahc-timeline__ticks {
-  position: relative;
-  min-block-size: 44px;
-}
-
-.ahc-timeline__tick {
-  position: absolute;
-  inset-block: 0;
-  transform: translateX(-50%);
-  color: var(--ahc-muted);
-  font-size: 0.78rem;
-  display: grid;
-  place-items: center;
-  min-inline-size: 48px;
-}
-
-.ahc-timeline__tick::after {
-  content: "";
-  position: absolute;
-  inset-block-end: 0;
-  inline-size: 1px;
-  block-size: 12px;
-  background: var(--ahc-grid-line);
-}
-
-.ahc-group {
-  direction: rtl;
-  margin: 10px;
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: var(--ahc-radius-sm);
-  background: rgba(15, 23, 42, 0.30);
-  overflow: clip;
-}
-
-.ahc-group:nth-child(even) {
-  background: rgba(15, 23, 42, 0.36);
-}
-
-.ahc-group__header {
-  position: sticky;
-  inset-inline-start: 0;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ahc-gap-sm);
-  min-block-size: 54px;
-  padding-block: 0;
-  padding-inline: var(--ahc-gap-md);
-  background:
-    linear-gradient(90deg, rgba(15, 23, 42, 0.82), rgba(30, 41, 59, 0.72)),
-    rgba(2, 6, 23, 0.34);
-  cursor: pointer;
-  list-style: none;
-}
-
-.ahc-group__header::-webkit-details-marker {
-  display: none;
-}
-
-.ahc-group__empty {
-  direction: rtl;
-  padding: var(--ahc-gap-md);
-  color: var(--ahc-muted);
-  font-size: 0.82rem;
-}
-
-.ahc-group__title {
-  display: flex;
-  align-items: center;
-  gap: var(--ahc-gap-xs);
-  color: var(--ahc-text);
-  font-weight: 850;
-}
-
-.ahc-group__meta {
-  color: var(--ahc-muted);
-  font-size: 0.78rem;
-}
-
-.ahc-row {
-  direction: ltr;
-  display: grid;
-  grid-template-columns: var(--ahc-label-width) minmax(0, 1fr);
-  min-block-size: 42px;
-  border-block-start: 1px solid rgba(148, 163, 184, 0.09);
-}
-
-.ahc-row:hover {
-  background: var(--ahc-row-hover);
-}
-
-.ahc-row__label {
-  position: sticky;
-  inset-inline-start: 0;
-  z-index: 2;
-  direction: rtl;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--ahc-gap-xs);
-  padding-inline: 14px 12px;
-  border-inline-end: 1px solid rgba(148, 163, 184, 0.12);
-  background: rgba(4, 10, 24, 0.82);
-  backdrop-filter: blur(10px);
-  min-inline-size: 0;
-}
-
-.ahc-entity-icon,
-.ahc-group-icon {
-  display: inline-grid;
-  place-items: center;
-  inline-size: 22px;
-  block-size: 22px;
-  color: var(--ahc-accent);
-  flex: 0 0 auto;
-}
-
-ha-icon.ahc-entity-icon,
-ha-icon.ahc-group-icon {
-  inline-size: 22px;
-  block-size: 22px;
-}
-
-.ahc-group-icon {
-  color: #7dd3fc;
-}
-
-.ahc-row__name {
-  min-inline-size: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--ahc-text);
-  font-weight: 700;
-  font-size: 0.86rem;
-}
-
-.ahc-row__state-chip {
-  justify-self: end;
-  border-radius: 999px;
-  padding-block: 3px;
-  padding-inline: 8px;
-  color: var(--ahc-text);
-  font-size: 0.72rem;
-  font-weight: 800;
-  background: rgba(148, 163, 184, 0.14);
-  border: 1px solid rgba(148, 163, 184, 0.18);
-}
-
-.ahc-row__state-chip[data-state="on"] { color: #bbf7d0; background: rgba(34,197,94,0.16); border-color: rgba(34,197,94,0.28); }
-.ahc-row__state-chip[data-state="cooling"] { color: #bae6fd; background: rgba(56,189,248,0.14); border-color: rgba(56,189,248,0.30); }
-.ahc-row__state-chip[data-state="heating"] { color: #fed7aa; background: rgba(251,146,60,0.16); border-color: rgba(251,146,60,0.30); }
-.ahc-row__state-chip[data-state="playing"] { color: #ddd6fe; background: rgba(167,139,250,0.16); border-color: rgba(167,139,250,0.30); }
-
-.ahc-row__track {
-  direction: ltr;
-  position: relative;
-  min-inline-size: 0;
-  min-block-size: 42px;
-  background-image: linear-gradient(to right, var(--ahc-grid-line) 1px, transparent 1px);
-  background-size: calc(100% / 8) 100%;
-}
-
-.ahc-row__svg {
-  position: absolute;
-  inset: 0;
-  inline-size: 100%;
-  block-size: 100%;
-  overflow: visible;
-}
-
-.ahc-row__svg-track {
-  stroke: rgba(148, 163, 184, 0.13);
-  stroke-width: 6;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-}
-
-.ahc-segment-svg {
-  cursor: pointer;
-  stroke: rgba(255,255,255,0.20);
-  stroke-width: 0.8;
-  vector-effect: non-scaling-stroke;
-  filter: drop-shadow(0 3px 7px rgba(0,0,0,0.22));
-}
-
-.ahc-segment-svg--inactive {
-  cursor: pointer;
-  opacity: 0.52;
-  stroke: rgba(255,255,255,0.10);
-  filter: none;
-}
-
-.ahc-segment-svg[data-active="true"] {
-  opacity: 0.96;
-}
-
-.ahc-segment-svg:focus-visible {
-  outline: 2px solid var(--ahc-focus);
-  outline-offset: 3px;
-}
-
-.ahc-segment-svg[data-category="on"] { fill: var(--ahc-on); }
-.ahc-segment-svg[data-category="off"] { fill: color-mix(in srgb, var(--ahc-off) 72%, #dbeafe 28%); }
-.ahc-segment-svg[data-category="cooling"] { fill: var(--ahc-cooling); }
-.ahc-segment-svg[data-category="heating"] { fill: var(--ahc-heating); }
-.ahc-segment-svg[data-category="playing"] { fill: var(--ahc-playing); }
-.ahc-segment-svg[data-category="opening"] { fill: var(--ahc-opening); }
-.ahc-segment-svg[data-category="closing"] { fill: var(--ahc-closing); }
-.ahc-segment-svg[data-category="idle"] { fill: color-mix(in srgb, var(--ahc-idle) 62%, #64748b 38%); }
-.ahc-segment-svg[data-category="unknown"] { fill: var(--ahc-unknown); stroke-dasharray: 3 2; }
-
-.ahc-row__track::before {
-  content: "";
-  position: absolute;
-  inset-inline: 14px;
-  inset-block-start: 50%;
-  block-size: 4px;
-  transform: translateY(-50%);
-  border-radius: 999px;
-  background: rgba(148, 163, 184, 0.10);
-}
-
-.ahc-segment {
-  position: absolute;
-  inset-block-start: 50%;
-  block-size: 12px;
-  transform: translateY(-50%);
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 6px 16px rgba(0,0,0,0.18);
-  cursor: pointer;
-}
-
-.ahc-segment:focus-visible {
-  outline: 2px solid var(--ahc-focus);
-  outline-offset: 3px;
-}
-
-.ahc-segment[data-category="on"] { background: linear-gradient(90deg, var(--ahc-on), color-mix(in srgb, var(--ahc-on) 72%, #0f172a)); }
-.ahc-segment[data-category="off"] { background: linear-gradient(90deg, var(--ahc-off), color-mix(in srgb, var(--ahc-off) 72%, #0f172a)); }
-.ahc-segment[data-category="cooling"] { background: linear-gradient(90deg, var(--ahc-cooling), color-mix(in srgb, var(--ahc-cooling) 70%, #1d4ed8)); }
-.ahc-segment[data-category="heating"] { background: linear-gradient(90deg, var(--ahc-heating), color-mix(in srgb, var(--ahc-heating) 70%, #7c2d12)); }
-.ahc-segment[data-category="playing"] { background: linear-gradient(90deg, var(--ahc-playing), color-mix(in srgb, var(--ahc-playing) 68%, #312e81)); }
-.ahc-segment[data-category="opening"] { background: linear-gradient(90deg, var(--ahc-opening), color-mix(in srgb, var(--ahc-opening) 70%, #713f12)); }
-.ahc-segment[data-category="closing"] { background: linear-gradient(90deg, var(--ahc-closing), color-mix(in srgb, var(--ahc-closing) 70%, #334155)); }
-.ahc-segment[data-category="idle"] { background: linear-gradient(90deg, var(--ahc-idle), color-mix(in srgb, var(--ahc-idle) 70%, #0f766e)); }
-.ahc-segment[data-category="unknown"] { background: repeating-linear-gradient(90deg, var(--ahc-unknown), var(--ahc-unknown) 6px, transparent 6px, transparent 10px); }
-
-.ahc-now-line {
-  position: absolute;
-  inset-block: 0;
-  inline-size: 1px;
-  background: linear-gradient(180deg, transparent, var(--ahc-now) 12%, var(--ahc-now) 88%, transparent);
-  box-shadow: 0 0 0 1px rgba(96,165,250,0.14), 0 0 18px rgba(96,165,250,0.30);
-  pointer-events: none;
-  z-index: 4;
-}
-
-.ahc-now-line__label {
-  position: absolute;
-  inset-block-start: 8px;
-  transform: translateX(-50%);
-  padding-block: 2px;
-  padding-inline: 8px;
-  border-radius: 999px;
-  background: rgba(37, 99, 235, 0.62);
-  color: #dbeafe;
-  font-size: 0.72rem;
-  font-weight: 800;
-  white-space: nowrap;
-}
-
-/* Legend */
-.ahc-legend {
-  direction: rtl;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--ahc-gap-md);
-  flex-wrap: wrap;
-  padding: var(--ahc-gap-md);
-  color: var(--ahc-muted);
-  font-size: 0.82rem;
-}
-
-.ahc-legend__item {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-}
-
-.ahc-legend__swatch {
-  inline-size: 24px;
-  block-size: 8px;
-  border-radius: 999px;
-  background: var(--swatch, var(--ahc-accent));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.14);
-}
-
-/* Tooltip / popover */
-.ahc-popover {
-  direction: rtl;
-  position: fixed;
-  inset-inline-start: var(--ahc-popover-x, 16px);
-  inset-block-start: var(--ahc-popover-y, 16px);
-  z-index: 2147483641;
-  max-inline-size: min(320px, calc(100vw - 32px));
-  padding: var(--ahc-gap-md);
-  border: 1px solid var(--ahc-border);
-  border-radius: var(--ahc-radius-md);
-  background: rgba(15, 23, 42, 0.96);
-  color: var(--ahc-text);
-  box-shadow: var(--ahc-shadow);
-  backdrop-filter: blur(18px);
-}
-
-.ahc-popover__close {
-  appearance: none;
-  position: absolute;
-  inset-block-start: 8px;
-  inset-inline-end: 8px;
-  inline-size: 30px;
-  block-size: 30px;
-  border: 1px solid var(--ahc-border-soft);
-  border-radius: 999px;
-  background: rgba(2, 6, 23, 0.32);
-  color: var(--ahc-text);
-  cursor: pointer;
-}
-
-.ahc-popover__title {
-  margin: 0 0 var(--ahc-gap-xs);
-  font-size: 1rem;
-  font-weight: 850;
-}
-
-.ahc-popover__dl {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 6px 14px;
-  margin: 0;
-  font-size: 0.86rem;
-}
-
-.ahc-popover__dt {
-  color: var(--ahc-muted);
-}
-
-.ahc-popover__dd {
-  margin: 0;
-  color: var(--ahc-text);
-  text-align: end;
-}
-
-/* Mobile filter sheet */
-.ahc-filter-sheet-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 2147483638;
-  background: rgba(2, 6, 23, 0.62);
-  backdrop-filter: blur(4px);
-}
-
-.ahc-filter-sheet {
-  direction: rtl;
-  position: fixed;
-  inset-inline: max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-right));
-  inset-block-end: 0;
-  z-index: 2147483639;
-  inline-size: min(720px, calc(100vw - 24px));
-  margin-inline: auto;
-  max-block-size: min(88svh, 900px);
-  overflow: auto;
-  padding:
-    var(--ahc-gap-lg)
-    max(var(--ahc-gap-lg), env(safe-area-inset-right))
-    max(var(--ahc-gap-lg), env(safe-area-inset-bottom))
-    max(var(--ahc-gap-lg), env(safe-area-inset-left));
-  border-start-start-radius: var(--ahc-radius-xl);
-  border-start-end-radius: var(--ahc-radius-xl);
-  border: 1px solid var(--ahc-border);
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.98));
-  color: var(--ahc-text);
-  box-shadow: 0 -24px 80px rgba(0,0,0,0.46);
-}
-
-.ahc-filter-sheet__handle {
-  inline-size: 72px;
-  block-size: 5px;
-  margin-inline: auto;
-  margin-block-end: var(--ahc-gap-md);
-  border-radius: 999px;
-  background: rgba(148, 163, 184, 0.50);
-}
-
-.ahc-filter-sheet__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ahc-gap-sm);
-  margin-block-end: var(--ahc-gap-md);
-}
-
-.ahc-filter-sheet__title {
-  margin: 0;
-  font-size: 1.35rem;
-  font-weight: 850;
-}
-
-.ahc-filter-section {
-  display: grid;
-  gap: var(--ahc-gap-sm);
-  padding: var(--ahc-gap-md);
-  border: 1px solid var(--ahc-border-soft);
-  border-radius: var(--ahc-radius-md);
-  background: rgba(30, 41, 59, 0.34);
-  margin-block-end: var(--ahc-gap-md);
-}
-
-.ahc-filter-section__chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ahc-gap-xs);
-}
-
-.ahc-filter-section__title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ahc-gap-sm);
-  color: var(--ahc-text);
-  font-weight: 850;
-}
-
-.ahc-filter-option {
-  appearance: none;
-  display: grid;
-  gap: 4px;
-  min-block-size: 64px;
-  padding-block: 10px;
-  padding-inline: 16px;
-  border: 1px solid var(--ahc-border-soft);
-  border-radius: var(--ahc-radius-sm);
-  background: rgba(15, 23, 42, 0.46);
-  color: var(--ahc-text);
-  text-align: start;
-  font: inherit;
-  cursor: pointer;
-}
-
-.ahc-filter-option small {
-  color: var(--ahc-muted);
-  font-size: 0.78rem;
-}
-
-.ahc-filter-option[aria-pressed="true"] {
-  border-color: rgba(56, 189, 248, 0.75);
-  background: linear-gradient(180deg, rgba(14, 165, 233, 0.24), rgba(37, 99, 235, 0.16));
-}
-
-.ahc__search--sheet {
-  inline-size: 100%;
-}
-
-.ahc-filter-sheet__footer {
-  position: sticky;
-  inset-block-end: 0;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
-  gap: var(--ahc-gap-sm);
-  padding-block-start: var(--ahc-gap-md);
-  background: linear-gradient(180deg, transparent, rgba(2,6,23,0.95) 22%);
-}
-
-/* Empty/loading/error */
-.ahc-loading {
-  display: grid;
-  gap: var(--ahc-gap-lg);
-  min-block-size: 420px;
-  padding: var(--ahc-gap-lg);
-  border: 1px solid var(--ahc-border-soft);
-  border-radius: var(--ahc-radius-md);
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.64), rgba(2, 6, 23, 0.34));
-}
-
-.ahc-loading__copy {
-  text-align: center;
-}
-
-.ahc-loading__copy h3 {
-  margin: 0 0 var(--ahc-gap-xs);
-  color: var(--ahc-text);
-}
-
-.ahc-loading__copy p {
-  margin: 0;
-  color: var(--ahc-muted);
-}
-
-.ahc-loading__timeline {
-  direction: ltr;
-  display: grid;
-  gap: var(--ahc-gap-md);
-}
-
-.ahc-loading__group {
-  display: grid;
-  gap: 10px;
-  padding: var(--ahc-gap-md);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: var(--ahc-radius-sm);
-  background: rgba(15, 23, 42, 0.34);
-}
-
-.ahc-loading__group span,
-.ahc-loading__group i {
-  display: block;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(148, 163, 184, 0.12), rgba(56, 189, 248, 0.22), rgba(148, 163, 184, 0.12));
-  animation: ahc-shimmer 1400ms ease-in-out infinite;
-  animation-delay: calc(var(--delay, 0) * 90ms);
-}
-
-.ahc-loading__group span {
-  inline-size: 120px;
-  block-size: 16px;
-}
-
-.ahc-loading__group i {
-  inline-size: var(--width, 48%);
-  block-size: 12px;
-}
-
-@keyframes ahc-shimmer {
-  0%,
-  100% { opacity: 0.44; }
-  50% { opacity: 1; }
-}
-
-.ahc-state-card {
-  display: grid;
-  place-items: center;
-  min-block-size: 220px;
-  padding: var(--ahc-gap-xl);
-  border: 1px dashed var(--ahc-border-soft);
-  border-radius: var(--ahc-radius-md);
-  color: var(--ahc-muted);
-  text-align: center;
-}
-
-.ahc-state-card__title {
-  margin: 0 0 var(--ahc-gap-xs);
-  color: var(--ahc-text);
-  font-weight: 850;
-}
-
-.ahc-state-card__yaml {
-  direction: ltr;
-  text-align: left;
-  max-inline-size: min(520px, 100%);
-  margin: var(--ahc-gap-md) auto 0;
-  padding: var(--ahc-gap-md);
-  overflow: auto;
-  border: 1px solid var(--ahc-border-soft);
-  border-radius: var(--ahc-radius-sm);
-  background: rgba(2, 6, 23, 0.34);
-  color: var(--ahc-text);
-  font-size: 0.82rem;
-}
-
-.ahc-debug {
-  display: block;
-  justify-self: start;
-  inline-size: fit-content;
-  max-inline-size: 100%;
-  gap: var(--ahc-gap-sm);
-  padding: 0;
-  border: 1px solid rgba(56, 189, 248, 0.24);
-  border-radius: var(--ahc-radius-sm);
-  background: rgba(2, 6, 23, 0.18);
-  color: var(--ahc-muted);
-  font-size: 0.78rem;
-}
-
-.ahc-debug summary {
-  cursor: pointer;
-  list-style: none;
-}
-
-.ahc-debug summary::-webkit-details-marker {
-  display: none;
-}
-
-.ahc-debug[open] {
-  display: grid;
-  inline-size: 100%;
-  padding: var(--ahc-gap-md);
-  border-style: dashed;
-  background: rgba(2, 6, 23, 0.32);
-}
-
-.ahc-debug__header {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--ahc-gap-sm);
-  min-block-size: 32px;
-  align-items: center;
-  padding-block: 0;
-  padding-inline: 10px;
-  color: var(--ahc-text);
-}
-
-.ahc-debug[open] .ahc-debug__header {
-  padding: 0;
-}
-
-.ahc-debug__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: var(--ahc-gap-xs);
-  margin: 0;
-}
-
-.ahc-debug__grid div {
-  display: grid;
-  gap: 2px;
-  padding: var(--ahc-gap-xs);
-  border-radius: var(--ahc-radius-xs);
-  background: rgba(15, 23, 42, 0.42);
-}
-
-.ahc-debug dt,
-.ahc-debug dd {
-  margin: 0;
-}
-
-.ahc-debug dd {
-  color: var(--ahc-text);
-  font-weight: 800;
-}
-
-.ahc-debug__meta {
-  margin: 0;
-  overflow-wrap: anywhere;
-}
-
-.ahc-entity-list {
-  display: grid;
-  gap: var(--ahc-gap-xs);
-  max-block-size: 260px;
-  overflow: auto;
-}
-
-.ahc-entity-list__item {
-  display: grid;
-  gap: 2px;
-  min-block-size: 44px;
-  padding-block: 7px;
-  padding-inline: 12px;
-  border: 1px solid var(--ahc-border-soft);
-  border-radius: var(--ahc-radius-sm);
-  background: rgba(15, 23, 42, 0.42);
-}
-
-.ahc-entity-list__item span {
-  color: var(--ahc-text);
-  font-weight: 750;
-}
-
-.ahc-entity-list__item small,
-.ahc-entity-list__more {
-  color: var(--ahc-muted);
-  font-size: 0.78rem;
-}
-
-/* Responsive */
-@media (max-width: 1100px) {
-  .ahc__body {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .ahc__insights {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .ahc__insights-title {
-    grid-column: 1 / -1;
-  }
-}
-
-@media (max-width: 760px) {
   :host {
-    --ahc-chip-height: 44px;
+    --ahc-radius-xs: 8px;
+    --ahc-radius-sm: 12px;
+    --ahc-radius-md: 18px;
+    --ahc-radius-lg: 24px;
+    --ahc-radius-xl: 32px;
+
+    --ahc-gap-xxs: 4px;
+    --ahc-gap-xs: 8px;
+    --ahc-gap-sm: 12px;
+    --ahc-gap-md: 16px;
+    --ahc-gap-lg: 24px;
+    --ahc-gap-xl: 32px;
+
+    --ahc-font-family: var(
+      --primary-font-family,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      Arial,
+      sans-serif
+    );
+    --ahc-card-bg: var(
+      --ha-card-background,
+      var(--card-background-color, #0f172a)
+    );
+    --ahc-page-bg: var(--lovelace-background, #020617);
+    --ahc-surface-1: color-mix(in srgb, var(--ahc-card-bg) 88%, #1e3a5f 12%);
+    --ahc-surface-2: color-mix(
+      in srgb,
+      var(--ahc-card-bg) 80%,
+      #2563eb 8%,
+      #0f172a 12%
+    );
+    --ahc-surface-3: color-mix(
+      in srgb,
+      var(--ahc-card-bg) 72%,
+      #38bdf8 7%,
+      #0f172a 21%
+    );
+    --ahc-border: color-mix(
+      in srgb,
+      var(--divider-color, #334155) 76%,
+      #60a5fa 24%
+    );
+    --ahc-border-soft: color-mix(
+      in srgb,
+      var(--divider-color, #334155) 55%,
+      transparent 45%
+    );
+    --ahc-shadow: 0 18px 60px rgba(0, 0, 0, 0.32);
+    --ahc-shadow-soft: 0 8px 26px rgba(0, 0, 0, 0.22);
+
+    --ahc-text: var(--primary-text-color, #f8fafc);
+    --ahc-muted: var(--secondary-text-color, #94a3b8);
+    --ahc-disabled: var(--disabled-text-color, #64748b);
+    --ahc-accent: var(--primary-color, #38bdf8);
+    --ahc-accent-strong: #0ea5e9;
+    --ahc-accent-soft: rgba(56, 189, 248, 0.16);
+    --ahc-focus: #93c5fd;
+
+    --ahc-on: var(--success-color, #22c55e);
+    --ahc-off: #64748b;
+    --ahc-cooling: #38bdf8;
+    --ahc-heating: #fb923c;
+    --ahc-playing: #a78bfa;
+    --ahc-opening: #facc15;
+    --ahc-closing: #cbd5e1;
+    --ahc-idle: #14b8a6;
+    --ahc-unknown: #94a3b8;
+
+    --ahc-track: rgba(148, 163, 184, 0.12);
+    --ahc-grid-line: rgba(148, 163, 184, 0.16);
+    --ahc-row-hover: rgba(56, 189, 248, 0.08);
+    --ahc-now: #60a5fa;
+    --ahc-label-width: clamp(280px, 17vw, 340px);
+
+    --ahc-chip-height: 40px;
+    --ahc-touch-target: 44px;
+    --ahc-mobile-breakpoint: 760px;
+
+    display: block;
+    font-family: var(--ahc-font-family);
   }
 
+  :host([hidden]) {
+    display: none;
+  }
+
+  /* Root */
   .ahc {
-    min-block-size: 100svh;
-    border-radius: var(--ahc-radius-md);
-    padding: var(--ahc-gap-md);
-    gap: var(--ahc-gap-md);
+    direction: rtl;
+    box-sizing: border-box;
+    position: relative;
+    display: grid;
+    gap: var(--ahc-gap-sm);
+    padding: clamp(14px, 1.6vw, 22px);
+    color: var(--ahc-text);
+    background:
+      radial-gradient(
+        circle at 92% 0%,
+        rgba(14, 165, 233, 0.22),
+        transparent 34%
+      ),
+      radial-gradient(
+        circle at 4% 12%,
+        rgba(124, 58, 237, 0.14),
+        transparent 28%
+      ),
+      linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.9));
+    border: 1px solid var(--ahc-border);
+    border-radius: var(--ahc-radius-lg);
+    box-shadow: var(--ahc-shadow-soft);
+    overflow: hidden;
+    isolation: isolate;
   }
 
-  .ahc--panel,
-  .ahc--fullscreen {
-    border-radius: 0;
-    min-block-size: 100svh;
-    padding:
-      max(12px, env(safe-area-inset-top))
-      max(12px, env(safe-area-inset-right))
-      max(12px, env(safe-area-inset-bottom))
-      max(12px, env(safe-area-inset-left));
+  .ahc *,
+  .ahc *::before,
+  .ahc *::after {
+    box-sizing: border-box;
   }
 
-  .ahc__topbar {
-    grid-template-columns: 1fr;
-    text-align: center;
+  .ahc[dir="ltr"] {
+    direction: ltr;
   }
 
-  .ahc__title-block {
-    order: -1;
-    justify-items: center;
-    text-align: center;
+  .ahc::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.035),
+        transparent 18%,
+        transparent 82%,
+        rgba(255, 255, 255, 0.025)
+      ),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.055), transparent 18%);
+    z-index: -1;
   }
 
-  .ahc__title {
-    font-size: 1.45rem;
-  }
-
-  .ahc__toolbar {
-    justify-content: center;
-    flex-wrap: wrap;
-    min-inline-size: 0;
-  }
-
-  .ahc__search {
+  .ahc--panel {
+    min-height: min(100svh, 920px);
     inline-size: 100%;
   }
 
-  .ahc__filters {
+  .ahc--fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483640;
+    min-height: 100svh;
+    border-radius: 0;
+    padding: max(var(--ahc-gap-lg), env(safe-area-inset-top))
+      max(var(--ahc-gap-lg), env(safe-area-inset-right))
+      max(var(--ahc-gap-lg), env(safe-area-inset-bottom))
+      max(var(--ahc-gap-lg), env(safe-area-inset-left));
+    background: linear-gradient(145deg, #020617, #0f172a 45%, #0b1221);
+  }
+
+  /* Top bar */
+  .ahc__topbar {
     display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--ahc-gap-md);
+    align-items: start;
+    padding: 12px 14px;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: var(--ahc-radius-md);
+    background:
+      linear-gradient(90deg, rgba(15, 23, 42, 0.28), rgba(30, 64, 175, 0.1)),
+      rgba(2, 6, 23, 0.14);
+  }
+
+  .ahc__title-block {
+    display: grid;
+    grid-auto-flow: row;
     gap: var(--ahc-gap-xs);
-    padding: 0;
+    justify-items: end;
+    text-align: end;
+  }
+
+  .ahc__title-row {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: var(--ahc-gap-sm);
+  }
+
+  .ahc__icon-badge {
+    display: inline-grid;
+    place-items: center;
+    min-inline-size: 48px;
+    min-block-size: 48px;
+    border-radius: var(--ahc-radius-md);
+    background: linear-gradient(
+      180deg,
+      rgba(56, 189, 248, 0.24),
+      rgba(37, 99, 235, 0.2)
+    );
+    border: 1px solid rgba(56, 189, 248, 0.42);
+    color: var(--ahc-accent);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.11),
+      0 10px 28px rgba(14, 165, 233, 0.1);
+  }
+
+  .ahc__icon-badge ha-icon {
+    inline-size: 26px;
+    block-size: 26px;
+  }
+
+  .ahc__title {
+    margin: 0;
+    color: var(--ahc-text);
+    font-size: 1.75rem;
+    line-height: 1.15;
+    font-weight: 800;
+    letter-spacing: 0;
+  }
+
+  .ahc__subtitle {
+    margin: 0;
+    color: var(--ahc-muted);
+    font-size: 0.92rem;
+    line-height: 1.45;
+  }
+
+  .ahc-last-event {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    max-inline-size: min(560px, 100%);
+    min-block-size: 34px;
+    padding-block: 4px;
+    padding-inline: 10px;
+    border: 1px solid rgba(56, 189, 248, 0.22);
+    border-radius: 999px;
+    background: rgba(2, 6, 23, 0.24);
+    color: var(--ahc-muted);
+    font-size: 0.78rem;
+  }
+
+  .ahc-last-event strong,
+  .ahc-last-event__label {
+    color: var(--ahc-text);
+    font-weight: 850;
+  }
+
+  .ahc__toolbar {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--ahc-gap-sm);
+    min-inline-size: min(460px, 100%);
+  }
+
+  .ahc__search {
+    position: relative;
+    inline-size: min(320px, 100%);
+  }
+
+  .ahc__search-input {
+    inline-size: 100%;
+    min-block-size: var(--ahc-touch-target);
+    border-radius: var(--ahc-radius-sm);
+    border: 1px solid var(--ahc-border-soft);
+    background: rgba(2, 6, 23, 0.42);
+    color: var(--ahc-text);
+    padding-block: 0;
+    padding-inline: 44px 16px;
+    outline: none;
+    text-align: start;
+    font: inherit;
+  }
+
+  .ahc__search-input::placeholder {
+    color: color-mix(in srgb, var(--ahc-muted) 82%, transparent 18%);
+  }
+
+  .ahc__search-icon {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 14px;
+    transform: translateY(-50%);
+    color: var(--ahc-muted);
+    pointer-events: none;
+  }
+
+  .ahc[dir="rtl"] .ahc__search-input {
+    padding-inline: 16px 44px;
+  }
+
+  .ahc[dir="rtl"] .ahc__search-icon {
+    inset-inline-start: auto;
+    inset-inline-end: 14px;
+  }
+
+  /* Buttons and chips */
+  .ahc__button,
+  .ahc__chip,
+  .ahc__segmented-button {
+    appearance: none;
+    min-block-size: var(--ahc-chip-height);
+    min-inline-size: var(--ahc-touch-target);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid var(--ahc-border-soft);
+    border-radius: var(--ahc-radius-sm);
+    background: rgba(15, 23, 42, 0.58);
+    color: var(--ahc-muted);
+    font: inherit;
+    font-size: 0.92rem;
+    line-height: 1;
+    padding-block: 0;
+    padding-inline: 16px;
+    cursor: pointer;
+    user-select: none;
+    transition:
+      background 160ms ease,
+      color 160ms ease,
+      border-color 160ms ease,
+      transform 160ms ease;
+  }
+
+  .ahc__button:hover,
+  .ahc__chip:hover,
+  .ahc__segmented-button:hover {
+    color: var(--ahc-text);
+    border-color: color-mix(
+      in srgb,
+      var(--ahc-accent) 46%,
+      var(--ahc-border-soft)
+    );
+    background: rgba(30, 41, 59, 0.72);
+  }
+
+  .ahc__button:focus-visible,
+  .ahc__chip:focus-visible,
+  .ahc__segmented-button:focus-visible,
+  .ahc__search-input:focus-visible,
+  .ahc__row-action:focus-visible,
+  .ahc-filter-option:focus-visible {
+    outline: 2px solid var(--ahc-focus);
+    outline-offset: 2px;
+  }
+
+  .ahc__chip[aria-pressed="true"],
+  .ahc__segmented-button[aria-pressed="true"],
+  .ahc__chip--active,
+  .ahc__button--primary {
+    color: #e0f2fe;
+    border-color: rgba(56, 189, 248, 0.75);
+    background: linear-gradient(
+      180deg,
+      rgba(14, 165, 233, 0.3),
+      rgba(37, 99, 235, 0.18)
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 8px 22px rgba(14, 165, 233, 0.1);
+  }
+
+  .ahc__button--ghost {
+    background: rgba(2, 6, 23, 0.34);
+  }
+
+  .ahc__button:disabled {
+    cursor: progress;
+    opacity: 0.58;
+  }
+
+  .ahc__refresh-indicator {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--ahc-chip-height);
+    padding-inline: 12px;
+    border: 1px solid rgba(56, 189, 248, 0.24);
+    border-radius: var(--ahc-radius-sm);
+    background: rgba(14, 165, 233, 0.1);
+    color: #bae6fd;
+    font-size: 0.82rem;
+  }
+
+  .ahc__button-icon {
+    inline-size: 20px;
+    block-size: 20px;
+    flex: 0 0 auto;
+  }
+
+  .ahc__segmented {
+    display: inline-flex;
+    border: 1px solid var(--ahc-border-soft);
+    border-radius: var(--ahc-radius-sm);
+    overflow: hidden;
+    background: rgba(2, 6, 23, 0.3);
+  }
+
+  .ahc__segmented-button {
     border: 0;
+    border-radius: 0;
     background: transparent;
+    min-inline-size: 84px;
+  }
+
+  .ahc__segmented-button + .ahc__segmented-button {
+    border-inline-start: 1px solid var(--ahc-border-soft);
+  }
+
+  /* Filters */
+  .ahc__filters {
+    display: flex;
+    align-items: center;
+    gap: var(--ahc-gap-xs);
+    padding: 10px;
+    border: 1px solid var(--ahc-border-soft);
+    border-radius: var(--ahc-radius-md);
+    background: rgba(15, 23, 42, 0.38);
     overflow: hidden;
   }
 
   .ahc__filter-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
     flex-wrap: nowrap;
+    gap: var(--ahc-gap-xs);
+    min-inline-size: 0;
+    inline-size: 100%;
+  }
+
+  .ahc__filter-row--primary {
     overflow-x: auto;
-    overflow-y: hidden;
-    padding-block: 2px 8px;
-    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+  }
+
+  .ahc__filter-row--primary > * {
+    flex: 0 0 auto;
+  }
+
+  .ahc__filter-row--compact {
+    overflow-x: auto;
     scrollbar-width: none;
   }
 
-  .ahc__filter-row::-webkit-scrollbar {
+  .ahc__filter-row--compact::-webkit-scrollbar {
     display: none;
   }
 
-  .ahc__filter-row > * {
+  .ahc__filter-row--compact > * {
     flex: 0 0 auto;
-    scroll-snap-align: start;
   }
 
   .ahc__filter-label {
-    min-inline-size: max-content;
+    color: var(--ahc-muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+    margin-inline-end: 2px;
   }
 
+  .ahc-curation-note {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 32px;
+    max-inline-size: min(480px, 42vw);
+    padding-inline: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    border-radius: 999px;
+    background: rgba(2, 6, 23, 0.22);
+    color: var(--ahc-muted);
+    font-size: 0.78rem;
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Summary */
   .ahc__summary-grid {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
-    gap: var(--ahc-gap-sm);
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-    scrollbar-width: none;
-  }
-
-  .ahc__summary-grid::-webkit-scrollbar {
-    display: none;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid var(--ahc-border-soft);
+    border-radius: var(--ahc-radius-md);
+    background:
+      linear-gradient(180deg, rgba(30, 41, 59, 0.5), rgba(15, 23, 42, 0.54)),
+      rgba(2, 6, 23, 0.2);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
   }
 
   .ahc__metric {
-    flex: 0 0 min(44vw, 230px);
-    scroll-snap-align: start;
-    min-block-size: 104px;
+    min-block-size: 88px;
+    display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    padding: var(--ahc-gap-sm);
-    border: 1px solid var(--ahc-border-soft);
-    border-radius: var(--ahc-radius-md);
-    background: linear-gradient(180deg, rgba(30, 41, 59, 0.54), rgba(15, 23, 42, 0.58));
+    align-items: center;
+    gap: var(--ahc-gap-sm);
+    padding: 12px 16px;
+    border: 0;
+    border-inline-start: 1px solid rgba(148, 163, 184, 0.13);
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .ahc__metric:first-child {
+    border-inline-start: 0;
+  }
+
+  .ahc__metric-copy {
+    min-inline-size: 0;
+    text-align: end;
+  }
+
+  .ahc__metric-label {
+    display: block;
+    color: var(--ahc-muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+    margin-block-end: 4px;
+  }
+
+  .ahc__metric-value {
+    display: block;
+    color: var(--ahc-text);
+    font-size: 1.95rem;
+    line-height: 1.05;
+    font-weight: 850;
+    letter-spacing: 0;
+  }
+
+  .ahc__metric-value--compact {
+    font-size: 1.12rem;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ahc__metric-value--positive {
+    color: var(--ahc-on);
+  }
+
+  .ahc__metric-subtitle {
+    display: block;
+    color: var(--ahc-muted);
+    font-size: 0.78rem;
+    line-height: 1.35;
+    margin-block-start: 6px;
   }
 
   .ahc__metric-icon {
-    inline-size: 44px;
-    block-size: 44px;
+    display: inline-grid;
+    place-items: center;
+    inline-size: 46px;
+    block-size: 46px;
     border-radius: 14px;
+    border: 1px solid var(--ahc-border-soft);
+    background: rgba(2, 6, 23, 0.22);
+    color: var(--ahc-accent);
+  }
+
+  /* Layout body */
+  .ahc__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(250px, 300px);
+    gap: var(--ahc-gap-md);
+    align-items: start;
+    max-inline-size: 1920px;
+  }
+
+  .ahc__body--no-insights {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ahc__main {
+    min-inline-size: 0;
+    display: grid;
+    gap: var(--ahc-gap-md);
   }
 
   .ahc__insights {
-    display: flex;
-    overflow-x: auto;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    scrollbar-width: none;
-  }
-
-  .ahc__insights::-webkit-scrollbar {
-    display: none;
+    display: grid;
+    gap: var(--ahc-gap-sm);
+    align-content: start;
+    padding: var(--ahc-gap-sm);
+    border: 1px solid var(--ahc-border-soft);
+    border-radius: var(--ahc-radius-md);
+    background: linear-gradient(
+      180deg,
+      rgba(30, 41, 59, 0.5),
+      rgba(15, 23, 42, 0.52)
+    );
   }
 
   .ahc__insights-title {
-    display: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ahc-gap-sm);
+    margin: 0 0 var(--ahc-gap-xs);
+    color: var(--ahc-text);
+    font-size: 1.05rem;
+    font-weight: 800;
   }
 
   .ahc__insight-card {
-    flex: 0 0 min(78vw, 280px);
+    padding: 12px;
+    border: 1px solid var(--ahc-border-soft);
+    border-radius: var(--ahc-radius-md);
+    background: rgba(15, 23, 42, 0.52);
   }
 
+  .ahc__insight-kicker {
+    display: block;
+    color: var(--ahc-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin-block-end: 8px;
+  }
+
+  .ahc__insight-value {
+    display: block;
+    color: var(--ahc-text);
+    font-size: 1.12rem;
+    font-weight: 850;
+    overflow-wrap: anywhere;
+  }
+
+  .ahc__insight-subtitle {
+    display: block;
+    color: var(--ahc-muted);
+    font-size: 0.78rem;
+    margin-block-start: 6px;
+  }
+
+  .ahc__spark {
+    display: flex;
+    align-items: end;
+    gap: 5px;
+    block-size: 34px;
+    margin-block-start: 10px;
+  }
+
+  .ahc__spark i {
+    inline-size: 8px;
+    block-size: var(--bar, 20%);
+    min-block-size: 4px;
+    border-radius: 999px 999px 2px 2px;
+    background: linear-gradient(
+      180deg,
+      var(--ahc-accent),
+      rgba(37, 99, 235, 0.38)
+    );
+  }
+
+  /* Timeline */
   .ahc-timeline-card {
+    min-inline-size: 0;
+    min-block-size: 420px;
+    border: 1px solid var(--ahc-border-soft);
     border-radius: var(--ahc-radius-md);
-    background: transparent;
-    border: 0;
+    background:
+      linear-gradient(180deg, rgba(30, 41, 59, 0.42), rgba(2, 6, 23, 0.3)),
+      radial-gradient(
+        circle at 88% 12%,
+        rgba(56, 189, 248, 0.1),
+        transparent 32%
+      );
+    overflow: hidden;
   }
 
   .ahc-timeline-toolbar {
-    position: sticky;
-    inset-block-start: 0;
-    z-index: 5;
-    background: rgba(15, 23, 42, 0.88);
-    backdrop-filter: blur(14px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ahc-gap-sm);
+    min-block-size: 58px;
+    padding: 12px 16px;
+    border-block-end: 1px solid var(--ahc-border-soft);
+    background: rgba(15, 23, 42, 0.4);
+  }
+
+  .ahc-timeline-toolbar .ahc-curation-note {
+    max-inline-size: min(520px, 48vw);
+  }
+
+  .ahc-timeline-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--ahc-text);
+  }
+
+  .ahc-timeline-scroll {
+    inline-size: 100%;
+    max-block-size: var(--ahc-timeline-height, min(62svh, 680px));
+    overflow: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-color: rgba(56, 189, 248, 0.42) rgba(15, 23, 42, 0.3);
   }
 
   .ahc-timeline {
-    min-inline-size: 760px;
+    direction: ltr;
+    position: relative;
+    min-inline-size: 1040px;
+    padding: 0;
   }
 
-  .ahc-timeline__groups {
+  .ahc-timeline__axis {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 3;
     display: grid;
-    gap: var(--ahc-gap-md);
-    padding: var(--ahc-gap-sm);
+    grid-template-columns: var(--ahc-label-width) minmax(0, 1fr);
+    min-block-size: 48px;
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(14px);
+    border-block-end: 1px solid var(--ahc-border-soft);
+  }
+
+  .ahc-timeline__axis-spacer {
+    position: sticky;
+    inset-inline-start: 0;
+    z-index: 4;
+    direction: rtl;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-inline: var(--ahc-gap-md);
+    color: var(--ahc-muted);
+    font-size: 0.8rem;
+  }
+
+  .ahc-timeline__ticks {
+    position: relative;
+    min-block-size: 44px;
+  }
+
+  .ahc-timeline__tick {
+    position: absolute;
+    inset-block: 0;
+    transform: translateX(-50%);
+    color: var(--ahc-muted);
+    font-size: 0.78rem;
+    display: grid;
+    place-items: center;
+    min-inline-size: 48px;
+  }
+
+  .ahc-timeline__tick::after {
+    content: "";
+    position: absolute;
+    inset-block-end: 0;
+    inline-size: 1px;
+    block-size: 12px;
+    background: var(--ahc-grid-line);
   }
 
   .ahc-group {
-    border: 1px solid var(--ahc-border-soft);
-    border-radius: var(--ahc-radius-md);
-    overflow: hidden;
-    background: linear-gradient(180deg, rgba(30, 41, 59, 0.48), rgba(15, 23, 42, 0.58));
+    direction: rtl;
+    margin: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: var(--ahc-radius-sm);
+    background: rgba(15, 23, 42, 0.3);
+    overflow: clip;
+  }
+
+  .ahc-group:nth-child(even) {
+    background: rgba(15, 23, 42, 0.36);
   }
 
   .ahc-group__header {
-    position: static;
-    min-block-size: 64px;
+    position: sticky;
+    inset-inline-start: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ahc-gap-sm);
+    min-block-size: 54px;
+    padding-block: 0;
+    padding-inline: var(--ahc-gap-md);
+    background:
+      linear-gradient(90deg, rgba(15, 23, 42, 0.82), rgba(30, 41, 59, 0.72)),
+      rgba(2, 6, 23, 0.34);
+    cursor: pointer;
+    list-style: none;
   }
 
-  .ahc-timeline__axis,
-  .ahc-row {
-    grid-template-columns: 180px minmax(560px, 1fr);
+  .ahc-group__header::-webkit-details-marker {
+    display: none;
+  }
+
+  .ahc-group__empty {
+    direction: rtl;
+    padding: var(--ahc-gap-md);
+    color: var(--ahc-muted);
+    font-size: 0.82rem;
+  }
+
+  .ahc-group__title {
+    display: flex;
+    align-items: center;
+    gap: var(--ahc-gap-xs);
+    color: var(--ahc-text);
+    font-weight: 850;
+  }
+
+  .ahc-group__meta {
+    color: var(--ahc-muted);
+    font-size: 0.78rem;
   }
 
   .ahc-row {
-    min-block-size: 46px;
+    direction: ltr;
+    display: grid;
+    grid-template-columns: var(--ahc-label-width) minmax(0, 1fr);
+    min-block-size: 42px;
+    border-block-start: 1px solid rgba(148, 163, 184, 0.09);
+  }
+
+  .ahc-row:hover {
+    background: var(--ahc-row-hover);
   }
 
   .ahc-row__label {
-    padding-inline: var(--ahc-gap-sm);
+    position: sticky;
+    inset-inline-start: 0;
+    z-index: 2;
+    direction: rtl;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--ahc-gap-xs);
+    padding-inline: 14px 12px;
+    border-inline-end: 1px solid rgba(148, 163, 184, 0.12);
+    background: rgba(4, 10, 24, 0.82);
+    backdrop-filter: blur(10px);
+    min-inline-size: 0;
+  }
+
+  .ahc-entity-icon,
+  .ahc-group-icon {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 22px;
+    block-size: 22px;
+    color: var(--ahc-accent);
+    flex: 0 0 auto;
+  }
+
+  ha-icon.ahc-entity-icon,
+  ha-icon.ahc-group-icon {
+    inline-size: 22px;
+    block-size: 22px;
+  }
+
+  .ahc-group-icon {
+    color: #7dd3fc;
+  }
+
+  .ahc-row__name {
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--ahc-text);
+    font-weight: 700;
+    font-size: 0.86rem;
   }
 
   .ahc-row__state-chip {
-    display: inline-flex;
-    min-block-size: 28px;
-    align-items: center;
+    justify-self: end;
+    border-radius: 999px;
+    padding-block: 3px;
+    padding-inline: 8px;
+    color: var(--ahc-text);
+    font-size: 0.72rem;
+    font-weight: 800;
+    background: rgba(148, 163, 184, 0.14);
+    border: 1px solid rgba(148, 163, 184, 0.18);
   }
 
+  .ahc-row__state-chip[data-state="on"] {
+    color: #bbf7d0;
+    background: rgba(34, 197, 94, 0.16);
+    border-color: rgba(34, 197, 94, 0.28);
+  }
+  .ahc-row__state-chip[data-state="cooling"] {
+    color: #bae6fd;
+    background: rgba(56, 189, 248, 0.14);
+    border-color: rgba(56, 189, 248, 0.3);
+  }
+  .ahc-row__state-chip[data-state="heating"] {
+    color: #fed7aa;
+    background: rgba(251, 146, 60, 0.16);
+    border-color: rgba(251, 146, 60, 0.3);
+  }
+  .ahc-row__state-chip[data-state="playing"] {
+    color: #ddd6fe;
+    background: rgba(167, 139, 250, 0.16);
+    border-color: rgba(167, 139, 250, 0.3);
+  }
+
+  .ahc-row__track {
+    direction: ltr;
+    position: relative;
+    min-inline-size: 0;
+    min-block-size: 42px;
+    background-image: linear-gradient(
+      to right,
+      var(--ahc-grid-line) 1px,
+      transparent 1px
+    );
+    background-size: calc(100% / 8) 100%;
+  }
+
+  .ahc-row__svg {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    overflow: visible;
+  }
+
+  .ahc-row__svg-track {
+    stroke: rgba(148, 163, 184, 0.13);
+    stroke-width: 6;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .ahc-segment-svg {
+    cursor: pointer;
+    stroke: rgba(255, 255, 255, 0.2);
+    stroke-width: 0.8;
+    vector-effect: non-scaling-stroke;
+    filter: drop-shadow(0 3px 7px rgba(0, 0, 0, 0.22));
+  }
+
+  .ahc-segment-svg--inactive {
+    cursor: pointer;
+    opacity: 0.52;
+    stroke: rgba(255, 255, 255, 0.1);
+    filter: none;
+  }
+
+  .ahc-segment-svg[data-active="true"] {
+    opacity: 0.96;
+  }
+
+  .ahc-segment-svg:focus-visible {
+    outline: 2px solid var(--ahc-focus);
+    outline-offset: 3px;
+  }
+
+  .ahc-segment-svg[data-category="on"] {
+    fill: var(--ahc-on);
+  }
+  .ahc-segment-svg[data-category="off"] {
+    fill: color-mix(in srgb, var(--ahc-off) 72%, #dbeafe 28%);
+  }
+  .ahc-segment-svg[data-category="cooling"] {
+    fill: var(--ahc-cooling);
+  }
+  .ahc-segment-svg[data-category="heating"] {
+    fill: var(--ahc-heating);
+  }
+  .ahc-segment-svg[data-category="playing"] {
+    fill: var(--ahc-playing);
+  }
+  .ahc-segment-svg[data-category="opening"] {
+    fill: var(--ahc-opening);
+  }
+  .ahc-segment-svg[data-category="closing"] {
+    fill: var(--ahc-closing);
+  }
+  .ahc-segment-svg[data-category="idle"] {
+    fill: color-mix(in srgb, var(--ahc-idle) 62%, #64748b 38%);
+  }
+  .ahc-segment-svg[data-category="unknown"] {
+    fill: var(--ahc-unknown);
+    stroke-dasharray: 3 2;
+  }
+
+  .ahc-row__track::before {
+    content: "";
+    position: absolute;
+    inset-inline: 14px;
+    inset-block-start: 50%;
+    block-size: 4px;
+    transform: translateY(-50%);
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.1);
+  }
+
+  .ahc-segment {
+    position: absolute;
+    inset-block-start: 50%;
+    block-size: 12px;
+    transform: translateY(-50%);
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.08) inset,
+      0 6px 16px rgba(0, 0, 0, 0.18);
+    cursor: pointer;
+  }
+
+  .ahc-segment:focus-visible {
+    outline: 2px solid var(--ahc-focus);
+    outline-offset: 3px;
+  }
+
+  .ahc-segment[data-category="on"] {
+    background: linear-gradient(
+      90deg,
+      var(--ahc-on),
+      color-mix(in srgb, var(--ahc-on) 72%, #0f172a)
+    );
+  }
+  .ahc-segment[data-category="off"] {
+    background: linear-gradient(
+      90deg,
+      var(--ahc-off),
+      color-mix(in srgb, var(--ahc-off) 72%, #0f172a)
+    );
+  }
+  .ahc-segment[data-category="cooling"] {
+    background: linear-gradient(
+      90deg,
+      var(--ahc-cooling),
+      color-mix(in srgb, var(--ahc-cooling) 70%, #1d4ed8)
+    );
+  }
+  .ahc-segment[data-category="heating"] {
+    background: linear-gradient(
+      90deg,
+      var(--ahc-heating),
+      color-mix(in srgb, var(--ahc-heating) 70%, #7c2d12)
+    );
+  }
+  .ahc-segment[data-category="playing"] {
+    background: linear-gradient(
+      90deg,
+      var(--ahc-playing),
+      color-mix(in srgb, var(--ahc-playing) 68%, #312e81)
+    );
+  }
+  .ahc-segment[data-category="opening"] {
+    background: linear-gradient(
+      90deg,
+      var(--ahc-opening),
+      color-mix(in srgb, var(--ahc-opening) 70%, #713f12)
+    );
+  }
+  .ahc-segment[data-category="closing"] {
+    background: linear-gradient(
+      90deg,
+      var(--ahc-closing),
+      color-mix(in srgb, var(--ahc-closing) 70%, #334155)
+    );
+  }
+  .ahc-segment[data-category="idle"] {
+    background: linear-gradient(
+      90deg,
+      var(--ahc-idle),
+      color-mix(in srgb, var(--ahc-idle) 70%, #0f766e)
+    );
+  }
+  .ahc-segment[data-category="unknown"] {
+    background: repeating-linear-gradient(
+      90deg,
+      var(--ahc-unknown),
+      var(--ahc-unknown) 6px,
+      transparent 6px,
+      transparent 10px
+    );
+  }
+
+  .ahc-now-line {
+    position: absolute;
+    inset-block: 0;
+    inline-size: 1px;
+    background: linear-gradient(
+      180deg,
+      transparent,
+      var(--ahc-now) 12%,
+      var(--ahc-now) 88%,
+      transparent
+    );
+    box-shadow:
+      0 0 0 1px rgba(96, 165, 250, 0.14),
+      0 0 18px rgba(96, 165, 250, 0.3);
+    pointer-events: none;
+    z-index: 4;
+  }
+
+  .ahc-now-line__label {
+    position: absolute;
+    inset-block-start: 8px;
+    transform: translateX(-50%);
+    padding-block: 2px;
+    padding-inline: 8px;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.62);
+    color: #dbeafe;
+    font-size: 0.72rem;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  /* Legend */
   .ahc-legend {
-    justify-content: flex-start;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    padding-inline: var(--ahc-gap-sm);
+    direction: rtl;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ahc-gap-md);
+    flex-wrap: wrap;
+    padding: var(--ahc-gap-md);
+    color: var(--ahc-muted);
+    font-size: 0.82rem;
   }
 
+  .ahc-legend__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .ahc-legend__swatch {
+    inline-size: 24px;
+    block-size: 8px;
+    border-radius: 999px;
+    background: var(--swatch, var(--ahc-accent));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+
+  /* Tooltip / popover */
   .ahc-popover {
-    inset-inline: 12px !important;
-    inset-block-end: 12px !important;
-    inset-block-start: auto !important;
-    max-inline-size: none;
-    border-radius: 24px;
+    direction: rtl;
+    position: fixed;
+    inset-inline-start: var(--ahc-popover-x, 16px);
+    inset-block-start: var(--ahc-popover-y, 16px);
+    z-index: 2147483641;
+    max-inline-size: min(320px, calc(100vw - 32px));
+    padding: var(--ahc-gap-md);
+    border: 1px solid var(--ahc-border);
+    border-radius: var(--ahc-radius-md);
+    background: rgba(15, 23, 42, 0.96);
+    color: var(--ahc-text);
+    box-shadow: var(--ahc-shadow);
+    backdrop-filter: blur(18px);
+  }
+
+  .ahc-popover__close {
+    appearance: none;
+    position: absolute;
+    inset-block-start: 8px;
+    inset-inline-end: 8px;
+    inline-size: 30px;
+    block-size: 30px;
+    border: 1px solid var(--ahc-border-soft);
+    border-radius: 999px;
+    background: rgba(2, 6, 23, 0.32);
+    color: var(--ahc-text);
+    cursor: pointer;
+  }
+
+  .ahc-popover__title {
+    margin: 0 0 var(--ahc-gap-xs);
+    font-size: 1rem;
+    font-weight: 850;
+  }
+
+  .ahc-popover__dl {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 6px 14px;
+    margin: 0;
+    font-size: 0.86rem;
+  }
+
+  .ahc-popover__dt {
+    color: var(--ahc-muted);
+  }
+
+  .ahc-popover__dd {
+    margin: 0;
+    color: var(--ahc-text);
+    text-align: end;
+  }
+
+  /* Mobile filter sheet */
+  .ahc-filter-sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483638;
+    background: rgba(2, 6, 23, 0.62);
+    backdrop-filter: blur(4px);
   }
 
   .ahc-filter-sheet {
-    inset-inline: max(10px, env(safe-area-inset-left)) max(10px, env(safe-area-inset-right));
-    inline-size: auto;
-    max-block-size: min(86svh, 820px);
-    border-start-start-radius: 28px;
-    border-start-end-radius: 28px;
+    direction: rtl;
+    position: fixed;
+    inset-inline: max(12px, env(safe-area-inset-left))
+      max(12px, env(safe-area-inset-right));
+    inset-block-end: 0;
+    z-index: 2147483639;
+    inline-size: min(720px, calc(100vw - 24px));
+    margin-inline: auto;
+    max-block-size: min(88svh, 900px);
+    overflow: auto;
+    padding: var(--ahc-gap-lg)
+      max(var(--ahc-gap-lg), env(safe-area-inset-right))
+      max(var(--ahc-gap-lg), env(safe-area-inset-bottom))
+      max(var(--ahc-gap-lg), env(safe-area-inset-left));
+    border-start-start-radius: var(--ahc-radius-xl);
+    border-start-end-radius: var(--ahc-radius-xl);
+    border: 1px solid var(--ahc-border);
+    background: linear-gradient(
+      180deg,
+      rgba(15, 23, 42, 0.98),
+      rgba(2, 6, 23, 0.98)
+    );
+    color: var(--ahc-text);
+    box-shadow: 0 -24px 80px rgba(0, 0, 0, 0.46);
+  }
+
+  .ahc-filter-sheet__handle {
+    inline-size: 72px;
+    block-size: 5px;
+    margin-inline: auto;
+    margin-block-end: var(--ahc-gap-md);
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.5);
+  }
+
+  .ahc-filter-sheet__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ahc-gap-sm);
+    margin-block-end: var(--ahc-gap-md);
+  }
+
+  .ahc-filter-sheet__title {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 850;
+  }
+
+  .ahc-filter-section {
+    display: grid;
+    gap: var(--ahc-gap-sm);
+    padding: var(--ahc-gap-md);
+    border: 1px solid var(--ahc-border-soft);
+    border-radius: var(--ahc-radius-md);
+    background: rgba(30, 41, 59, 0.34);
+    margin-block-end: var(--ahc-gap-md);
   }
 
   .ahc-filter-section__chips {
     display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scrollbar-width: none;
+    flex-wrap: wrap;
+    gap: var(--ahc-gap-xs);
   }
 
-  .ahc-filter-section__chips::-webkit-scrollbar {
+  .ahc-filter-section__title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ahc-gap-sm);
+    color: var(--ahc-text);
+    font-weight: 850;
+  }
+
+  .ahc-filter-option {
+    appearance: none;
+    display: grid;
+    gap: 4px;
+    min-block-size: 64px;
+    padding-block: 10px;
+    padding-inline: 16px;
+    border: 1px solid var(--ahc-border-soft);
+    border-radius: var(--ahc-radius-sm);
+    background: rgba(15, 23, 42, 0.46);
+    color: var(--ahc-text);
+    text-align: start;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .ahc-filter-option small {
+    color: var(--ahc-muted);
+    font-size: 0.78rem;
+  }
+
+  .ahc-filter-option[aria-pressed="true"] {
+    border-color: rgba(56, 189, 248, 0.75);
+    background: linear-gradient(
+      180deg,
+      rgba(14, 165, 233, 0.24),
+      rgba(37, 99, 235, 0.16)
+    );
+  }
+
+  .ahc__search--sheet {
+    inline-size: 100%;
+  }
+
+  .ahc-filter-sheet__footer {
+    position: sticky;
+    inset-block-end: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+    gap: var(--ahc-gap-sm);
+    padding-block-start: var(--ahc-gap-md);
+    background: linear-gradient(180deg, transparent, rgba(2, 6, 23, 0.95) 22%);
+  }
+
+  /* Empty/loading/error */
+  .ahc-loading {
+    display: grid;
+    gap: var(--ahc-gap-lg);
+    min-block-size: 420px;
+    padding: var(--ahc-gap-lg);
+    border: 1px solid var(--ahc-border-soft);
+    border-radius: var(--ahc-radius-md);
+    background: linear-gradient(
+      180deg,
+      rgba(15, 23, 42, 0.64),
+      rgba(2, 6, 23, 0.34)
+    );
+  }
+
+  .ahc-loading__copy {
+    text-align: center;
+  }
+
+  .ahc-loading__copy h3 {
+    margin: 0 0 var(--ahc-gap-xs);
+    color: var(--ahc-text);
+  }
+
+  .ahc-loading__copy p {
+    margin: 0;
+    color: var(--ahc-muted);
+  }
+
+  .ahc-loading__timeline {
+    direction: ltr;
+    display: grid;
+    gap: var(--ahc-gap-md);
+  }
+
+  .ahc-loading__group {
+    display: grid;
+    gap: 10px;
+    padding: var(--ahc-gap-md);
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: var(--ahc-radius-sm);
+    background: rgba(15, 23, 42, 0.34);
+  }
+
+  .ahc-loading__group span,
+  .ahc-loading__group i {
+    display: block;
+    border-radius: 999px;
+    background: linear-gradient(
+      90deg,
+      rgba(148, 163, 184, 0.12),
+      rgba(56, 189, 248, 0.22),
+      rgba(148, 163, 184, 0.12)
+    );
+    animation: ahc-shimmer 1400ms ease-in-out infinite;
+    animation-delay: calc(var(--delay, 0) * 90ms);
+  }
+
+  .ahc-loading__group span {
+    inline-size: 120px;
+    block-size: 16px;
+  }
+
+  .ahc-loading__group i {
+    inline-size: var(--width, 48%);
+    block-size: 12px;
+  }
+
+  @keyframes ahc-shimmer {
+    0%,
+    100% {
+      opacity: 0.44;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .ahc-state-card {
+    display: grid;
+    place-items: center;
+    min-block-size: 220px;
+    padding: var(--ahc-gap-xl);
+    border: 1px dashed var(--ahc-border-soft);
+    border-radius: var(--ahc-radius-md);
+    color: var(--ahc-muted);
+    text-align: center;
+  }
+
+  .ahc-state-card__title {
+    margin: 0 0 var(--ahc-gap-xs);
+    color: var(--ahc-text);
+    font-weight: 850;
+  }
+
+  .ahc-state-card__yaml {
+    direction: ltr;
+    text-align: left;
+    max-inline-size: min(520px, 100%);
+    margin: var(--ahc-gap-md) auto 0;
+    padding: var(--ahc-gap-md);
+    overflow: auto;
+    border: 1px solid var(--ahc-border-soft);
+    border-radius: var(--ahc-radius-sm);
+    background: rgba(2, 6, 23, 0.34);
+    color: var(--ahc-text);
+    font-size: 0.82rem;
+  }
+
+  .ahc-empty-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--ahc-gap-xs);
+    margin-block-start: var(--ahc-gap-md);
+  }
+
+  .ahc-debug {
+    display: block;
+    justify-self: start;
+    inline-size: fit-content;
+    max-inline-size: 100%;
+    gap: var(--ahc-gap-sm);
+    padding: 0;
+    border: 1px solid rgba(56, 189, 248, 0.24);
+    border-radius: var(--ahc-radius-sm);
+    background: rgba(2, 6, 23, 0.18);
+    color: var(--ahc-muted);
+    font-size: 0.78rem;
+  }
+
+  .ahc-debug summary {
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .ahc-debug summary::-webkit-details-marker {
     display: none;
   }
 
-  .ahc-filter-section__chips > * {
-    flex: 0 0 auto;
-  }
-}
-
-@media (max-width: 420px) {
-  .ahc__summary-grid {
-    margin-inline: -2px;
+  .ahc-debug[open] {
+    display: grid;
+    inline-size: 100%;
+    padding: var(--ahc-gap-md);
+    border-style: dashed;
+    background: rgba(2, 6, 23, 0.32);
   }
 
-  .ahc__metric-value {
-    font-size: 1.32rem;
+  .ahc-debug__header {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--ahc-gap-sm);
+    min-block-size: 32px;
+    align-items: center;
+    padding-block: 0;
+    padding-inline: 10px;
+    color: var(--ahc-text);
   }
 
-  .ahc-timeline__axis,
-  .ahc-row {
-    grid-template-columns: 164px minmax(540px, 1fr);
+  .ahc-debug[open] .ahc-debug__header {
+    padding: 0;
   }
 
-  .ahc-row__name {
-    font-size: 0.80rem;
-  }
-}
-
-/* Motion & contrast */
-@media (prefers-reduced-motion: reduce) {
-  .ahc *,
-  .ahc *::before,
-  .ahc *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-@media (forced-colors: active) {
-  .ahc,
-  .ahc__metric,
-  .ahc__filters,
-  .ahc-timeline-card,
-  .ahc__insights,
-  .ahc-filter-sheet,
-  .ahc-popover {
-    border: 1px solid CanvasText;
-    background: Canvas;
-    color: CanvasText;
+  .ahc-debug__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: var(--ahc-gap-xs);
+    margin: 0;
   }
 
-  .ahc__button,
-  .ahc__chip,
-  .ahc__segmented-button {
-    border: 1px solid ButtonText;
-    background: ButtonFace;
-    color: ButtonText;
+  .ahc-debug__grid div {
+    display: grid;
+    gap: 2px;
+    padding: var(--ahc-gap-xs);
+    border-radius: var(--ahc-radius-xs);
+    background: rgba(15, 23, 42, 0.42);
   }
 
-  .ahc-segment {
-    border: 2px solid CanvasText;
+  .ahc-debug dt,
+  .ahc-debug dd {
+    margin: 0;
   }
-}
 
-/* Optional compact mode for many entities */
-.ahc--dense .ahc-row {
-  min-block-size: 30px;
-}
+  .ahc-debug dd {
+    color: var(--ahc-text);
+    font-weight: 800;
+  }
 
-.ahc--dense .ahc-row__track {
-  min-block-size: 30px;
-}
+  .ahc-debug__meta {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
 
-.ahc--dense .ahc-segment {
-  block-size: 8px;
-}
+  .ahc-entity-list {
+    display: grid;
+    gap: var(--ahc-gap-xs);
+    max-block-size: 260px;
+    overflow: auto;
+  }
 
-.ahc--dense .ahc-row__state-chip {
-  display: none;
-}
+  .ahc-entity-list__item {
+    display: grid;
+    gap: 2px;
+    min-block-size: 44px;
+    padding-block: 7px;
+    padding-inline: 12px;
+    border: 1px solid var(--ahc-border-soft);
+    border-radius: var(--ahc-radius-sm);
+    background: rgba(15, 23, 42, 0.42);
+  }
 
-.ahc--dense .ahc-row__name {
-  font-size: 0.78rem;
-}
+  .ahc-entity-list__item span {
+    color: var(--ahc-text);
+    font-weight: 750;
+  }
 
-.ahc--ultra-dense .ahc-row,
-.ahc-timeline-card--ultra-dense .ahc-row {
-  min-block-size: 24px;
-}
+  .ahc-entity-list__item small,
+  .ahc-entity-list__more {
+    color: var(--ahc-muted);
+    font-size: 0.78rem;
+  }
 
-.ahc--ultra-dense .ahc-row__track,
-.ahc-timeline-card--ultra-dense .ahc-row__track {
-  min-block-size: 24px;
-}
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .ahc__body {
+      grid-template-columns: minmax(0, 1fr);
+    }
 
-.ahc--ultra-dense .ahc-row__state-chip,
-.ahc-timeline-card--ultra-dense .ahc-row__state-chip {
-  display: none;
-}
+    .ahc__insights {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 
-.ahc--ultra-dense .ahc-row__name,
-.ahc-timeline-card--ultra-dense .ahc-row__name {
-  font-size: 0.74rem;
-}
+    .ahc__insights-title {
+      grid-column: 1 / -1;
+    }
+  }
 
+  @media (max-width: 760px) {
+    :host {
+      --ahc-chip-height: 44px;
+    }
+
+    .ahc {
+      min-block-size: 100svh;
+      border-radius: var(--ahc-radius-md);
+      padding: var(--ahc-gap-md);
+      gap: var(--ahc-gap-md);
+    }
+
+    .ahc--panel,
+    .ahc--fullscreen {
+      border-radius: 0;
+      min-block-size: 100svh;
+      padding: max(12px, env(safe-area-inset-top))
+        max(12px, env(safe-area-inset-right))
+        max(12px, env(safe-area-inset-bottom))
+        max(12px, env(safe-area-inset-left));
+    }
+
+    .ahc__topbar {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+
+    .ahc__title-block {
+      order: -1;
+      justify-items: center;
+      text-align: center;
+    }
+
+    .ahc__title {
+      font-size: 1.45rem;
+    }
+
+    .ahc__toolbar {
+      justify-content: center;
+      flex-wrap: wrap;
+      min-inline-size: 0;
+    }
+
+    .ahc__search {
+      inline-size: 100%;
+    }
+
+    .ahc__filters {
+      display: grid;
+      gap: var(--ahc-gap-xs);
+      padding: 0;
+      border: 0;
+      background: transparent;
+      overflow: hidden;
+    }
+
+    .ahc__filter-row {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-block: 2px 8px;
+      scroll-snap-type: x proximity;
+      scrollbar-width: none;
+    }
+
+    .ahc__filter-row::-webkit-scrollbar {
+      display: none;
+    }
+
+    .ahc__filter-row > * {
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+    }
+
+    .ahc-curation-note {
+      max-inline-size: 72vw;
+    }
+
+    .ahc__filter-label {
+      min-inline-size: max-content;
+    }
+
+    .ahc__summary-grid {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+      gap: var(--ahc-gap-sm);
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      scrollbar-width: none;
+    }
+
+    .ahc__summary-grid::-webkit-scrollbar {
+      display: none;
+    }
+
+    .ahc__metric {
+      flex: 0 0 min(44vw, 230px);
+      scroll-snap-align: start;
+      min-block-size: 104px;
+      grid-template-columns: minmax(0, 1fr) auto;
+      padding: var(--ahc-gap-sm);
+      border: 1px solid var(--ahc-border-soft);
+      border-radius: var(--ahc-radius-md);
+      background: linear-gradient(
+        180deg,
+        rgba(30, 41, 59, 0.54),
+        rgba(15, 23, 42, 0.58)
+      );
+    }
+
+    .ahc__metric-icon {
+      inline-size: 44px;
+      block-size: 44px;
+      border-radius: 14px;
+    }
+
+    .ahc__insights {
+      display: flex;
+      overflow-x: auto;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      scrollbar-width: none;
+    }
+
+    .ahc__insights::-webkit-scrollbar {
+      display: none;
+    }
+
+    .ahc__insights-title {
+      display: none;
+    }
+
+    .ahc__insight-card {
+      flex: 0 0 min(78vw, 280px);
+    }
+
+    .ahc-timeline-card {
+      border-radius: var(--ahc-radius-md);
+      background: transparent;
+      border: 0;
+    }
+
+    .ahc-timeline-toolbar {
+      position: sticky;
+      inset-block-start: 0;
+      z-index: 5;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(14px);
+    }
+
+    .ahc-timeline {
+      min-inline-size: 760px;
+    }
+
+    .ahc-timeline__groups {
+      display: grid;
+      gap: var(--ahc-gap-md);
+      padding: var(--ahc-gap-sm);
+    }
+
+    .ahc-group {
+      border: 1px solid var(--ahc-border-soft);
+      border-radius: var(--ahc-radius-md);
+      overflow: hidden;
+      background: linear-gradient(
+        180deg,
+        rgba(30, 41, 59, 0.48),
+        rgba(15, 23, 42, 0.58)
+      );
+    }
+
+    .ahc-group__header {
+      position: static;
+      min-block-size: 64px;
+    }
+
+    .ahc-timeline__axis,
+    .ahc-row {
+      grid-template-columns: 180px minmax(560px, 1fr);
+    }
+
+    .ahc-row {
+      min-block-size: 46px;
+    }
+
+    .ahc-row__label {
+      padding-inline: var(--ahc-gap-sm);
+    }
+
+    .ahc-row__state-chip {
+      display: inline-flex;
+      min-block-size: 28px;
+      align-items: center;
+    }
+
+    .ahc-legend {
+      justify-content: flex-start;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      padding-inline: var(--ahc-gap-sm);
+    }
+
+    .ahc-popover {
+      inset-inline: 12px !important;
+      inset-block-end: 12px !important;
+      inset-block-start: auto !important;
+      max-inline-size: none;
+      border-radius: 24px;
+    }
+
+    .ahc-filter-sheet {
+      inset-inline: max(10px, env(safe-area-inset-left))
+        max(10px, env(safe-area-inset-right));
+      inline-size: auto;
+      max-block-size: min(86svh, 820px);
+      border-start-start-radius: 28px;
+      border-start-end-radius: 28px;
+    }
+
+    .ahc-filter-section__chips {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .ahc-filter-section__chips::-webkit-scrollbar {
+      display: none;
+    }
+
+    .ahc-filter-section__chips > * {
+      flex: 0 0 auto;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .ahc__summary-grid {
+      margin-inline: -2px;
+    }
+
+    .ahc__metric-value {
+      font-size: 1.32rem;
+    }
+
+    .ahc-timeline__axis,
+    .ahc-row {
+      grid-template-columns: 164px minmax(540px, 1fr);
+    }
+
+    .ahc-row__name {
+      font-size: 0.8rem;
+    }
+  }
+
+  /* Motion & contrast */
+  @media (prefers-reduced-motion: reduce) {
+    .ahc *,
+    .ahc *::before,
+    .ahc *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .ahc,
+    .ahc__metric,
+    .ahc__filters,
+    .ahc-timeline-card,
+    .ahc__insights,
+    .ahc-filter-sheet,
+    .ahc-popover {
+      border: 1px solid CanvasText;
+      background: Canvas;
+      color: CanvasText;
+    }
+
+    .ahc__button,
+    .ahc__chip,
+    .ahc__segmented-button {
+      border: 1px solid ButtonText;
+      background: ButtonFace;
+      color: ButtonText;
+    }
+
+    .ahc-segment {
+      border: 2px solid CanvasText;
+    }
+  }
+
+  /* Optional compact mode for many entities */
+  .ahc--dense .ahc-row {
+    min-block-size: 30px;
+  }
+
+  .ahc--dense .ahc-row__track {
+    min-block-size: 30px;
+  }
+
+  .ahc--dense .ahc-segment {
+    block-size: 8px;
+  }
+
+  .ahc--dense .ahc-row__state-chip {
+    display: none;
+  }
+
+  .ahc--dense .ahc-row__name {
+    font-size: 0.78rem;
+  }
+
+  .ahc--ultra-dense .ahc-row,
+  .ahc-timeline-card--ultra-dense .ahc-row {
+    min-block-size: 24px;
+  }
+
+  .ahc--ultra-dense .ahc-row__track,
+  .ahc-timeline-card--ultra-dense .ahc-row__track {
+    min-block-size: 24px;
+  }
+
+  .ahc--ultra-dense .ahc-row__state-chip,
+  .ahc-timeline-card--ultra-dense .ahc-row__state-chip {
+    display: none;
+  }
+
+  .ahc--ultra-dense .ahc-row__name,
+  .ahc-timeline-card--ultra-dense .ahc-row__name {
+    font-size: 0.74rem;
+  }
 `;
-function W(t) {
-  const e = t.flatMap((h) => h.rows), a = e.flatMap((h) => h.segments.filter((_) => _.active)), i = a.reduce((h, _) => h + _.durationMs, 0), s = e.filter((h) => h.totalActiveMs > 0), r = a.length, n = Date.now(), c = e.filter((h) => h.segments.some((_) => _.active && _.start.getTime() <= n && _.end.getTime() >= n - 9e4)).length, o = [...a].sort((h, _) => _.start.getTime() - h.start.getTime())[0], l = o ? e.find((h) => h.entity.entity_id === o.entity_id) : void 0, d = [...s].sort((h, _) => _.totalActiveMs - h.totalActiveMs)[0], u = [...t].filter((h) => h.totalActiveMs > 0).sort((h, _) => _.totalActiveMs - h.totalActiveMs)[0];
+function V(t) {
+  const e = t.flatMap((u) => u.rows), i = e.flatMap(
+    (u) => u.segments.filter((p) => p.active)
+  ), a = i.reduce(
+    (u, p) => u + p.durationMs,
+    0
+  ), s = e.filter((u) => u.totalActiveMs > 0), n = i.length, r = Date.now(), o = e.filter(
+    (u) => u.segments.some(
+      (p) => p.active && p.start.getTime() <= r && p.end.getTime() >= r - 9e4
+    )
+  ).length, c = [...i].sort(
+    (u, p) => p.start.getTime() - u.start.getTime()
+  )[0], l = c ? e.find((u) => u.entity.entity_id === c.entity_id) : void 0, d = [...s].sort(
+    (u, p) => p.totalActiveMs - u.totalActiveMs
+  )[0], h = [...t].filter((u) => u.totalActiveMs > 0).sort((u, p) => p.totalActiveMs - u.totalActiveMs)[0];
   return {
-    totalActiveMs: i,
+    totalActiveMs: a,
     activeEntityCount: s.length,
-    eventCount: r,
-    activeNowCount: c,
-    lastEvent: o,
+    eventCount: n,
+    activeNowCount: o,
+    lastEvent: c,
     lastEventRow: l,
     mostActiveEntity: d,
-    mostActiveArea: u,
-    peakBucketLabel: gi(a)
+    mostActiveArea: h,
+    peakBucketLabel: Mi(i)
   };
 }
-function gi(t) {
+function Mi(t) {
   if (!t.length) return;
   const e = new Array(24).fill(0);
   for (const s of t) {
-    const r = s.start.getHours();
-    e[r] = (e[r] ?? 0) + s.durationMs;
+    const n = s.start.getHours();
+    e[n] = (e[n] ?? 0) + s.durationMs;
   }
-  const a = Math.max(...e), i = e.indexOf(a);
-  if (!(i < 0))
-    return `${String(i).padStart(2, "0")}:00 – ${String((i + 1) % 24).padStart(2, "0")}:00`;
+  const i = Math.max(...e), a = e.indexOf(i);
+  if (!(a < 0))
+    return `${String(a).padStart(2, "0")}:00 – ${String((a + 1) % 24).padStart(2, "0")}:00`;
 }
-class mi extends H {
+class Hi extends H {
   constructor() {
-    super(...arguments), this._config = { type: "custom:activity-history-card" }, this._areas = [], this._labels = [], this._domains = Y, this._loadedOptions = !1;
+    super(...arguments), this._config = {
+      type: "custom:activity-history-card"
+    }, this._areas = [], this._labels = [], this._domains = J, this._loadedOptions = !1;
   }
   static {
-    this.styles = Ie`
+    this.styles = qe`
     :host {
       display: block;
       color: var(--primary-text-color, #e5e7eb);
-      font-family: var(--primary-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif);
+      font-family: var(
+        --primary-font-family,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif
+      );
       direction: rtl;
     }
 
@@ -3120,7 +3831,11 @@ class mi extends H {
       padding: 14px;
       border: 1px solid var(--divider-color, rgba(148, 163, 184, 0.24));
       border-radius: 12px;
-      background: color-mix(in srgb, var(--card-background-color, #111827) 88%, transparent);
+      background: color-mix(
+        in srgb,
+        var(--card-background-color, #111827) 88%,
+        transparent
+      );
     }
 
     h3 {
@@ -3189,130 +3904,292 @@ class mi extends H {
       ...e,
       type: "custom:activity-history-card",
       auto_discover: e.auto_discover ?? !0,
-      hours_to_show: e.hours_to_show ?? k.hours_to_show,
-      display_mode: e.display_mode ?? k.display_mode,
-      group_by: e.group_by ?? k.group_by
+      hours_to_show: e.hours_to_show ?? x.hours_to_show,
+      display_mode: e.display_mode ?? x.display_mode,
+      group_by: e.group_by ?? x.group_by
     }, this.requestUpdate();
   }
   set hass(e) {
     this._hass = e, this._loadedOptions || (this._loadedOptions = !0, this._loadOptions());
   }
   render() {
-    const e = this._config, a = e.domains?.length ? e.domains : Y;
-    return p`
+    const e = this._config, i = e.domains?.length ? e.domains : J;
+    return _`
       <div class="editor">
         <section class="section">
           <h3>הגדרות כלליות</h3>
           <div class="row">
             <label>
               כותרת
-              <input type="text" .value=${e.title ?? k.title} @input=${(i) => this._setValue("title", ne(i))} />
+              <input
+                type="text"
+                .value=${e.title ?? x.title}
+                @input=${(a) => this._setValue("title", B(a))}
+              />
             </label>
             <label>
               טווח שעות
-              <input type="number" min="1" max="168" .value=${String(e.hours_to_show ?? 24)} @input=${(i) => this._setNumber("hours_to_show", ne(i))} />
+              <input
+                type="number"
+                min="1"
+                max="168"
+                .value=${String(e.hours_to_show ?? 24)}
+                @input=${(a) => this._setNumber("hours_to_show", B(a))}
+              />
             </label>
           </div>
           <div class="row">
             <label>
               מצב תצוגה
-              <select .value=${e.display_mode ?? "panel"} @change=${(i) => this._setValue("display_mode", ne(i))}>
+              <select
+                .value=${e.display_mode ?? "panel"}
+                @change=${(a) => this._setValue(
+      "display_mode",
+      B(a)
+    )}
+              >
                 <option value="card">כרטיס רגיל</option>
                 <option value="panel">פאנל</option>
                 <option value="fullscreen">מסך מלא</option>
               </select>
             </label>
             <label class="check">
-              <input type="checkbox" .checked=${e.mock_data === !0} @change=${(i) => this._setChecked("mock_data", i)} />
+              <input
+                type="checkbox"
+                .checked=${e.mock_data === !0}
+                @change=${(a) => this._setChecked("mock_data", a)}
+              />
               נתוני דוגמה
             </label>
           </div>
           <label class="check">
-            <input type="checkbox" .checked=${e.debug === !0} @change=${(i) => this._setChecked("debug", i)} />
+            <input
+              type="checkbox"
+              .checked=${e.debug === !0}
+              @change=${(a) => this._setChecked("debug", a)}
+            />
             הצג דיאגנוסטיקה
           </label>
           <label class="check">
-            <input type="checkbox" .checked=${e.auto_discover !== !1} @change=${(i) => this._setChecked("auto_discover", i)} />
+            <input
+              type="checkbox"
+              .checked=${e.auto_discover !== !1}
+              @change=${(a) => this._setChecked("auto_discover", a)}
+            />
             משוך אוטומטית רכיבים שמשויכים לאזורים
           </label>
-          <p class="hint">כאשר האפשרות פעילה ואין רשימת entities ידנית, הכרטיס מאתר ישויות לפי אזורי Home Assistant ומסנן לפי הדומיינים והלייבלים שבחרת.</p>
+          <p class="hint">
+            כאשר האפשרות פעילה ואין רשימת entities ידנית, הכרטיס מאתר ישויות לפי
+            אזורי Home Assistant ומסנן לפי הדומיינים והלייבלים שבחרת.
+          </p>
+        </section>
+
+        <section class="section">
+          <h3>סינון חכם</h3>
+          <div class="row">
+            <label class="check">
+              <input
+                type="checkbox"
+                .checked=${e.smart_filter !== !1}
+                @change=${(a) => this._setChecked("smart_filter", a)}
+              />
+              הסתר רעש אוטומטית
+            </label>
+            <label class="check">
+              <input
+                type="checkbox"
+                .checked=${e.hide_empty_rows !== !1}
+                @change=${(a) => this._setChecked("hide_empty_rows", a)}
+              />
+              הסתר שורות ללא פעילות
+            </label>
+          </div>
+          <div class="row">
+            <label>
+              מינימום פעילות בשניות
+              <input
+                type="number"
+                min="0"
+                max="3600"
+                .value=${String(
+      e.min_row_active_seconds ?? x.min_row_active_seconds
+    )}
+                @input=${(a) => this._setNumber("min_row_active_seconds", B(a))}
+              />
+            </label>
+            <label>
+              מקסימום שורות להצגה
+              <input
+                type="number"
+                min="1"
+                max="200"
+                .value=${String(
+      e.max_total_rows ?? x.max_total_rows
+    )}
+                @input=${(a) => this._setNumber("max_total_rows", B(a))}
+              />
+            </label>
+          </div>
+          <div class="check-grid">
+            <label class="check">
+              <input
+                type="checkbox"
+                .checked=${e.show_technical_entities === !0}
+                @change=${(a) => this._setChecked("show_technical_entities", a)}
+              />
+              הצג רכיבים טכניים
+            </label>
+            <label class="check">
+              <input
+                type="checkbox"
+                .checked=${e.show_config_entities === !0}
+                @change=${(a) => this._setChecked("show_config_entities", a)}
+              />
+              הצג ישויות הגדרה
+            </label>
+            <label class="check">
+              <input
+                type="checkbox"
+                .checked=${e.show_diagnostic_entities === !0}
+                @change=${(a) => this._setChecked("show_diagnostic_entities", a)}
+              />
+              הצג ישויות אבחון
+            </label>
+          </div>
+          <p class="hint">
+            ברירת המחדל מסתירה שורות ריקות, רכיבי אבחון, אפשרויות תוכנית ורעש
+            כמו נתבים/חיבור/עדכונים. רכיבים שהוגדרו ידנית ב-YAML לא מוסתרים
+            אוטומטית.
+          </p>
         </section>
 
         <section class="section">
           <h3>דומיינים להצגה</h3>
           <div class="check-grid">
-            ${this._domains.map((i) => this._renderArrayCheckbox("domains", i, L[i] ?? i, a.includes(i)))}
+            ${this._domains.map(
+      (a) => this._renderArrayCheckbox(
+        "domains",
+        a,
+        L[a] ?? a,
+        i.includes(a)
+      )
+    )}
           </div>
-          <p class="hint">אם לא תבחר ידנית, הכרטיס משתמש בדומיינים שימושיים לפעילות כמו תאורה, מתגים, מזגנים, תריסים וחיישנים בינאריים.</p>
+          <p class="hint">
+            אם לא תבחר ידנית, הכרטיס משתמש בדומיינים שימושיים לפעילות כמו תאורה,
+            מתגים, מזגנים, נגני מדיה, תריסים ומאווררים.
+          </p>
         </section>
 
         <section class="section">
           <h3>אזורים</h3>
-          ${this._areas.length ? p`<div class="check-grid">
-                ${this._areas.map((i) => this._renderArrayCheckbox("areas", i.name, i.name, (e.areas ?? []).includes(i.name) || (e.areas ?? []).includes(i.area_id)))}
-              </div>` : p`<p class="hint">לא נטענו אזורים מה־registry. אפשר עדיין לערוך YAML ידנית.</p>`}
-          <p class="hint">אם לא נבחר אזור, יוצגו כל האזורים שיש להם רכיבים מתאימים.</p>
+          ${this._areas.length ? _`<div class="check-grid">
+                ${this._areas.map(
+      (a) => this._renderArrayCheckbox(
+        "areas",
+        a.name,
+        a.name,
+        (e.areas ?? []).includes(a.name) || (e.areas ?? []).includes(a.area_id)
+      )
+    )}
+              </div>` : _`<p class="hint">
+                לא נטענו אזורים מה־registry. אפשר עדיין לערוך YAML ידנית.
+              </p>`}
+          <p class="hint">
+            אם לא נבחר אזור, יוצגו כל האזורים שיש להם רכיבים מתאימים.
+          </p>
         </section>
 
         <section class="section">
           <h3>לייבלים</h3>
-          ${this._labels.length ? this._renderLabelControls(e) : p`<p class="hint">לא נמצאו labels ב־Home Assistant, או שהגרסה לא תומכת ב־label registry.</p>`}
+          ${this._labels.length ? this._renderLabelControls(e) : _`<p class="hint">
+                לא נמצאו labels ב־Home Assistant, או שהגרסה לא תומכת ב־label
+                registry.
+              </p>`}
         </section>
       </div>
     `;
   }
   _renderLabelControls(e) {
-    return p`
-      <p class="hint">בחר labels להצגה או להסתרה. הסתרה גוברת על הצגה, כך שאפשר למשל להסתיר "לא להצגה" או "רכיבים מוגנים".</p>
+    return _`
+      <p class="hint">
+        בחר labels להצגה או להסתרה. הסתרה גוברת על הצגה, כך שאפשר למשל להסתיר
+        "לא להצגה" או "רכיבים מוגנים".
+      </p>
       <h3>הצג רק labels אלה</h3>
       <div class="check-grid">
-        ${this._labels.map((a) => this._renderArrayCheckbox("include_labels", a.name, a.name, (e.include_labels ?? []).includes(a.name) || (e.include_labels ?? []).includes(a.label_id)))}
+        ${this._labels.map(
+      (i) => this._renderArrayCheckbox(
+        "include_labels",
+        i.name,
+        i.name,
+        (e.include_labels ?? []).includes(i.name) || (e.include_labels ?? []).includes(i.label_id)
+      )
+    )}
       </div>
       <h3>הסתר labels אלה</h3>
       <div class="check-grid">
-        ${this._labels.map((a) => this._renderArrayCheckbox("exclude_labels", a.name, a.name, (e.exclude_labels ?? []).includes(a.name) || (e.exclude_labels ?? []).includes(a.label_id)))}
+        ${this._labels.map(
+      (i) => this._renderArrayCheckbox(
+        "exclude_labels",
+        i.name,
+        i.name,
+        (e.exclude_labels ?? []).includes(i.name) || (e.exclude_labels ?? []).includes(i.label_id)
+      )
+    )}
       </div>
     `;
   }
-  _renderArrayCheckbox(e, a, i, s) {
-    return p`
+  _renderArrayCheckbox(e, i, a, s) {
+    return _`
       <label class="check">
-        <input type="checkbox" .checked=${s} @change=${(r) => this._toggleArrayValue(e, a, r)} />
-        ${i}
+        <input
+          type="checkbox"
+          .checked=${s}
+          @change=${(n) => this._toggleArrayValue(e, i, n)}
+        />
+        ${a}
       </label>
     `;
   }
   async _loadOptions() {
     if (!this._hass) return;
-    const [e, a] = await Promise.all([this._safeRegistryCall("config/area_registry/list"), this._safeRegistryCall("config/label_registry/list")]), i = [...new Set(Object.keys(this._hass.states).map(F))].filter(Boolean).sort();
-    this._areas = e.sort((s, r) => s.name.localeCompare(r.name, "he")), this._labels = a.sort((s, r) => s.name.localeCompare(r.name, "he")), this._domains = [.../* @__PURE__ */ new Set([...Y, ...i])].sort(), this.requestUpdate();
+    const [e, i] = await Promise.all([
+      this._safeRegistryCall("config/area_registry/list"),
+      this._safeRegistryCall("config/label_registry/list")
+    ]), a = [
+      ...new Set(Object.keys(this._hass.states).map(F))
+    ].filter(Boolean).sort();
+    this._areas = e.sort((s, n) => s.name.localeCompare(n.name, "he")), this._labels = i.sort((s, n) => s.name.localeCompare(n.name, "he")), this._domains = [
+      .../* @__PURE__ */ new Set([...J, ...a])
+    ].sort(), this.requestUpdate();
   }
   async _safeRegistryCall(e) {
     try {
-      const a = await this._hass?.callWS({ type: e });
-      return Array.isArray(a) ? a : [];
+      const i = await this._hass?.callWS({ type: e });
+      return Array.isArray(i) ? i : [];
     } catch {
       return [];
     }
   }
-  _setValue(e, a) {
-    this._emitConfig({ ...this._config, [e]: a });
-  }
-  _setNumber(e, a) {
-    const i = Number(a);
-    Number.isFinite(i) && i > 0 && this._emitConfig({ ...this._config, [e]: i });
-  }
-  _setChecked(e, a) {
-    const i = a.target.checked;
+  _setValue(e, i) {
     this._emitConfig({ ...this._config, [e]: i });
   }
-  _toggleArrayValue(e, a, i) {
-    const s = i.target.checked, r = new Set(this._config[e] ?? []);
-    s ? r.add(a) : r.delete(a);
-    const n = [...r];
+  _setNumber(e, i) {
+    const a = Number(i);
+    Number.isFinite(a) && (e === "hours_to_show" && a <= 0 || e !== "hours_to_show" && a < 0 || this._emitConfig({ ...this._config, [e]: a }));
+  }
+  _setChecked(e, i) {
+    const a = i.target.checked;
+    this._emitConfig({ ...this._config, [e]: a });
+  }
+  _toggleArrayValue(e, i, a) {
+    const s = a.target.checked, n = new Set(this._config[e] ?? []);
+    s ? n.add(i) : n.delete(i);
+    const r = [...n];
     this._emitConfig({
       ...this._config,
-      [e]: n.length ? n : void 0
+      [e]: r.length ? r : void 0
     });
   }
   _emitConfig(e) {
@@ -3325,30 +4202,36 @@ class mi extends H {
     ), this.requestUpdate();
   }
 }
-function ne(t) {
+function B(t) {
   return t.target.value;
 }
-customElements.get("activity-history-card-editor") || customElements.define("activity-history-card-editor", mi);
-class fi extends H {
+customElements.get("activity-history-card-editor") || customElements.define(
+  "activity-history-card-editor",
+  Hi
+);
+class Di extends H {
   constructor() {
-    super(...arguments), this._rows = [], this._groups = [], this._loading = !1, this._fullscreen = !1, this._filterSheetOpen = !1, this._usingMockData = !1, this._fetchToken = 0, this._lastFetchKey = "", this._hasFetchedOnce = !1, this._initialLoad = !1, this._backgroundLoading = !1, this._lastResolvedEntityKey = "", this._lastHistoryFetchAt = 0, this._historyCache = /* @__PURE__ */ new Map(), this._filter = {
+    super(...arguments), this._rows = [], this._visibleRows = [], this._groups = [], this._loading = !1, this._fullscreen = !1, this._filterSheetOpen = !1, this._usingMockData = !1, this._showAllRows = !1, this._fetchToken = 0, this._lastFetchKey = "", this._hasFetchedOnce = !1, this._initialLoad = !1, this._backgroundLoading = !1, this._lastResolvedEntityKey = "", this._lastHistoryFetchAt = 0, this._historyCache = /* @__PURE__ */ new Map(), this._filter = {
       search: "",
       areas: [],
       domains: [],
       stateMode: "all",
       groupBy: "area",
       timePreset: "24h"
-    }, this._openSegmentPopover = (e, a, i) => {
+    }, this._openSegmentPopover = (e, i, a) => {
       e.preventDefault(), e.stopPropagation();
-      const s = this._rows.find((l) => l.entity.entity_id === a), r = s?.segments[i], n = e.currentTarget instanceof Element ? e.currentTarget : void 0;
-      if (!s || !r || !n) return;
-      const c = n.getBoundingClientRect(), o = Zt(c, { width: window.innerWidth, height: window.innerHeight });
+      const s = this._visibleRows.find((l) => l.entity.entity_id === i) ?? this._rows.find((l) => l.entity.entity_id === i), n = s?.segments[a], r = e.currentTarget instanceof Element ? e.currentTarget : void 0;
+      if (!s || !n || !r) return;
+      const o = r.getBoundingClientRect(), c = ri(o, {
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
       this._segmentPopover = {
         row: s,
-        segment: r,
-        x: o.x,
-        y: o.y,
-        placement: o.placement
+        segment: n,
+        x: c.x,
+        y: c.y,
+        placement: c.placement
       }, document.addEventListener("pointerdown", this._onDocumentPointerDown), document.addEventListener("keydown", this._onDocumentKeyDown), this.requestUpdate();
     }, this._closeSegmentPopover = () => {
       this._segmentPopover = void 0, document.removeEventListener("pointerdown", this._onDocumentPointerDown), !this._fullscreen && !this._filterSheetOpen && document.removeEventListener("keydown", this._onDocumentKeyDown), this.requestUpdate();
@@ -3357,18 +4240,20 @@ class fi extends H {
     }, this._closeFilterSheet = () => {
       this._filterSheetOpen = !1, this._fullscreen || document.removeEventListener("keydown", this._onDocumentKeyDown), this.requestUpdate();
     }, this._onSearchInput = (e) => {
-      const a = e.target;
-      this._filter = { ...this._filter, search: a.value }, this._rebuildGroups();
+      const i = e.target;
+      this._filter = { ...this._filter, search: i.value }, this._rebuildGroups();
     }, this._clearFilters = () => {
-      const e = this._filter.timePreset, a = this._initialTimePreset(this._config);
-      this._filter = {
+      const e = this._filter.timePreset, i = this._initialTimePreset(this._config);
+      this._showAllRows = !1, this._filter = {
         search: "",
         areas: [],
         domains: [],
         stateMode: "all",
         groupBy: this._config.group_by ?? "area",
-        timePreset: a
-      }, this._rebuildGroups(), e !== a && (this._lastFetchKey = "", this._requestHistoryRefresh("range", { force: !0 }));
+        timePreset: i
+      }, this._rebuildGroups(), e !== i && (this._lastFetchKey = "", this._requestHistoryRefresh("range", { force: !0 }));
+    }, this._toggleShowAllRows = () => {
+      this._showAllRows = !this._showAllRows, this._rebuildGroups();
     }, this._manualRefresh = () => {
       this._historyCache.clear(), this._lastFetchKey = "", this._requestHistoryRefresh("manual", { force: !0 });
     }, this._toggleFullscreen = async () => {
@@ -3381,7 +4266,10 @@ class fi extends H {
         }
         await this.updateComplete, this.renderRoot.querySelector(".ahc")?.focus();
       } else
-        document.removeEventListener("fullscreenchange", this._onFullscreenChange), this._filterSheetOpen || document.removeEventListener("keydown", this._onDocumentKeyDown), document.fullscreenElement && await document.exitFullscreen().catch(() => {
+        document.removeEventListener(
+          "fullscreenchange",
+          this._onFullscreenChange
+        ), this._filterSheetOpen || document.removeEventListener("keydown", this._onDocumentKeyDown), document.fullscreenElement && await document.exitFullscreen().catch(() => {
         });
       this.requestUpdate();
     }, this._onDocumentKeyDown = (e) => {
@@ -3397,13 +4285,18 @@ class fi extends H {
         this._fullscreen && this._toggleFullscreen();
       }
     }, this._onDocumentPointerDown = (e) => {
-      e.composedPath().some((i) => i instanceof HTMLElement && i.classList.contains("ahc-popover")) || this._segmentPopover && this._closeSegmentPopover();
+      e.composedPath().some(
+        (a) => a instanceof HTMLElement && a.classList.contains("ahc-popover")
+      ) || this._segmentPopover && this._closeSegmentPopover();
     }, this._onFullscreenChange = () => {
-      !document.fullscreenElement && this._fullscreen && (this._fullscreen = !1, document.removeEventListener("fullscreenchange", this._onFullscreenChange), this._filterSheetOpen || document.removeEventListener("keydown", this._onDocumentKeyDown), this.requestUpdate());
+      !document.fullscreenElement && this._fullscreen && (this._fullscreen = !1, document.removeEventListener(
+        "fullscreenchange",
+        this._onFullscreenChange
+      ), this._filterSheetOpen || document.removeEventListener("keydown", this._onDocumentKeyDown), this.requestUpdate());
     };
   }
   static {
-    this.styles = _i;
+    this.styles = Ti;
   }
   static getConfigElement() {
     return document.createElement("activity-history-card-editor");
@@ -3411,7 +4304,7 @@ class fi extends H {
   static getStubConfig() {
     return {
       type: "custom:activity-history-card",
-      title: k.title,
+      title: x.title,
       auto_discover: !0,
       display_mode: "panel",
       hours_to_show: 24,
@@ -3420,13 +4313,15 @@ class fi extends H {
   }
   setConfig(e) {
     if (!e || e.type !== "custom:activity-history-card")
-      throw new Error("Invalid card type. Expected custom:activity-history-card");
-    const a = this._initialTimePreset(e);
+      throw new Error(
+        "Invalid card type. Expected custom:activity-history-card"
+      );
+    const i = this._initialTimePreset(e);
     this._config = {
-      ...k,
+      ...x,
       ...e,
       view_mode: e.view_mode ?? e.default_view ?? "swimlane",
-      group_by: e.group_by ?? k.group_by,
+      group_by: e.group_by ?? x.group_by,
       filters: {
         show: !0,
         show_search: !0,
@@ -3442,23 +4337,27 @@ class fi extends H {
       domains: this._config.filters?.default_domains ?? [],
       stateMode: this._config.filters?.active_only ? "active_only" : "all",
       groupBy: this._config.group_by ?? "area",
-      timePreset: a
-    }, this._lastFetchKey = "", this._lastResolvedEntityKey = "", this._historyCache.clear(), this._syncRefreshTimer(), this._requestHistoryRefresh(this._hasFetchedOnce ? "config" : "initial", { force: !0 });
+      timePreset: i
+    }, this._lastFetchKey = "", this._lastResolvedEntityKey = "", this._showAllRows = !1, this._historyCache.clear(), this._syncRefreshTimer(), this._requestHistoryRefresh(this._hasFetchedOnce ? "config" : "initial", {
+      force: !0
+    });
   }
   set hass(e) {
-    this._hass = e, Qt({
+    this._hass = e, oi({
       hasFetchedOnce: this._hasFetchedOnce,
       live: this._config?.live !== !1,
       lastHistoryFetchAt: this._lastHistoryFetchAt,
       now: Date.now(),
       refreshIntervalSeconds: this._refreshIntervalSeconds()
-    }) ? this._requestHistoryRefresh(this._hasFetchedOnce ? "interval" : "initial") : this.requestUpdate();
+    }) ? this._requestHistoryRefresh(
+      this._hasFetchedOnce ? "interval" : "initial"
+    ) : this.requestUpdate();
   }
   disconnectedCallback() {
     super.disconnectedCallback(), this._unsubscribeHistory?.(), this._unsubscribeHistory = void 0, this._fetchToken += 1, this._refreshTimer && window.clearTimeout(this._refreshTimer), this._refreshTimer = void 0, this._inFlightHistoryRequest = void 0, document.removeEventListener("keydown", this._onDocumentKeyDown), document.removeEventListener("fullscreenchange", this._onFullscreenChange), document.removeEventListener("pointerdown", this._onDocumentPointerDown);
   }
   getCardSize() {
-    const e = this._rows.length || (this._config?.entities?.length ?? 3);
+    const e = this._visibleRows.length || this._rows.length || (this._config?.entities?.length ?? 3);
     return Math.min(18, Math.max(5, Math.ceil(e * 0.7) + 4));
   }
   getGridOptions() {
@@ -3470,19 +4369,28 @@ class fi extends H {
     };
   }
   render() {
-    if (!this._config) return p``;
-    const e = this._hass?.locale?.language ?? this._hass?.language, a = At(this._config.direction ?? this._config.rtl ?? "auto", e), i = [
+    if (!this._config) return _``;
+    const e = this._hass?.locale?.language ?? this._hass?.language, i = Mt(
+      this._config.direction ?? this._config.rtl ?? "auto",
+      e
+    ), a = [
       "ahc",
       this._config.display_mode === "panel" ? "ahc--panel" : "",
       this._fullscreen || this._config.display_mode === "fullscreen" ? "ahc--fullscreen" : "",
       this._filterSheetOpen ? "ahc--sheet-open" : "",
       this._usingMockData ? "ahc--mock" : "",
       this._backgroundLoading ? "ahc--background-loading" : "",
-      this._rows.length > 70 ? "ahc--ultra-dense" : this._rows.length > 30 ? "ahc--dense" : ""
+      this._visibleRows.length > 70 ? "ahc--ultra-dense" : this._visibleRows.length > 30 ? "ahc--dense" : ""
     ].filter(Boolean).join(" ");
-    return p`
-      <ha-card class=${i} dir=${a ? "rtl" : "ltr"} tabindex=${this._fullscreen ? "0" : "-1"} aria-busy=${this._initialLoad ? "true" : "false"}>
-        ${this._renderHeader()} ${this._renderFilters()} ${this._renderSummary()}
+    return _`
+      <ha-card
+        class=${a}
+        dir=${i ? "rtl" : "ltr"}
+        tabindex=${this._fullscreen ? "0" : "-1"}
+        aria-busy=${this._initialLoad ? "true" : "false"}
+      >
+        ${this._renderHeader()} ${this._renderFilters()}
+        ${this._renderSummary()}
         ${this._config.debug ? this._renderDiagnostics() : g}
         ${this._renderBody()}
         ${this._segmentPopover ? this._renderSegmentPopover() : g}
@@ -3492,8 +4400,10 @@ class fi extends H {
   }
   _renderBody() {
     const e = this._config.show_insights !== !1;
-    return p`
-      <div class=${e ? "ahc__body" : "ahc__body ahc__body--no-insights"}>
+    return _`
+      <div
+        class=${e ? "ahc__body" : "ahc__body ahc__body--no-insights"}
+      >
         <main class="ahc__main">${this._renderMainContent()}</main>
         ${e ? this._renderInsights() : g}
       </div>
@@ -3501,58 +4411,110 @@ class fi extends H {
   }
   _renderHeader() {
     const e = `${this._timePresetLabel(this._filter.timePreset)} · ${this._usingMockData ? "נתוני דוגמה" : "נתוני Home Assistant"}`;
-    return p`
+    return _`
       <header class="ahc__topbar">
         <div class="ahc__toolbar">
-          ${this._config.show_fullscreen_button === !1 ? g : p`
+          ${this._config.show_fullscreen_button === !1 ? g : _`
                 <button
                   class="ahc__button ahc__button--ghost"
                   type="button"
                   @click=${this._toggleFullscreen}
                   aria-pressed=${this._fullscreen ? "true" : "false"}
                 >
-                  <span aria-hidden="true">${this._fullscreen ? "×" : "⛶"}</span>
+                  <span aria-hidden="true"
+                    >${this._fullscreen ? "×" : "⛶"}</span
+                  >
                   <span>${this._fullscreen ? "צא ממסך מלא" : "מסך מלא"}</span>
                 </button>
               `}
-          <button class="ahc__button ahc__button--ghost" type="button" @click=${this._manualRefresh} ?disabled=${this._initialLoad || this._backgroundLoading}>
+          <button
+            class="ahc__button ahc__button--ghost"
+            type="button"
+            @click=${this._manualRefresh}
+            ?disabled=${this._initialLoad || this._backgroundLoading}
+          >
             <span aria-hidden="true">↻</span><span>רענן</span>
           </button>
-          ${this._backgroundLoading ? p`<span class="ahc__refresh-indicator" role="status">מעדכן...</span>` : g}
+          ${this._backgroundLoading ? _`<span class="ahc__refresh-indicator" role="status"
+                >מעדכן...</span
+              >` : g}
         </div>
         <div class="ahc__title-block">
           <div class="ahc__title-row">
-            <span class="ahc__icon-badge" aria-hidden="true"><ha-icon icon="mdi:chart-timeline-variant"></ha-icon></span>
-            <h2 class="ahc__title">${this._config.title ?? k.title}</h2>
+            <span class="ahc__icon-badge" aria-hidden="true"
+              ><ha-icon icon="mdi:chart-timeline-variant"></ha-icon
+            ></span>
+            <h2 class="ahc__title">
+              ${this._config.title ?? x.title}
+            </h2>
           </div>
           <p class="ahc__subtitle">${e}</p>
+          ${this._renderLastEventPill()}
         </div>
       </header>
     `;
   }
   _renderLastEventPill() {
-    const e = this._summary, a = e?.lastEventRow, i = e?.lastEvent;
-    return !a || !i ? g : p`
+    const e = this._summary, i = e?.lastEventRow, a = e?.lastEvent;
+    return !i || !a ? g : _`
       <div class="ahc-last-event">
         <span class="ahc-last-event__label">אירוע אחרון</span>
-        <strong>${a.entity.name}</strong>
-        <span>${x(i.start)} · ${O[i.category]} · ${ae(a, this._config.debug === !0)}</span>
+        <strong>${i.entity.name}</strong>
+        <span
+          >${$(a.start)} · ${O[a.category]} ·
+          ${se(i, this._config.debug === !0)}</span
+        >
       </div>
     `;
   }
   _renderFilters() {
-    return this._config.filters?.show === !1 ? g : p`
+    if (this._config.filters?.show === !1) return g;
+    const e = he(this._curation), i = !!(this._curation?.hiddenRows || this._showAllRows);
+    return _`
       <section class="ahc__filters" aria-label="מסננים">
         <div class="ahc__filter-row ahc__filter-row--primary">
           <span class="ahc__filter-label">טווח זמן</span>
-          ${this._renderChip("24 שעות", this._filter.timePreset === "24h", () => this._setTimePreset("24h"))}
-          ${this._renderChip("7 ימים", this._filter.timePreset === "7d", () => this._setTimePreset("7d"))}
-          ${this._renderChip("מותאם", this._filter.timePreset === "custom", () => this._setTimePreset("custom"))}
+          ${this._renderChip(
+      "24 שעות",
+      this._filter.timePreset === "24h",
+      () => this._setTimePreset("24h")
+    )}
+          ${this._renderChip(
+      "7 ימים",
+      this._filter.timePreset === "7d",
+      () => this._setTimePreset("7d")
+    )}
+          ${this._renderChip(
+      "מותאם",
+      this._filter.timePreset === "custom",
+      () => this._setTimePreset("custom")
+    )}
           <span class="ahc__filter-label">קבץ לפי</span>
           <div class="ahc__segmented" aria-label="קיבוץ לפי">
-            <button class="ahc__segmented-button" type="button" aria-pressed=${this._filter.groupBy === "area"} @click=${() => this._setGroupBy("area")}>אזור</button>
-            <button class="ahc__segmented-button" type="button" aria-pressed=${this._filter.groupBy === "domain"} @click=${() => this._setGroupBy("domain")}>סוג</button>
-            <button class="ahc__segmented-button" type="button" aria-pressed=${this._filter.groupBy === "none"} @click=${() => this._setGroupBy("none")}>ללא</button>
+            <button
+              class="ahc__segmented-button"
+              type="button"
+              aria-pressed=${this._filter.groupBy === "area"}
+              @click=${() => this._setGroupBy("area")}
+            >
+              אזור
+            </button>
+            <button
+              class="ahc__segmented-button"
+              type="button"
+              aria-pressed=${this._filter.groupBy === "domain"}
+              @click=${() => this._setGroupBy("domain")}
+            >
+              סוג
+            </button>
+            <button
+              class="ahc__segmented-button"
+              type="button"
+              aria-pressed=${this._filter.groupBy === "none"}
+              @click=${() => this._setGroupBy("none")}
+            >
+              ללא
+            </button>
           </div>
           <div class="ahc__search">
             <span class="ahc__search-icon" aria-hidden="true">⌕</span>
@@ -3564,27 +4526,100 @@ class fi extends H {
               @input=${this._onSearchInput}
             />
           </div>
-          <button class="ahc__button ahc__button--primary" type="button" @click=${this._openFilterSheet} aria-expanded=${this._filterSheetOpen ? "true" : "false"}>
+          <button
+            class="ahc__button ahc__button--primary"
+            type="button"
+            @click=${this._openFilterSheet}
+            aria-expanded=${this._filterSheetOpen ? "true" : "false"}
+          >
             <span aria-hidden="true">▾</span><span>סינון</span>
           </button>
+          ${i ? _`<button
+                class="ahc__button ahc__button--ghost"
+                type="button"
+                aria-pressed=${this._showAllRows ? "true" : "false"}
+                @click=${this._toggleShowAllRows}
+              >
+                ${this._showAllRows ? "סינון חכם" : "הצג הכל"}
+              </button>` : g}
+          ${e ? _`<span class="ahc-curation-note">${e}</span>` : g}
         </div>
       </section>
     `;
   }
-  _renderChip(e, a, i) {
-    return p`<button class="ahc__chip" type="button" aria-pressed=${a ? "true" : "false"} @click=${i}>${e}</button>`;
+  _renderChip(e, i, a) {
+    return _`<button
+      class="ahc__chip"
+      type="button"
+      aria-pressed=${i ? "true" : "false"}
+      @click=${a}
+    >
+      ${e}
+    </button>`;
   }
   _renderSummary() {
     if (this._config.show_summary === !1) return g;
-    const e = this._summary, a = e?.lastEventRow, i = e?.lastEvent;
-    return p`
+    const e = this._summary, i = this._visibleRows.length || this._rows.length;
+    return _`
+      <section class="ahc__summary-grid" aria-label="סיכום פעילות">
+        <article class="ahc__metric">
+          <div class="ahc__metric-copy">
+            <span class="ahc__metric-label">פעילים עכשיו</span>
+            <span class="ahc__metric-value"
+              >${e?.activeNowCount ?? 0}</span
+            >
+            <span class="ahc__metric-subtitle">רכיבים שפועלים כרגע</span>
+          </div>
+          <span class="ahc__metric-icon" aria-hidden="true">●</span>
+        </article>
+        <article class="ahc__metric">
+          <div class="ahc__metric-copy">
+            <span class="ahc__metric-label">רכיבים שפעלו</span>
+            <span class="ahc__metric-value"
+              >${e?.activeEntityCount ?? 0}</span
+            >
+            <span class="ahc__metric-subtitle"
+              >מתוך ${i} רכיבים מוצגים</span
+            >
+          </div>
+          <span class="ahc__metric-icon" aria-hidden="true">▣</span>
+        </article>
+        <article class="ahc__metric">
+          <div class="ahc__metric-copy">
+            <span class="ahc__metric-label">אירועים</span>
+            <span class="ahc__metric-value">${e?.eventCount ?? 0}</span>
+            <span class="ahc__metric-subtitle">שינויי מצב פעילים</span>
+          </div>
+          <span class="ahc__metric-icon" aria-hidden="true">⌁</span>
+        </article>
+        <article class="ahc__metric">
+          <div class="ahc__metric-copy">
+            <span class="ahc__metric-label">סה״כ שעות־רכיב</span>
+            <span class="ahc__metric-value ahc__metric-value--positive"
+              >${E(e?.totalActiveMs ?? 0)}</span
+            >
+            <span class="ahc__metric-subtitle"
+              >סכום פעילות על פני כל הרכיבים</span
+            >
+          </div>
+          <span class="ahc__metric-icon" aria-hidden="true">◴</span>
+        </article>
+      </section>
+    `;
+  }
+  _renderSummaryLegacy() {
+    if (this._config.show_summary === !1) return g;
+    const e = this._summary, i = e?.lastEventRow, a = e?.lastEvent;
+    return _`
       <section class="ahc__summary-grid" aria-label="סיכום פעילות">
         <article class="ahc__metric">
           <div class="ahc__metric-copy">
             <span class="ahc__metric-label">אירוע אחרון</span>
-            <span class="ahc__metric-value ahc__metric-value--compact">${a?.entity.name ?? "אין"}</span>
+            <span class="ahc__metric-value ahc__metric-value--compact"
+              >${i?.entity.name ?? "אין"}</span
+            >
             <span class="ahc__metric-subtitle">
-              ${i && a ? `${x(i.start)} · ${O[i.category]} · ${ae(a, this._config.debug === !0)}` : "לא נמצאו אירועים בטווח"}
+              ${a && i ? `${$(a.start)} · ${O[a.category]} · ${se(i, this._config.debug === !0)}` : "לא נמצאו אירועים בטווח"}
             </span>
           </div>
           <span class="ahc__metric-icon" aria-hidden="true">♪</span>
@@ -3592,8 +4627,12 @@ class fi extends H {
         <article class="ahc__metric">
           <div class="ahc__metric-copy">
             <span class="ahc__metric-label">סה״כ שעות־רכיב</span>
-            <span class="ahc__metric-value ahc__metric-value--positive">${M(e?.totalActiveMs ?? 0)}</span>
-            <span class="ahc__metric-subtitle">סכום פעילות על פני כל הרכיבים</span>
+            <span class="ahc__metric-value ahc__metric-value--positive"
+              >${E(e?.totalActiveMs ?? 0)}</span
+            >
+            <span class="ahc__metric-subtitle"
+              >סכום פעילות על פני כל הרכיבים</span
+            >
           </div>
           <span class="ahc__metric-icon" aria-hidden="true">◷</span>
         </article>
@@ -3608,8 +4647,12 @@ class fi extends H {
         <article class="ahc__metric">
           <div class="ahc__metric-copy">
             <span class="ahc__metric-label">פעילים עכשיו</span>
-            <span class="ahc__metric-value">${e?.activeNowCount ?? 0}</span>
-            <span class="ahc__metric-subtitle">${e?.activeEntityCount ?? 0} רכיבים פעלו בטווח</span>
+            <span class="ahc__metric-value"
+              >${e?.activeNowCount ?? 0}</span
+            >
+            <span class="ahc__metric-subtitle"
+              >${e?.activeEntityCount ?? 0} רכיבים פעלו בטווח</span
+            >
           </div>
           <span class="ahc__metric-icon" aria-hidden="true">●</span>
         </article>
@@ -3620,31 +4663,39 @@ class fi extends H {
     if (this._initialLoad && !this._rows.length)
       return this._renderInitialLoading();
     if (this._error && !this._rows.length)
-      return p`<div class="ahc-state-card"><div><h3 class="ahc-state-card__title">שגיאה בטעינת ההיסטוריה</h3><p>${this._error}</p></div></div>`;
+      return _`<div class="ahc-state-card">
+        <div>
+          <h3 class="ahc-state-card__title">שגיאה בטעינת ההיסטוריה</h3>
+          <p>${this._error}</p>
+        </div>
+      </div>`;
     if (this._emptyReason || !this._groups.length)
-      return this._renderEmptyState(this._emptyReason ?? "no_resolved_entities");
+      return this._renderEmptyState(
+        this._emptyReason ?? "no_resolved_entities"
+      );
     const e = this._resolveRange();
     switch (this._config.view_mode ?? this._config.default_view ?? "swimlane") {
       case "heatmap":
-        return ii();
+        return di();
       case "detail":
-        return ti();
+        return li();
       case "correlation":
-        return ei();
+        return ci();
       case "swimlane":
       default:
-        return di({
+        return Ri({
           groups: this._groups,
           range: e,
           config: this._config,
-          summary: this._summary ?? W(this._groups),
+          summary: this._summary ?? V(this._groups),
+          curation: this._curation,
           onSegmentClick: this._openSegmentPopover
         });
     }
   }
   _renderInitialLoading() {
     const e = !this._hass && !this._usingMockData ? "ממתין לחיבור Home Assistant." : "מושך היסטוריה מה-Recorder.";
-    return p`
+    return _`
       <section class="ahc-loading" aria-label="טעינת היסטוריה" aria-busy="true">
         <div class="ahc-loading__copy">
           <h3>טוען ציר זמן...</h3>
@@ -3652,10 +4703,14 @@ class fi extends H {
         </div>
         <div class="ahc-loading__timeline" aria-hidden="true">
           ${Array.from({ length: 4 }).map(
-      (a, i) => p`
+      (i, a) => _`
               <div class="ahc-loading__group">
                 <span></span>
-                ${Array.from({ length: 5 }).map((s, r) => p`<i style="--delay:${i + r}; --width:${42 + (i + r) % 4 * 12}%"></i>`)}
+                ${Array.from({ length: 5 }).map(
+        (s, n) => _`<i
+                      style="--delay:${a + n}; --width:${42 + (a + n) % 4 * 12}%"
+                    ></i>`
+      )}
               </div>
             `
     )}
@@ -3665,9 +4720,13 @@ class fi extends H {
   }
   _renderSegmentPopover() {
     const e = this._segmentPopover;
-    if (!e) return p``;
-    const a = Ct(e.row, e.segment, this._config.debug === !0);
-    return p`
+    if (!e) return _``;
+    const i = Dt(
+      e.row,
+      e.segment,
+      this._config.debug === !0
+    );
+    return _`
       <aside
         class="ahc-popover"
         data-placement=${e.placement}
@@ -3675,16 +4734,26 @@ class fi extends H {
         aria-label="פרטי מקטע פעילות"
         style=${`--ahc-popover-x:${e.x}px; --ahc-popover-y:${e.y}px`}
       >
-        <button class="ahc-popover__close" type="button" aria-label="סגור" @click=${this._closeSegmentPopover}>×</button>
+        <button
+          class="ahc-popover__close"
+          type="button"
+          aria-label="סגור"
+          @click=${this._closeSegmentPopover}
+        >
+          ×
+        </button>
         <h3 class="ahc-popover__title">${e.row.entity.name}</h3>
         <dl class="ahc-popover__dl">
-          ${a.map(([i, s]) => p`<dt class="ahc-popover__dt">${i}</dt><dd class="ahc-popover__dd">${s}</dd>`)}
+          ${i.map(
+      ([a, s]) => _`<dt class="ahc-popover__dt">${a}</dt>
+                <dd class="ahc-popover__dd">${s}</dd>`
+    )}
         </dl>
       </aside>
     `;
   }
   _renderEmptyState(e) {
-    const i = {
+    const a = {
       no_entities_selected: {
         title: "לא נבחרו רכיבים",
         body: "הפעל גילוי אוטומטי או הוסף רשימת entities ידנית. בלי אחד מהם הכרטיס לא יודע אילו רכיבים לטעון.",
@@ -3721,201 +4790,464 @@ debug: true`
 auto_discover: true
 filters:
   active_only: false`
+      },
+      no_meaningful_activity: {
+        title: "לא נמצאה פעילות משמעותית",
+        body: "הכרטיס מצא רכיבים והיסטוריה, אבל הסינון החכם הסתיר שורות ריקות, טכניות או קצרות מאוד כדי לשמור על ציר זמן קריא.",
+        yaml: `type: custom:activity-history-card
+auto_discover: true
+smart_filter: false`
       }
     }[e], s = e === "no_resolved_entities" && this._diagnostics?.discovery?.unavailableReasons.length ? this._diagnostics.discovery.unavailableReasons.join(", ") : "";
-    return p`
+    return _`
       <div class="ahc-state-card">
         <div>
-          <h3 class="ahc-state-card__title">${i.title}</h3>
-          <p>${i.body}</p>
-          ${s ? p`<p>אזהרת discovery: ${s}. אם האזורים לא זמינים, נסה להגדיר entities ידנית או להפעיל debug.</p>` : g}
-          <pre class="ahc-state-card__yaml" dir="ltr"><code>${i.yaml}</code></pre>
+          <h3 class="ahc-state-card__title">${a.title}</h3>
+          <p>${a.body}</p>
+          ${s ? _`<p>
+                אזהרת discovery: ${s}. אם האזורים לא זמינים, נסה
+                להגדיר entities ידנית או להפעיל debug.
+              </p>` : g}
+          <pre
+            class="ahc-state-card__yaml"
+            dir="ltr"
+          ><code>${a.yaml}</code></pre>
+          ${e === "no_meaningful_activity" ? _`<div class="ahc-empty-actions">
+                <button
+                  class="ahc__button ahc__button--primary"
+                  type="button"
+                  @click=${this._toggleShowAllRows}
+                >
+                  הצג הכל
+                </button>
+                <button
+                  class="ahc__button ahc__button--ghost"
+                  type="button"
+                  @click=${() => this._setTimePreset("7d")}
+                >
+                  7 ימים
+                </button>
+                <button
+                  class="ahc__button ahc__button--ghost"
+                  type="button"
+                  @click=${this._openFilterSheet}
+                >
+                  פתח סינון
+                </button>
+              </div>` : g}
         </div>
       </div>
     `;
   }
   _renderDiagnostics() {
     const e = this._diagnostics;
-    return e ? p`
+    return e ? _`
       <details class="ahc-debug" aria-label="אבחון">
         <summary class="ahc-debug__header">
           <strong>Debug</strong>
-          <span>${e.fetchReason ?? "loaded"} · ${e.cacheHit ? "cache hit" : "cache miss"}</span>
+          <span
+            >${e.fetchReason ?? "loaded"} ·
+            ${e.cacheHit ? "cache hit" : "cache miss"}</span
+          >
         </summary>
         <dl class="ahc-debug__grid">
-          <div><dt>רכיבים</dt><dd>${e.resolvedEntityCount}</dd></div>
-          <div><dt>רשומות</dt><dd>${e.historyRecordCount}</dd></div>
-          <div><dt>מקטעים</dt><dd>${e.timelineSegmentCount}</dd></div>
-          <div><dt>פעילים</dt><dd>${e.activeTimelineSegmentCount}</dd></div>
-          <div><dt>אחרי סינון</dt><dd>${e.filteredRowCount}</dd></div>
-          <div><dt>קבוצות</dt><dd>${e.renderedGroupCount}</dd></div>
-          <div><dt>attributes</dt><dd>${e.attributesRequested.withAttributes}/${e.attributesRequested.withoutAttributes}</dd></div>
-          <div><dt>registry</dt><dd>${e.discovery?.registryAvailable ? "זמין" : "fallback"}</dd></div>
-          <div><dt>refresh</dt><dd>${e.refreshIntervalSeconds ?? this._refreshIntervalSeconds()}s</dd></div>
-          <div><dt>duration</dt><dd>${e.fetchDurationMs ?? 0}ms</dd></div>
-          <div><dt>mode</dt><dd>${e.initialLoad ? "initial" : e.backgroundLoading ? "background" : "idle"}</dd></div>
+          <div>
+            <dt>רכיבים</dt>
+            <dd>${e.resolvedEntityCount}</dd>
+          </div>
+          <div>
+            <dt>רשומות</dt>
+            <dd>${e.historyRecordCount}</dd>
+          </div>
+          <div>
+            <dt>מקטעים</dt>
+            <dd>${e.timelineSegmentCount}</dd>
+          </div>
+          <div>
+            <dt>פעילים</dt>
+            <dd>${e.activeTimelineSegmentCount}</dd>
+          </div>
+          <div>
+            <dt>אחרי סינון</dt>
+            <dd>${e.filteredRowCount}</dd>
+          </div>
+          <div>
+            <dt>מוצגות</dt>
+            <dd>${e.curation?.visibleRows ?? 0}</dd>
+          </div>
+          <div>
+            <dt>הוסתרו חכם</dt>
+            <dd>${e.curation?.hiddenRows ?? 0}</dd>
+          </div>
+          <div>
+            <dt>קבוצות</dt>
+            <dd>${e.renderedGroupCount}</dd>
+          </div>
+          <div>
+            <dt>attributes</dt>
+            <dd>
+              ${e.attributesRequested.withAttributes}/${e.attributesRequested.withoutAttributes}
+            </dd>
+          </div>
+          <div>
+            <dt>registry</dt>
+            <dd>
+              ${e.discovery?.registryAvailable ? "זמין" : "fallback"}
+            </dd>
+          </div>
+          <div>
+            <dt>refresh</dt>
+            <dd>
+              ${e.refreshIntervalSeconds ?? this._refreshIntervalSeconds()}s
+            </dd>
+          </div>
+          <div>
+            <dt>duration</dt>
+            <dd>${e.fetchDurationMs ?? 0}ms</dd>
+          </div>
+          <div>
+            <dt>mode</dt>
+            <dd>
+              ${e.initialLoad ? "initial" : e.backgroundLoading ? "background" : "idle"}
+            </dd>
+          </div>
         </dl>
         <p class="ahc-debug__meta" dir="ltr">
           ${e.historyRange ? `${e.historyRange.start.toISOString()} → ${e.historyRange.end.toISOString()}` : "no range"}
         </p>
-        <p class="ahc-debug__meta" dir="ltr">last fetch: ${e.lastFetchTime?.toISOString() ?? "never"}</p>
-        <p class="ahc-debug__meta" dir="ltr">history key: ${e.currentHistoryKey ?? "none"}</p>
-        <p class="ahc-debug__meta">מסננים: ${JSON.stringify(e.activeFilters)}</p>
-        ${e.discovery?.unavailableReasons.length ? p`<p class="ahc-debug__meta">Registry warnings: ${e.discovery.unavailableReasons.join(", ")}</p>` : g}
+        <p class="ahc-debug__meta" dir="ltr">
+          last fetch: ${e.lastFetchTime?.toISOString() ?? "never"}
+        </p>
+        <p class="ahc-debug__meta" dir="ltr">
+          history key: ${e.currentHistoryKey ?? "none"}
+        </p>
+        <p class="ahc-debug__meta">
+          מסננים: ${JSON.stringify(e.activeFilters)}
+        </p>
+        ${e.curation ? _`<p class="ahc-debug__meta" dir="ltr">
+              curation: ${JSON.stringify(e.curation.hiddenByReason)}
+            </p>` : g}
+        ${e.discovery?.unavailableReasons.length ? _`<p class="ahc-debug__meta">
+              Registry warnings:
+              ${e.discovery.unavailableReasons.join(", ")}
+            </p>` : g}
       </details>
-    ` : p`<details class="ahc-debug" aria-label="אבחון"><summary>Debug · ממתין לטעינת נתונים...</summary></details>`;
+    ` : _`<details class="ahc-debug" aria-label="אבחון">
+        <summary>Debug · ממתין לטעינת נתונים...</summary>
+      </details>`;
   }
   _renderInsights() {
-    const e = this._summary, a = e?.mostActiveEntity, i = e?.mostActiveArea, s = !!(e && e.eventCount > 0);
-    return p`
+    const e = this._summary, i = e?.mostActiveEntity, a = e?.mostActiveArea, s = !!(e && e.eventCount > 0);
+    return _`
       <aside class="ahc__insights" aria-label="תובנות חכמות">
-        <h3 class="ahc__insights-title"><span>תובנות חכמות</span><span aria-hidden="true">✦</span></h3>
+        <h3 class="ahc__insights-title">
+          <span>תובנות חכמות</span><span aria-hidden="true">✦</span>
+        </h3>
         <article class="ahc__insight-card">
           <span class="ahc__insight-kicker">הרכיב הפעיל ביותר</span>
-          <span class="ahc__insight-value">${a?.entity.name ?? "אין מספיק נתונים"}</span>
-          <span class="ahc__insight-subtitle">${a ? `${M(a.totalActiveMs)} · ${ae(a, this._config.debug === !0)}` : "צריך היסטוריה פעילה בטווח"}</span>
+          <span class="ahc__insight-value"
+            >${i?.entity.name ?? "אין מספיק נתונים"}</span
+          >
+          <span class="ahc__insight-subtitle"
+            >${i ? `${E(i.totalActiveMs)} · ${se(i, this._config.debug === !0)}` : "צריך היסטוריה פעילה בטווח"}</span
+          >
         </article>
         <article class="ahc__insight-card">
           <span class="ahc__insight-kicker">האזור הפעיל ביותר</span>
-          <span class="ahc__insight-value">${i?.title ?? "אין מספיק נתונים"}</span>
-          <span class="ahc__insight-subtitle">${i ? `${M(i.totalActiveMs)} · ${i.subtitle ?? ""}` : "אין אזור עם פעילות משמעותית"}</span>
+          <span class="ahc__insight-value"
+            >${a?.title ?? "אין מספיק נתונים"}</span
+          >
+          <span class="ahc__insight-subtitle"
+            >${a ? `${E(a.totalActiveMs)} · ${a.subtitle ?? ""}` : "אין אזור עם פעילות משמעותית"}</span
+          >
         </article>
         <article class="ahc__insight-card">
           <span class="ahc__insight-kicker">שעות שיא</span>
-          <span class="ahc__insight-value">${e?.peakBucketLabel ?? "אין מספיק נתונים"}</span>
+          <span class="ahc__insight-value"
+            >${e?.peakBucketLabel ?? "אין מספיק נתונים"}</span
+          >
           <span class="ahc__insight-subtitle">לפי משך פעילות</span>
-          <span class="ahc__spark" aria-hidden="true">${[35, 48, 62, 44, 72, 54, 38].map((r) => p`<i style="--bar:${s ? r : 12}%"></i>`)}</span>
+          <span class="ahc__spark" aria-hidden="true"
+            >${[35, 48, 62, 44, 72, 54, 38].map(
+      (n) => _`<i style="--bar:${s ? n : 12}%"></i>`
+    )}</span
+          >
         </article>
         <article class="ahc__insight-card">
           <span class="ahc__insight-kicker">דפוס שימוש קצר</span>
-          <span class="ahc__insight-value">${s ? `${e?.activeEntityCount ?? 0} רכיבים` : "אין מספיק נתונים"}</span>
-          <span class="ahc__insight-subtitle">${s ? `נרשמו ${e?.eventCount ?? 0} אירועים בטווח הנוכחי` : "נסה טווח זמן ארוך יותר או ודא שה-Recorder פעיל"}</span>
+          <span class="ahc__insight-value"
+            >${s ? `${e?.activeEntityCount ?? 0} רכיבים` : "אין מספיק נתונים"}</span
+          >
+          <span class="ahc__insight-subtitle"
+            >${s ? `נרשמו ${e?.eventCount ?? 0} אירועים בטווח הנוכחי` : "נסה טווח זמן ארוך יותר או ודא שה-Recorder פעיל"}</span
+          >
         </article>
       </aside>
     `;
   }
   _renderFilterSheet() {
-    const e = this._availableAreas(), a = this._availableDomains(), i = Ee(this._rows, this._filter);
-    return p`
-      <div class="ahc-filter-sheet-backdrop" @click=${this._closeFilterSheet}></div>
-      <section class="ahc-filter-sheet" role="dialog" aria-modal="true" aria-label="סינון מתקדם">
+    const e = this._availableAreas(), i = this._availableDomains(), a = this._visibleRows;
+    return _`
+      <div
+        class="ahc-filter-sheet-backdrop"
+        @click=${this._closeFilterSheet}
+      ></div>
+      <section
+        class="ahc-filter-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-label="סינון מתקדם"
+      >
         <div class="ahc-filter-sheet__handle" aria-hidden="true"></div>
         <header class="ahc-filter-sheet__header">
-          <button class="ahc__button ahc__button--ghost" type="button" @click=${this._closeFilterSheet} aria-label="סגור">×</button>
+          <button
+            class="ahc__button ahc__button--ghost"
+            type="button"
+            @click=${this._closeFilterSheet}
+            aria-label="סגור"
+          >
+            ×
+          </button>
           <h3 class="ahc-filter-sheet__title">סינון מתקדם</h3>
         </header>
 
         <div class="ahc-filter-section">
-          <div class="ahc-filter-section__title"><span>טווח זמן</span><span aria-hidden="true">◷</span></div>
+          <div class="ahc-filter-section__title">
+            <span>טווח זמן</span><span aria-hidden="true">◷</span>
+          </div>
           <div class="ahc-filter-section__chips">
-            ${this._renderChip("24 שעות", this._filter.timePreset === "24h", () => this._setTimePreset("24h"))}
-            ${this._renderChip("7 ימים", this._filter.timePreset === "7d", () => this._setTimePreset("7d"))}
-            ${this._renderChip("טווח מותאם", this._filter.timePreset === "custom", () => this._setTimePreset("custom"))}
+            ${this._renderChip(
+      "24 שעות",
+      this._filter.timePreset === "24h",
+      () => this._setTimePreset("24h")
+    )}
+            ${this._renderChip(
+      "7 ימים",
+      this._filter.timePreset === "7d",
+      () => this._setTimePreset("7d")
+    )}
+            ${this._renderChip(
+      "טווח מותאם",
+      this._filter.timePreset === "custom",
+      () => this._setTimePreset("custom")
+    )}
           </div>
         </div>
 
         <div class="ahc-filter-section">
-          <div class="ahc-filter-section__title"><span>אזורים</span><span aria-hidden="true">▦</span></div>
+          <div class="ahc-filter-section__title">
+            <span>אזורים</span><span aria-hidden="true">▦</span>
+          </div>
           <div class="ahc-filter-section__chips">
-            ${this._renderChip("כל האזורים", !this._filter.areas.length, () => this._setAreas([]))}
-            ${e.map((s) => this._renderChip(s, this._filter.areas.includes(s), () => this._toggleArea(s)))}
+            ${this._renderChip(
+      "כל האזורים",
+      !this._filter.areas.length,
+      () => this._setAreas([])
+    )}
+            ${e.map(
+      (s) => this._renderChip(
+        s,
+        this._filter.areas.includes(s),
+        () => this._toggleArea(s)
+      )
+    )}
           </div>
         </div>
 
         <div class="ahc-filter-section">
-          <div class="ahc-filter-section__title"><span>סוגי רכיבים</span><span aria-hidden="true">▦</span></div>
+          <div class="ahc-filter-section__title">
+            <span>סוגי רכיבים</span><span aria-hidden="true">▦</span>
+          </div>
           <div class="ahc-filter-section__chips">
-            ${this._renderChip("כל הסוגים", !this._filter.domains.length, () => this._setDomains([]))}
-            ${a.map((s) => this._renderChip(L[s] ?? s, this._filter.domains.includes(s), () => this._toggleDomain(s)))}
+            ${this._renderChip(
+      "כל הסוגים",
+      !this._filter.domains.length,
+      () => this._setDomains([])
+    )}
+            ${i.map(
+      (s) => this._renderChip(
+        L[s] ?? s,
+        this._filter.domains.includes(s),
+        () => this._toggleDomain(s)
+      )
+    )}
           </div>
         </div>
 
         <div class="ahc-filter-section">
-          <div class="ahc-filter-section__title"><span>מצבים</span><span aria-hidden="true">⌁</span></div>
-          <button class="ahc-filter-option" type="button" aria-pressed=${this._filter.stateMode === "active_only"} @click=${() => this._setStateMode("active_only")}>
+          <div class="ahc-filter-section__title">
+            <span>מצבים</span><span aria-hidden="true">⌁</span>
+          </div>
+          <button
+            class="ahc-filter-option"
+            type="button"
+            aria-pressed=${this._filter.stateMode === "active_only"}
+            @click=${() => this._setStateMode("active_only")}
+          >
             <span>רק פעילים</span><small>הצג רכיבים שהיו פעילים בטווח</small>
           </button>
-          <button class="ahc-filter-option" type="button" aria-pressed=${this._filter.stateMode === "all"} @click=${() => this._setStateMode("all")}>
+          <button
+            class="ahc-filter-option"
+            type="button"
+            aria-pressed=${this._filter.stateMode === "all"}
+            @click=${() => this._setStateMode("all")}
+          >
             <span>כל המצבים</span><small>הצג גם זמני כבוי ולא זמין</small>
           </button>
-          <button class="ahc-filter-option" type="button" aria-pressed=${this._filter.stateMode === "currently_active"} @click=${() => this._setStateMode("currently_active")}>
+          <button
+            class="ahc-filter-option"
+            type="button"
+            aria-pressed=${this._filter.stateMode === "currently_active"}
+            @click=${() => this._setStateMode("currently_active")}
+          >
             <span>פעילים עכשיו</span><small>התמקד ברכיבים שפועלים כעת</small>
           </button>
         </div>
 
         <div class="ahc-filter-section">
-          <div class="ahc-filter-section__title"><span>קבוצות וחיפוש</span><span aria-hidden="true">▤</span></div>
+          <div class="ahc-filter-section__title">
+            <span>תצוגה חכמה</span
+            ><span>${this._curation?.visibleRows ?? a.length}</span>
+          </div>
+          <button
+            class="ahc-filter-option"
+            type="button"
+            aria-pressed=${this._showAllRows ? "true" : "false"}
+            @click=${this._toggleShowAllRows}
+          >
+            <span>${this._showAllRows ? "הפעל סינון חכם" : "הצג הכל"}</span>
+            <small
+              >${he(this._curation) || "הסתר שורות ריקות, טכניות וקצרות מאוד"}</small
+            >
+          </button>
+        </div>
+
+        <div class="ahc-filter-section">
+          <div class="ahc-filter-section__title">
+            <span>קבוצות וחיפוש</span><span aria-hidden="true">▤</span>
+          </div>
           <div class="ahc-filter-section__chips">
-            ${this._renderChip("קבץ לפי אזור", this._filter.groupBy === "area", () => this._setGroupBy("area"))}
-            ${this._renderChip("קבץ לפי סוג", this._filter.groupBy === "domain", () => this._setGroupBy("domain"))}
-            ${this._renderChip("ללא קיבוץ", this._filter.groupBy === "none", () => this._setGroupBy("none"))}
+            ${this._renderChip(
+      "קבץ לפי אזור",
+      this._filter.groupBy === "area",
+      () => this._setGroupBy("area")
+    )}
+            ${this._renderChip(
+      "קבץ לפי סוג",
+      this._filter.groupBy === "domain",
+      () => this._setGroupBy("domain")
+    )}
+            ${this._renderChip(
+      "ללא קיבוץ",
+      this._filter.groupBy === "none",
+      () => this._setGroupBy("none")
+    )}
           </div>
           <div class="ahc__search ahc__search--sheet">
             <span class="ahc__search-icon" aria-hidden="true">⌕</span>
-            <input class="ahc__search-input" type="search" .value=${this._filter.search} placeholder="חיפוש רכיב או אזור" @input=${this._onSearchInput} />
+            <input
+              class="ahc__search-input"
+              type="search"
+              .value=${this._filter.search}
+              placeholder="חיפוש רכיב או אזור"
+              @input=${this._onSearchInput}
+            />
           </div>
         </div>
 
         <div class="ahc-filter-section">
-          <div class="ahc-filter-section__title"><span>רכיבים נבחרים</span><span>${i.length}</span></div>
+          <div class="ahc-filter-section__title">
+            <span>רכיבים נבחרים</span><span>${a.length}</span>
+          </div>
           <div class="ahc-entity-list">
-            ${i.slice(0, 32).map(
-      (s) => p`
+            ${a.slice(0, 32).map(
+      (s) => _`
                 <span class="ahc-entity-list__item">
                   <span>${s.entity.name}</span>
-                  <small>${[s.entity.area, L[s.entity.domain] ?? s.entity.domain].filter(Boolean).join(" · ")}</small>
+                  <small
+                    >${[
+        s.entity.area,
+        L[s.entity.domain] ?? s.entity.domain
+      ].filter(Boolean).join(" · ")}</small
+                  >
                 </span>
               `
     )}
-            ${i.length > 32 ? p`<span class="ahc-entity-list__more">ועוד ${i.length - 32} רכיבים</span>` : g}
+            ${a.length > 32 ? _`<span class="ahc-entity-list__more"
+                  >ועוד ${a.length - 32} רכיבים</span
+                >` : g}
           </div>
         </div>
 
         <footer class="ahc-filter-sheet__footer">
-          <button class="ahc__button ahc__button--ghost" type="button" @click=${this._clearFilters}>נקה סינון</button>
-          <button class="ahc__button ahc__button--primary" type="button" @click=${this._closeFilterSheet}>החל סינון</button>
+          <button
+            class="ahc__button ahc__button--ghost"
+            type="button"
+            @click=${this._clearFilters}
+          >
+            נקה סינון
+          </button>
+          <button
+            class="ahc__button ahc__button--primary"
+            type="button"
+            @click=${this._closeFilterSheet}
+          >
+            החל סינון
+          </button>
         </footer>
       </section>
     `;
   }
-  _requestHistoryRefresh(e, a = {}) {
-    if (!this._config || this._inFlightHistoryRequest && !a.force) return;
-    const i = this._fetchAndRender(e, a.force === !0);
-    this._inFlightHistoryRequest = i, i.finally(() => {
-      this._inFlightHistoryRequest === i && (this._inFlightHistoryRequest = void 0);
+  _requestHistoryRefresh(e, i = {}) {
+    if (!this._config || this._inFlightHistoryRequest && !i.force) return;
+    const a = this._fetchAndRender(e, i.force === !0);
+    this._inFlightHistoryRequest = a, a.finally(() => {
+      this._inFlightHistoryRequest === a && (this._inFlightHistoryRequest = void 0);
     });
   }
-  async _fetchAndRender(e, a) {
+  async _fetchAndRender(e, i) {
     if (!this._config) return;
-    const i = Date.now(), s = this._config.mock_data === !0;
+    const a = Date.now(), s = this._config.mock_data === !0;
     if (!this._hass && !s) {
       this._usingMockData = !1, this._initialLoad = !this._rows.length, this._loading = this._initialLoad, this._backgroundLoading = !1, this._error = void 0, this._emptyReason = void 0, this.requestUpdate();
       return;
     }
-    const r = ++this._fetchToken, n = !this._hasFetchedOnce && !this._rows.length;
-    this._initialLoad = n, this._loading = n, this._backgroundLoading = !n, this._error = void 0, this._rows.length || (this._emptyReason = void 0), this._usingMockData = s, this.requestUpdate();
-    const c = s ? { entities: Jt(), diagnostics: void 0 } : await Et(this._config, this._hass);
-    if (r !== this._fetchToken) return;
-    const o = c.entities, l = bi(o), d = this._resolveRange(), u = Ye(o), h = Bt({
+    const n = ++this._fetchToken, r = !this._hasFetchedOnce && !this._rows.length;
+    this._initialLoad = r, this._loading = r, this._backgroundLoading = !r, this._error = void 0, this._rows.length || (this._emptyReason = void 0), this._usingMockData = s, this.requestUpdate();
+    const o = s ? { entities: si(), diagnostics: void 0 } : await Pt(this._config, this._hass);
+    if (n !== this._fetchToken) return;
+    const c = o.entities, l = Pi(c), d = this._resolveRange(), h = et(c), u = Jt({
       mock: s,
       start: d.start.toISOString(),
       end: d.end.toISOString(),
-      entityIds: o.map((m) => m.entity_id),
-      withAttributes: u.withAttributes.map((m) => m.entity_id),
-      withoutAttributes: u.withoutAttributes.map((m) => m.entity_id),
+      entityIds: c.map((m) => m.entity_id),
+      withAttributes: h.withAttributes.map(
+        (m) => m.entity_id
+      ),
+      withoutAttributes: h.withoutAttributes.map(
+        (m) => m.entity_id
+      ),
       includeLabels: this._config.include_labels ?? [],
       excludeLabels: this._config.exclude_labels ?? [],
       significant: this._config.significant_changes_only,
       minimal: this._config.minimal_response
-    }), _ = a && ["manual", "timer", "interval", "config"].includes(e), b = !!(this._lastResolvedEntityKey && this._lastResolvedEntityKey !== l) && e === "interval" ? "entities" : e, R = (m, A, ee = c.diagnostics) => {
-      this._lastResolvedEntityKey = l, this._lastHistoryFetchAt = Date.now(), this._hasFetchedOnce = !0, this._setPostLoadState(A, d, u, m, s, ee, {
-        reason: b,
-        key: h,
-        durationMs: Date.now() - i
-      }), this._syncRefreshTimer();
+    }), p = i && ["manual", "timer", "interval", "config"].includes(e), y = !!(this._lastResolvedEntityKey && this._lastResolvedEntityKey !== l) && e === "interval" ? "entities" : e, v = (m, S, te = o.diagnostics) => {
+      this._lastResolvedEntityKey = l, this._lastHistoryFetchAt = Date.now(), this._hasFetchedOnce = !0, this._setPostLoadState(
+        S,
+        d,
+        h,
+        m,
+        s,
+        te,
+        {
+          reason: y,
+          key: u,
+          durationMs: Date.now() - a
+        }
+      ), this._syncRefreshTimer();
     };
-    if (!o.length) {
-      this._usingMockData = !1, this._rows = [], this._groups = [], this._summary = W([]), this._emptyReason = this._config.auto_discover === !1 && !this._config.entities?.length ? "no_entities_selected" : "no_resolved_entities", this._setDiagnostics({
+    if (!c.length) {
+      this._usingMockData = !1, this._rows = [], this._visibleRows = [], this._groups = [], this._summary = V([]), this._curation = oe([], this._config).diagnostics, this._emptyReason = this._config.auto_discover === !1 && !this._config.entities?.length ? "no_entities_selected" : "no_resolved_entities", this._setDiagnostics({
         resolvedEntityCount: 0,
         historyRecordCount: 0,
         timelineSegmentCount: 0,
@@ -3927,67 +5259,100 @@ filters:
         attributesRequested: { withAttributes: 0, withoutAttributes: 0 },
         cacheHit: !1,
         mockData: s,
-        discovery: c.diagnostics,
+        discovery: o.diagnostics,
+        curation: this._curation,
         lastFetchTime: /* @__PURE__ */ new Date(),
-        fetchDurationMs: Date.now() - i,
-        fetchReason: b,
-        currentHistoryKey: h,
+        fetchDurationMs: Date.now() - a,
+        fetchReason: y,
+        currentHistoryKey: u,
         refreshIntervalSeconds: this._refreshIntervalSeconds(),
-        initialLoad: n,
+        initialLoad: r,
         backgroundLoading: !1
       }), this._hasFetchedOnce = !0, this._lastResolvedEntityKey = l, this._lastHistoryFetchAt = Date.now(), this._initialLoad = !1, this._loading = !1, this._backgroundLoading = !1, this._error = void 0, this._syncRefreshTimer(), this.requestUpdate();
       return;
     }
-    if (!_ && h === this._lastFetchKey) {
-      const m = this._historyCache.get(h);
+    if (!p && u === this._lastFetchKey) {
+      const m = this._historyCache.get(u);
       if (m) {
-        const A = Oe(m);
-        this._rows = De(m, o, d, this._config, this._hass?.states ?? {}), R(!0, A), this._initialLoad = !1, this._loading = !1, this._backgroundLoading = !1, this._error = void 0, this._rebuildGroups();
+        const S = Ue(m);
+        this._rows = Oe(
+          m,
+          c,
+          d,
+          this._config,
+          this._hass?.states ?? {}
+        ), v(!0, S), this._initialLoad = !1, this._loading = !1, this._backgroundLoading = !1, this._error = void 0, this._rebuildGroups();
         return;
       }
     }
     try {
-      let m = _ ? void 0 : this._historyCache.get(h);
-      if (m || (m = s ? Xt(d) : await jt(this._hass, o, d, this._config), this._historyCache.set(h, m)), r !== this._fetchToken) return;
-      const A = Oe(m);
-      this._rows = De(m, o, d, this._config, this._hass?.states ?? {}), R(!1, A), this._lastFetchKey = h, this._rebuildGroups();
+      let m = p ? void 0 : this._historyCache.get(u);
+      if (m || (m = s ? ni(d) : await Xt(
+        this._hass,
+        c,
+        d,
+        this._config
+      ), this._historyCache.set(u, m)), n !== this._fetchToken) return;
+      const S = Ue(m);
+      this._rows = Oe(
+        m,
+        c,
+        d,
+        this._config,
+        this._hass?.states ?? {}
+      ), v(!1, S), this._lastFetchKey = u, this._rebuildGroups();
     } catch (m) {
-      this._error = m instanceof Error ? m.message : String(m), this._rows.length || (this._groups = [], this._summary = W([]), this._emptyReason = void 0);
+      this._error = m instanceof Error ? m.message : String(m), this._rows.length || (this._visibleRows = [], this._groups = [], this._summary = V([]), this._curation = oe([], this._config).diagnostics, this._emptyReason = void 0);
     } finally {
-      r === this._fetchToken && (this._initialLoad = !1, this._loading = !1, this._backgroundLoading = !1, this.requestUpdate());
+      n === this._fetchToken && (this._initialLoad = !1, this._loading = !1, this._backgroundLoading = !1, this.requestUpdate());
     }
   }
   _rebuildGroups() {
-    const e = Ee(this._rows, this._filter);
-    this._groups = Ut(e, this._filter.groupBy), this._summary = W(this._groups), this._rows.length && !e.length ? this._emptyReason = "all_entities_filtered" : this._emptyReason === "all_entities_filtered" && (this._emptyReason = void 0), this._diagnostics && this._setDiagnostics({
+    const e = Yt(this._rows, this._filter), i = oe(e, this._config, {
+      showAll: this._showAllRows,
+      groupBy: this._filter.groupBy
+    });
+    this._visibleRows = i.rows, this._curation = i.diagnostics, this._groups = Te(i.rows, this._filter.groupBy).filter(
+      (s) => this._config.hide_empty_groups === !1 || s.rows.length > 0
+    );
+    const a = this._config.summary_scope === "all" ? Te(e, this._filter.groupBy) : this._groups;
+    this._summary = V(a), this._rows.length && !e.length ? this._emptyReason = "all_entities_filtered" : e.length && !i.rows.length ? this._emptyReason = "no_meaningful_activity" : (this._emptyReason === "all_entities_filtered" || this._emptyReason === "no_meaningful_activity") && (this._emptyReason = void 0), this._diagnostics && this._setDiagnostics({
       ...this._diagnostics,
       filteredRowCount: e.length,
       renderedGroupCount: this._groups.length,
+      curation: i.diagnostics,
       activeFilters: { ...this._filter }
     }), this.requestUpdate();
   }
-  _setPostLoadState(e, a, i, s, r, n, c) {
-    const o = this._rows.reduce((d, u) => d + u.segments.length, 0), l = this._rows.reduce((d, u) => d + u.segments.filter((h) => h.active).length, 0);
-    e === 0 && l === 0 ? this._emptyReason = "no_history_returned" : e > 0 && o === 0 ? this._emptyReason = "history_unusable" : this._emptyReason = void 0, this._setDiagnostics({
+  _setPostLoadState(e, i, a, s, n, r, o) {
+    const c = this._rows.reduce(
+      (d, h) => d + h.segments.length,
+      0
+    ), l = this._rows.reduce(
+      (d, h) => d + h.segments.filter((u) => u.active).length,
+      0
+    );
+    e === 0 && l === 0 ? this._emptyReason = "no_history_returned" : e > 0 && c === 0 ? this._emptyReason = "history_unusable" : this._emptyReason = void 0, this._setDiagnostics({
       resolvedEntityCount: this._rows.length,
       historyRecordCount: e,
-      timelineSegmentCount: o,
+      timelineSegmentCount: c,
       activeTimelineSegmentCount: l,
       filteredRowCount: this._rows.length,
       renderedGroupCount: 0,
       activeFilters: { ...this._filter },
-      historyRange: a,
+      historyRange: i,
       attributesRequested: {
-        withAttributes: i.withAttributes.length,
-        withoutAttributes: i.withoutAttributes.length
+        withAttributes: a.withAttributes.length,
+        withoutAttributes: a.withoutAttributes.length
       },
       cacheHit: s,
-      mockData: r,
-      discovery: n,
+      mockData: n,
+      discovery: r,
+      curation: this._curation,
       lastFetchTime: new Date(this._lastHistoryFetchAt || Date.now()),
-      fetchDurationMs: c.durationMs,
-      fetchReason: c.reason,
-      currentHistoryKey: c.key,
+      fetchDurationMs: o.durationMs,
+      fetchReason: o.reason,
+      currentHistoryKey: o.key,
       refreshIntervalSeconds: this._refreshIntervalSeconds(),
       initialLoad: this._initialLoad,
       backgroundLoading: this._backgroundLoading
@@ -4004,11 +5369,29 @@ filters:
     }, e * 1e3);
   }
   _refreshIntervalSeconds() {
-    return Xe(this._config?.refresh_interval_seconds);
+    return it(
+      this._config?.refresh_interval_seconds
+    );
   }
   _resolveRange() {
     const e = this._roundedNow();
-    return this._filter.timePreset === "24h" ? ie({ ...this._config, start_time: void 0, end_time: e.toISOString(), hours_to_show: 24 }, e) : this._filter.timePreset === "7d" ? ie({ ...this._config, start_time: void 0, end_time: e.toISOString(), hours_to_show: 24 * 7 }, e) : ie(this._config, e);
+    return this._filter.timePreset === "24h" ? ae(
+      {
+        ...this._config,
+        start_time: void 0,
+        end_time: e.toISOString(),
+        hours_to_show: 24
+      },
+      e
+    ) : this._filter.timePreset === "7d" ? ae(
+      {
+        ...this._config,
+        start_time: void 0,
+        end_time: e.toISOString(),
+        hours_to_show: 24 * 7
+      },
+      e
+    ) : ae(this._config, e);
   }
   _roundedNow() {
     const e = Date.now();
@@ -4018,18 +5401,22 @@ filters:
     return [...new Set(this._rows.map((e) => e.entity.domain))].filter(Boolean).sort();
   }
   _availableAreas() {
-    return [...new Set(this._rows.map((e) => e.entity.area).filter((e) => !!e))].sort();
+    return [
+      ...new Set(
+        this._rows.map((e) => e.entity.area).filter((e) => !!e)
+      )
+    ].sort();
   }
   _toggleArea(e) {
-    const a = this._filter.areas.includes(e) ? this._filter.areas.filter((i) => i !== e) : [...this._filter.areas, e];
-    this._setAreas(a);
+    const i = this._filter.areas.includes(e) ? this._filter.areas.filter((a) => a !== e) : [...this._filter.areas, e];
+    this._setAreas(i);
   }
   _setAreas(e) {
     this._filter = { ...this._filter, areas: e }, this._rebuildGroups();
   }
   _toggleDomain(e) {
-    const a = this._filter.domains.includes(e) ? this._filter.domains.filter((i) => i !== e) : [...this._filter.domains, e];
-    this._setDomains(a);
+    const i = this._filter.domains.includes(e) ? this._filter.domains.filter((a) => a !== e) : [...this._filter.domains, e];
+    this._setDomains(i);
   }
   _setDomains(e) {
     this._filter = { ...this._filter, domains: e }, this._rebuildGroups();
@@ -4050,13 +5437,16 @@ filters:
     return e === "7d" ? "7 ימים" : e === "custom" ? "טווח מותאם" : "24 שעות אחרונות";
   }
 }
-function Oe(t) {
-  return Object.values(t).reduce((e, a) => e + a.length, 0);
+function Ue(t) {
+  return Object.values(t).reduce(
+    (e, i) => e + i.length,
+    0
+  );
 }
-function bi(t) {
+function Pi(t) {
   return t.map((e) => "entity" in e ? e.entity.entity_id : e.entity_id).sort().join("|");
 }
-customElements.get("activity-history-card") || customElements.define("activity-history-card", fi);
+customElements.get("activity-history-card") || customElements.define("activity-history-card", Di);
 window.customCards = window.customCards || [];
 window.customCards.some((t) => t.type === "activity-history-card") || window.customCards.push({
   type: "activity-history-card",
@@ -4066,6 +5456,6 @@ window.customCards.some((t) => t.type === "activity-history-card") || window.cus
   documentationURL: "https://github.com/jonioliel/activity-history-card"
 });
 export {
-  fi as ActivityHistoryCard
+  Di as ActivityHistoryCard
 };
 //# sourceMappingURL=activity-history-card.js.map

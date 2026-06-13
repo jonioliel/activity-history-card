@@ -1,15 +1,18 @@
 # Activity History Card - Codex Development Brief
 
 ## Goal
+
 Build a Home Assistant Lovelace custom card that visualizes entity activity over a selected time range. The card should make it easy to understand when each component was active, in which area, and how activity overlaps across switches, lights, climate devices, media players and similar entities.
 
 ## Core UI modes
+
 1. **Swimlane timeline** - one row per entity, grouped by area/type. Best MVP.
 2. **Area heatmap** - one row per area, columns by hour or time bucket.
 3. **Entity drill-down** - details for one entity, including durations, state transitions and optional numeric overlays.
 4. **Correlation timeline** - grouped by domain/type with event log and overlap tooltip.
 
 ## Home Assistant data strategy
+
 Use the Home Assistant frontend `hass` object from the custom card.
 
 Recommended runtime calls:
@@ -40,7 +43,7 @@ this._unsub = await hass.connection.subscribeMessage(
     significant_changes_only: true,
     no_attributes: !needsAttributes(entityIds),
   },
-  { resubscribe: false }
+  { resubscribe: false },
 );
 ```
 
@@ -51,6 +54,7 @@ GET /api/history/period/<start>?end_time=<end>&filter_entity_id=a,b,c&minimal_re
 ```
 
 ## Entity active-state defaults
+
 ```ts
 const DEFAULT_ACTIVE_STATES = {
   light: ["on"],
@@ -70,6 +74,7 @@ const CLIMATE_ACTIVE_ACTIONS = ["cooling", "heating", "drying", "fan"];
 For `climate`, `humidifier`, `water_heater`, `person`, `device_tracker`, and any domain that needs state attributes, set `no_attributes: false` or selectively fetch with attributes. For `climate`, keep attributes such as `hvac_action`, `current_temperature`, `temperature`, `target_temp_low`, `target_temp_high`, `humidity`.
 
 ## Intervalization algorithm
+
 1. Normalize HA history records into `{ entity_id, state, attributes, ts }`.
 2. Sort by timestamp per entity.
 3. Deduplicate sequential records with the same effective state.
@@ -81,6 +86,7 @@ For `climate`, `humidifier`, `water_heater`, `person`, `device_tracker`, and any
 9. Compute summaries: total active duration, activation count, longest run, last active.
 
 ## Suggested config schema
+
 ```yaml
 type: custom:activity-history-card
 title: היסטוריית פעילות הבית
@@ -117,6 +123,7 @@ colors:
 ```
 
 ## File structure for MVP
+
 ```text
 src/
   activity-history-card.ts
@@ -135,6 +142,7 @@ src/
 ```
 
 ## Implementation notes
+
 - Use a custom element, preferably Lit + TypeScript.
 - Render with SVG for MVP; switch body rows to canvas only if many entities cause performance issues.
 - Virtualize rows when entity count is high.
@@ -145,6 +153,7 @@ src/
 - Add a visual editor later; MVP can be YAML-only.
 
 ## Acceptance criteria
+
 - Works with 5-50 entities in a 24h window.
 - Clearly shows active intervals for binary, climate and media entities.
 - Shows group headers by area.

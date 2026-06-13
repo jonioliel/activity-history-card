@@ -40,7 +40,10 @@ export function iconForGroup(group: TimelineGroup): string {
   return hint?.[1] ?? "mdi:home-outline";
 }
 
-export function renderDisplayIcon(icon: string, className: string): TemplateResult {
+export function renderDisplayIcon(
+  icon: string,
+  className: string,
+): TemplateResult {
   if (icon.startsWith("mdi:")) {
     return html`<ha-icon class=${className} icon=${icon}></ha-icon>`;
   }
@@ -48,10 +51,16 @@ export function renderDisplayIcon(icon: string, className: string): TemplateResu
   return html`<span class=${className} aria-hidden="true">${icon}</span>`;
 }
 
-export function renderEntityIcon(entity: EntityMeta, className = "ahc-entity-icon"): TemplateResult {
+export function renderEntityIcon(
+  entity: EntityMeta,
+  className = "ahc-entity-icon",
+): TemplateResult {
   return renderDisplayIcon(iconForEntity(entity), className);
 }
 
-export function renderGroupIcon(group: TimelineGroup, className = "ahc-group-icon"): TemplateResult {
+export function renderGroupIcon(
+  group: TimelineGroup,
+  className = "ahc-group-icon",
+): TemplateResult {
   return renderDisplayIcon(iconForGroup(group), className);
 }

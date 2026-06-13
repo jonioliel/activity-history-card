@@ -16,9 +16,18 @@ export interface PopoverPoint {
   placement: "floating" | "bottom";
 }
 
-export function positionPopover(anchor: RectLike, viewport: ViewportLike, popoverWidth = 320, popoverHeight = 220): PopoverPoint {
+export function positionPopover(
+  anchor: RectLike,
+  viewport: ViewportLike,
+  popoverWidth = 320,
+  popoverHeight = 220,
+): PopoverPoint {
   if (viewport.width <= 640) {
-    return { x: 12, y: Math.max(12, viewport.height - popoverHeight - 12), placement: "bottom" };
+    return {
+      x: 12,
+      y: Math.max(12, viewport.height - popoverHeight - 12),
+      placement: "bottom",
+    };
   }
 
   const margin = 16;

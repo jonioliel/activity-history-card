@@ -1,7 +1,15 @@
 import { LitElement, css, html, nothing, type TemplateResult } from "lit";
-import { DEFAULT_CONFIG, DEFAULT_DISCOVERY_DOMAINS, DOMAIN_LABELS_HE } from "./defaults";
+import {
+  DEFAULT_CONFIG,
+  DEFAULT_DISCOVERY_DOMAINS,
+  DOMAIN_LABELS_HE,
+} from "./defaults";
 import { getDomain } from "./format";
-import type { ActivityHistoryCardConfig, DisplayMode, HomeAssistant } from "./types";
+import type {
+  ActivityHistoryCardConfig,
+  DisplayMode,
+  HomeAssistant,
+} from "./types";
 
 interface EditorArea {
   area_id: string;
@@ -18,7 +26,15 @@ export class ActivityHistoryCardEditor extends LitElement {
     :host {
       display: block;
       color: var(--primary-text-color, #e5e7eb);
-      font-family: var(--primary-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif);
+      font-family: var(
+        --primary-font-family,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif
+      );
       direction: rtl;
     }
 
@@ -34,7 +50,11 @@ export class ActivityHistoryCardEditor extends LitElement {
       padding: 14px;
       border: 1px solid var(--divider-color, rgba(148, 163, 184, 0.24));
       border-radius: 12px;
-      background: color-mix(in srgb, var(--card-background-color, #111827) 88%, transparent);
+      background: color-mix(
+        in srgb,
+        var(--card-background-color, #111827) 88%,
+        transparent
+      );
     }
 
     h3 {
@@ -98,7 +118,9 @@ export class ActivityHistoryCardEditor extends LitElement {
     }
   `;
 
-  private _config: ActivityHistoryCardConfig = { type: "custom:activity-history-card" };
+  private _config: ActivityHistoryCardConfig = {
+    type: "custom:activity-history-card",
+  };
   private _hass?: HomeAssistant;
   private _areas: EditorArea[] = [];
   private _labels: EditorLabel[] = [];
@@ -127,7 +149,9 @@ export class ActivityHistoryCardEditor extends LitElement {
 
   protected override render(): TemplateResult {
     const config = this._config;
-    const selectedDomains = config.domains?.length ? config.domains : DEFAULT_DISCOVERY_DOMAINS;
+    const selectedDomains = config.domains?.length
+      ? config.domains
+      : DEFAULT_DISCOVERY_DOMAINS;
 
     return html`
       <div class="editor">
@@ -136,74 +160,245 @@ export class ActivityHistoryCardEditor extends LitElement {
           <div class="row">
             <label>
               כותרת
-              <input type="text" .value=${config.title ?? DEFAULT_CONFIG.title} @input=${(event: Event) => this._setValue("title", inputValue(event))} />
+              <input
+                type="text"
+                .value=${config.title ?? DEFAULT_CONFIG.title}
+                @input=${(event: Event) =>
+                  this._setValue("title", inputValue(event))}
+              />
             </label>
             <label>
               טווח שעות
-              <input type="number" min="1" max="168" .value=${String(config.hours_to_show ?? 24)} @input=${(event: Event) => this._setNumber("hours_to_show", inputValue(event))} />
+              <input
+                type="number"
+                min="1"
+                max="168"
+                .value=${String(config.hours_to_show ?? 24)}
+                @input=${(event: Event) =>
+                  this._setNumber("hours_to_show", inputValue(event))}
+              />
             </label>
           </div>
           <div class="row">
             <label>
               מצב תצוגה
-              <select .value=${config.display_mode ?? "panel"} @change=${(event: Event) => this._setValue("display_mode", inputValue(event) as DisplayMode)}>
+              <select
+                .value=${config.display_mode ?? "panel"}
+                @change=${(event: Event) =>
+                  this._setValue(
+                    "display_mode",
+                    inputValue(event) as DisplayMode,
+                  )}
+              >
                 <option value="card">כרטיס רגיל</option>
                 <option value="panel">פאנל</option>
                 <option value="fullscreen">מסך מלא</option>
               </select>
             </label>
             <label class="check">
-              <input type="checkbox" .checked=${config.mock_data === true} @change=${(event: Event) => this._setChecked("mock_data", event)} />
+              <input
+                type="checkbox"
+                .checked=${config.mock_data === true}
+                @change=${(event: Event) =>
+                  this._setChecked("mock_data", event)}
+              />
               נתוני דוגמה
             </label>
           </div>
           <label class="check">
-            <input type="checkbox" .checked=${config.debug === true} @change=${(event: Event) => this._setChecked("debug", event)} />
+            <input
+              type="checkbox"
+              .checked=${config.debug === true}
+              @change=${(event: Event) => this._setChecked("debug", event)}
+            />
             הצג דיאגנוסטיקה
           </label>
           <label class="check">
-            <input type="checkbox" .checked=${config.auto_discover !== false} @change=${(event: Event) => this._setChecked("auto_discover", event)} />
+            <input
+              type="checkbox"
+              .checked=${config.auto_discover !== false}
+              @change=${(event: Event) =>
+                this._setChecked("auto_discover", event)}
+            />
             משוך אוטומטית רכיבים שמשויכים לאזורים
           </label>
-          <p class="hint">כאשר האפשרות פעילה ואין רשימת entities ידנית, הכרטיס מאתר ישויות לפי אזורי Home Assistant ומסנן לפי הדומיינים והלייבלים שבחרת.</p>
+          <p class="hint">
+            כאשר האפשרות פעילה ואין רשימת entities ידנית, הכרטיס מאתר ישויות לפי
+            אזורי Home Assistant ומסנן לפי הדומיינים והלייבלים שבחרת.
+          </p>
+        </section>
+
+        <section class="section">
+          <h3>סינון חכם</h3>
+          <div class="row">
+            <label class="check">
+              <input
+                type="checkbox"
+                .checked=${config.smart_filter !== false}
+                @change=${(event: Event) =>
+                  this._setChecked("smart_filter", event)}
+              />
+              הסתר רעש אוטומטית
+            </label>
+            <label class="check">
+              <input
+                type="checkbox"
+                .checked=${config.hide_empty_rows !== false}
+                @change=${(event: Event) =>
+                  this._setChecked("hide_empty_rows", event)}
+              />
+              הסתר שורות ללא פעילות
+            </label>
+          </div>
+          <div class="row">
+            <label>
+              מינימום פעילות בשניות
+              <input
+                type="number"
+                min="0"
+                max="3600"
+                .value=${String(
+                  config.min_row_active_seconds ??
+                    DEFAULT_CONFIG.min_row_active_seconds,
+                )}
+                @input=${(event: Event) =>
+                  this._setNumber("min_row_active_seconds", inputValue(event))}
+              />
+            </label>
+            <label>
+              מקסימום שורות להצגה
+              <input
+                type="number"
+                min="1"
+                max="200"
+                .value=${String(
+                  config.max_total_rows ?? DEFAULT_CONFIG.max_total_rows,
+                )}
+                @input=${(event: Event) =>
+                  this._setNumber("max_total_rows", inputValue(event))}
+              />
+            </label>
+          </div>
+          <div class="check-grid">
+            <label class="check">
+              <input
+                type="checkbox"
+                .checked=${config.show_technical_entities === true}
+                @change=${(event: Event) =>
+                  this._setChecked("show_technical_entities", event)}
+              />
+              הצג רכיבים טכניים
+            </label>
+            <label class="check">
+              <input
+                type="checkbox"
+                .checked=${config.show_config_entities === true}
+                @change=${(event: Event) =>
+                  this._setChecked("show_config_entities", event)}
+              />
+              הצג ישויות הגדרה
+            </label>
+            <label class="check">
+              <input
+                type="checkbox"
+                .checked=${config.show_diagnostic_entities === true}
+                @change=${(event: Event) =>
+                  this._setChecked("show_diagnostic_entities", event)}
+              />
+              הצג ישויות אבחון
+            </label>
+          </div>
+          <p class="hint">
+            ברירת המחדל מסתירה שורות ריקות, רכיבי אבחון, אפשרויות תוכנית ורעש
+            כמו נתבים/חיבור/עדכונים. רכיבים שהוגדרו ידנית ב-YAML לא מוסתרים
+            אוטומטית.
+          </p>
         </section>
 
         <section class="section">
           <h3>דומיינים להצגה</h3>
           <div class="check-grid">
-            ${this._domains.map((domain) => this._renderArrayCheckbox("domains", domain, DOMAIN_LABELS_HE[domain] ?? domain, selectedDomains.includes(domain)))}
+            ${this._domains.map((domain) =>
+              this._renderArrayCheckbox(
+                "domains",
+                domain,
+                DOMAIN_LABELS_HE[domain] ?? domain,
+                selectedDomains.includes(domain),
+              ),
+            )}
           </div>
-          <p class="hint">אם לא תבחר ידנית, הכרטיס משתמש בדומיינים שימושיים לפעילות כמו תאורה, מתגים, מזגנים, תריסים וחיישנים בינאריים.</p>
+          <p class="hint">
+            אם לא תבחר ידנית, הכרטיס משתמש בדומיינים שימושיים לפעילות כמו תאורה,
+            מתגים, מזגנים, נגני מדיה, תריסים ומאווררים.
+          </p>
         </section>
 
         <section class="section">
           <h3>אזורים</h3>
           ${this._areas.length
             ? html`<div class="check-grid">
-                ${this._areas.map((area) => this._renderArrayCheckbox("areas", area.name, area.name, (config.areas ?? []).includes(area.name) || (config.areas ?? []).includes(area.area_id)))}
+                ${this._areas.map((area) =>
+                  this._renderArrayCheckbox(
+                    "areas",
+                    area.name,
+                    area.name,
+                    (config.areas ?? []).includes(area.name) ||
+                      (config.areas ?? []).includes(area.area_id),
+                  ),
+                )}
               </div>`
-            : html`<p class="hint">לא נטענו אזורים מה־registry. אפשר עדיין לערוך YAML ידנית.</p>`}
-          <p class="hint">אם לא נבחר אזור, יוצגו כל האזורים שיש להם רכיבים מתאימים.</p>
+            : html`<p class="hint">
+                לא נטענו אזורים מה־registry. אפשר עדיין לערוך YAML ידנית.
+              </p>`}
+          <p class="hint">
+            אם לא נבחר אזור, יוצגו כל האזורים שיש להם רכיבים מתאימים.
+          </p>
         </section>
 
         <section class="section">
           <h3>לייבלים</h3>
-          ${this._labels.length ? this._renderLabelControls(config) : html`<p class="hint">לא נמצאו labels ב־Home Assistant, או שהגרסה לא תומכת ב־label registry.</p>`}
+          ${this._labels.length
+            ? this._renderLabelControls(config)
+            : html`<p class="hint">
+                לא נמצאו labels ב־Home Assistant, או שהגרסה לא תומכת ב־label
+                registry.
+              </p>`}
         </section>
       </div>
     `;
   }
 
-  private _renderLabelControls(config: ActivityHistoryCardConfig): TemplateResult {
+  private _renderLabelControls(
+    config: ActivityHistoryCardConfig,
+  ): TemplateResult {
     return html`
-      <p class="hint">בחר labels להצגה או להסתרה. הסתרה גוברת על הצגה, כך שאפשר למשל להסתיר "לא להצגה" או "רכיבים מוגנים".</p>
+      <p class="hint">
+        בחר labels להצגה או להסתרה. הסתרה גוברת על הצגה, כך שאפשר למשל להסתיר
+        "לא להצגה" או "רכיבים מוגנים".
+      </p>
       <h3>הצג רק labels אלה</h3>
       <div class="check-grid">
-        ${this._labels.map((label) => this._renderArrayCheckbox("include_labels", label.name, label.name, (config.include_labels ?? []).includes(label.name) || (config.include_labels ?? []).includes(label.label_id)))}
+        ${this._labels.map((label) =>
+          this._renderArrayCheckbox(
+            "include_labels",
+            label.name,
+            label.name,
+            (config.include_labels ?? []).includes(label.name) ||
+              (config.include_labels ?? []).includes(label.label_id),
+          ),
+        )}
       </div>
       <h3>הסתר labels אלה</h3>
       <div class="check-grid">
-        ${this._labels.map((label) => this._renderArrayCheckbox("exclude_labels", label.name, label.name, (config.exclude_labels ?? []).includes(label.name) || (config.exclude_labels ?? []).includes(label.label_id)))}
+        ${this._labels.map((label) =>
+          this._renderArrayCheckbox(
+            "exclude_labels",
+            label.name,
+            label.name,
+            (config.exclude_labels ?? []).includes(label.name) ||
+              (config.exclude_labels ?? []).includes(label.label_id),
+          ),
+        )}
       </div>
     `;
   }
@@ -216,7 +411,11 @@ export class ActivityHistoryCardEditor extends LitElement {
   ): TemplateResult {
     return html`
       <label class="check">
-        <input type="checkbox" .checked=${checked} @change=${(event: Event) => this._toggleArrayValue(key, value, event)} />
+        <input
+          type="checkbox"
+          .checked=${checked}
+          @change=${(event: Event) => this._toggleArrayValue(key, value, event)}
+        />
         ${label}
       </label>
     `;
@@ -224,11 +423,20 @@ export class ActivityHistoryCardEditor extends LitElement {
 
   private async _loadOptions(): Promise<void> {
     if (!this._hass) return;
-    const [areas, labels] = await Promise.all([this._safeRegistryCall<EditorArea>("config/area_registry/list"), this._safeRegistryCall<EditorLabel>("config/label_registry/list")]);
-    const domainsFromStates = [...new Set(Object.keys(this._hass.states).map(getDomain))].filter(Boolean).sort();
+    const [areas, labels] = await Promise.all([
+      this._safeRegistryCall<EditorArea>("config/area_registry/list"),
+      this._safeRegistryCall<EditorLabel>("config/label_registry/list"),
+    ]);
+    const domainsFromStates = [
+      ...new Set(Object.keys(this._hass.states).map(getDomain)),
+    ]
+      .filter(Boolean)
+      .sort();
     this._areas = areas.sort((a, b) => a.name.localeCompare(b.name, "he"));
     this._labels = labels.sort((a, b) => a.name.localeCompare(b.name, "he"));
-    this._domains = [...new Set([...DEFAULT_DISCOVERY_DOMAINS, ...domainsFromStates])].sort();
+    this._domains = [
+      ...new Set([...DEFAULT_DISCOVERY_DOMAINS, ...domainsFromStates]),
+    ].sort();
     this.requestUpdate();
   }
 
@@ -241,18 +449,36 @@ export class ActivityHistoryCardEditor extends LitElement {
     }
   }
 
-  private _setValue<K extends keyof ActivityHistoryCardConfig>(key: K, value: ActivityHistoryCardConfig[K]): void {
+  private _setValue<K extends keyof ActivityHistoryCardConfig>(
+    key: K,
+    value: ActivityHistoryCardConfig[K],
+  ): void {
     this._emitConfig({ ...this._config, [key]: value });
   }
 
-  private _setNumber(key: "hours_to_show", value: string): void {
+  private _setNumber(
+    key: "hours_to_show" | "min_row_active_seconds" | "max_total_rows",
+    value: string,
+  ): void {
     const parsed = Number(value);
-    if (Number.isFinite(parsed) && parsed > 0) {
-      this._emitConfig({ ...this._config, [key]: parsed });
-    }
+    if (!Number.isFinite(parsed)) return;
+    if (key === "hours_to_show" && parsed <= 0) return;
+    if (key !== "hours_to_show" && parsed < 0) return;
+    this._emitConfig({ ...this._config, [key]: parsed });
   }
 
-  private _setChecked(key: "auto_discover" | "mock_data" | "debug", event: Event): void {
+  private _setChecked(
+    key:
+      | "auto_discover"
+      | "mock_data"
+      | "debug"
+      | "smart_filter"
+      | "hide_empty_rows"
+      | "show_technical_entities"
+      | "show_config_entities"
+      | "show_diagnostic_entities",
+    event: Event,
+  ): void {
     const checked = (event.target as HTMLInputElement).checked;
     this._emitConfig({ ...this._config, [key]: checked });
   }
@@ -294,5 +520,8 @@ function inputValue(event: Event): string {
 }
 
 if (!customElements.get("activity-history-card-editor")) {
-  customElements.define("activity-history-card-editor", ActivityHistoryCardEditor);
+  customElements.define(
+    "activity-history-card-editor",
+    ActivityHistoryCardEditor,
+  );
 }

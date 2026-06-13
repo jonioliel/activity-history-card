@@ -4,6 +4,7 @@ export type ViewMode = "swimlane" | "heatmap" | "detail" | "correlation";
 export type GroupBy = "area" | "domain" | "floor" | "entity" | "none";
 export type StateMode = "all" | "active_only" | "currently_active";
 export type TimePreset = "24h" | "7d" | "custom";
+export type SummaryScope = "visible" | "all";
 
 export interface HassEntity {
   entity_id: string;
@@ -86,6 +87,17 @@ export interface ActivityHistoryCardConfig {
   min_duration_seconds?: number;
   merge_gap_seconds?: number;
   max_visible_rows?: number;
+  smart_filter?: boolean;
+  hide_empty_rows?: boolean;
+  hide_empty_groups?: boolean;
+  min_row_active_seconds?: number;
+  max_rows_per_group?: number;
+  max_total_rows?: number;
+  show_technical_entities?: boolean;
+  show_config_entities?: boolean;
+  show_diagnostic_entities?: boolean;
+  show_entity_id_when_name_missing?: boolean;
+  summary_scope?: SummaryScope;
   collapse_groups?: boolean;
   default_collapsed_groups?: string[];
   timeline_height?: string;
@@ -141,6 +153,13 @@ export interface EntityMeta {
   domain: string;
   icon?: string;
   labels?: string[];
+  entity_category?: string;
+  device_id?: string;
+  device_name?: string;
+  device_manufacturer?: string;
+  device_model?: string;
+  hidden_by?: string;
+  disabled_by?: string;
   config?: EntityConfig;
 }
 
@@ -201,6 +220,32 @@ export interface DiscoveryDiagnostics {
   unavailableReasons: string[];
 }
 
+export type RowCurationHiddenReason =
+  | "empty"
+  | "technical"
+  | "config"
+  | "diagnostic"
+  | "min_duration"
+  | "max_rows";
+
+export interface RowCurationDiagnostics {
+  totalRows: number;
+  visibleRows: number;
+  hiddenRows: number;
+  hiddenEmptyRows: number;
+  hiddenTechnicalRows: number;
+  hiddenConfigRows: number;
+  hiddenDiagnosticRows: number;
+  hiddenMinDurationRows: number;
+  hiddenMaxRows: number;
+  hiddenByReason: Partial<Record<RowCurationHiddenReason, number>>;
+  smartFilter: boolean;
+  showAll: boolean;
+  manualRowsProtected: number;
+  maxRowsPerGroup: number;
+  maxTotalRows: number;
+}
+
 export interface ActivityDiagnostics {
   resolvedEntityCount: number;
   historyRecordCount: number;
@@ -217,6 +262,7 @@ export interface ActivityDiagnostics {
   cacheHit: boolean;
   mockData: boolean;
   discovery?: DiscoveryDiagnostics;
+  curation?: RowCurationDiagnostics;
   lastFetchTime?: Date;
   fetchDurationMs?: number;
   fetchReason?: string;

@@ -16,9 +16,18 @@ export function getTimelineDensity(rowCount: number): TimelineDensity {
   return "normal";
 }
 
-export function limitTimelineGroups(groups: TimelineGroup[], maxVisibleRows?: number): TimelineDisplayGroups {
-  const totalRowCount = groups.reduce((sum, group) => sum + group.rows.length, 0);
-  const limit = Number.isFinite(maxVisibleRows) && maxVisibleRows && maxVisibleRows > 0 ? Math.floor(maxVisibleRows) : totalRowCount;
+export function limitTimelineGroups(
+  groups: TimelineGroup[],
+  maxVisibleRows?: number,
+): TimelineDisplayGroups {
+  const totalRowCount = groups.reduce(
+    (sum, group) => sum + group.rows.length,
+    0,
+  );
+  const limit =
+    Number.isFinite(maxVisibleRows) && maxVisibleRows && maxVisibleRows > 0
+      ? Math.floor(maxVisibleRows)
+      : totalRowCount;
   let remaining = limit;
   const visibleGroups: TimelineGroup[] = [];
 
@@ -32,7 +41,10 @@ export function limitTimelineGroups(groups: TimelineGroup[], maxVisibleRows?: nu
     visibleGroups.push({ ...group, rows });
   }
 
-  const visibleRowCount = visibleGroups.reduce((sum, group) => sum + group.rows.length, 0);
+  const visibleRowCount = visibleGroups.reduce(
+    (sum, group) => sum + group.rows.length,
+    0,
+  );
   return {
     groups: visibleGroups,
     totalRowCount,

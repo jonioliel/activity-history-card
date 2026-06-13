@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { normalizeRefreshIntervalSeconds, shouldRefreshFromHassSetter } from "../src/refresh-policy";
+import {
+  normalizeRefreshIntervalSeconds,
+  shouldRefreshFromHassSetter,
+} from "../src/refresh-policy";
 
 describe("refresh policy", () => {
   it("refreshes on the first hass setter only", () => {

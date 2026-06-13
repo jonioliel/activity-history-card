@@ -1,341 +1,1383 @@
 <!doctype html>
 <html lang="he" dir="rtl">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Activity History Card Mockups — Home Assistant</title>
-  <style>
-    :root {
-      --page-bg: #080b12;
-      --card-bg: #111827;
-      --card-bg-2: #0f172a;
-      --card-border: rgba(148,163,184,.16);
-      --muted: #94a3b8;
-      --text: #e5e7eb;
-      --soft: rgba(255,255,255,.055);
-      --soft-2: rgba(255,255,255,.09);
-      --grid: rgba(148,163,184,.15);
-      --accent: #38bdf8;
-      --on: #22c55e;
-      --cool: #38bdf8;
-      --heat: #fb923c;
-      --media: #a78bfa;
-      --warn: #facc15;
-      --off: rgba(148,163,184,.22);
-      --radius: 24px;
-      --shadow: 0 24px 70px rgba(0,0,0,.42);
-      --font: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Hebrew","Noto Sans",Arial,sans-serif;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: radial-gradient(circle at top right, rgba(56,189,248,.13), transparent 38%),
-                  radial-gradient(circle at 10% 20%, rgba(167,139,250,.13), transparent 40%),
-                  var(--page-bg);
-      color: var(--text);
-      font-family: var(--font);
-      padding: 36px;
-    }
-    .page-title { max-width: 1260px; margin: 0 auto 22px; }
-    h1 { margin: 0; font-weight: 800; letter-spacing: -.03em; }
-    .subtitle { margin-top: 8px; color: var(--muted); font-size: 16px; }
-    .mockups { display: grid; gap: 30px; max-width: 1260px; margin: 0 auto; }
-    .mockup-wrap { display: grid; gap: 12px; }
-    .mockup-title { color: #cbd5e1; font-size: 17px; font-weight: 700; margin-right: 8px; }
-    .ha-card {
-      width: 1180px;
-      min-height: 600px;
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025)), var(--card-bg);
-      border: 1px solid var(--card-border);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      padding: 22px;
-      position: relative;
-    }
-    .ha-card::before {
-      content: "";
-      position: absolute; inset: 0 0 auto 0; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent);
-      opacity: .9;
-    }
-    .header { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 18px; }
-    .title-block { display: flex; gap: 13px; align-items: center; min-width: 0; }
-    .card-icon {
-      width: 46px; height: 46px; border-radius: 16px;
-      background: linear-gradient(135deg, rgba(56,189,248,.26), rgba(167,139,250,.2));
-      display: grid; place-items: center; font-size: 23px; flex: none;
-      border: 1px solid rgba(255,255,255,.1);
-    }
-    .title { font-size: 25px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; }
-    .sub { color: var(--muted); margin-top: 5px; font-size: 13px; }
-    .controls { display: flex; gap: 8px; flex-wrap: wrap; justify-content: end; }
-    .chip, .control-chip {
-      border: 1px solid rgba(148,163,184,.18);
-      background: rgba(15,23,42,.82);
-      border-radius: 999px;
-      padding: 8px 12px;
-      color: #cbd5e1;
-      font-size: 13px;
-      display: inline-flex; gap: 7px; align-items: center;
-      white-space: nowrap;
-    }
-    .control-chip.active { background: rgba(56,189,248,.16); color: #e0f2fe; border-color: rgba(56,189,248,.42); }
-    .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
-    .summary-card {
-      background: rgba(15,23,42,.68); border: 1px solid rgba(148,163,184,.13); border-radius: 18px; padding: 12px 14px;
-    }
-    .summary-card .value { font-size: 24px; font-weight: 800; letter-spacing: -.02em; direction:ltr; text-align:right; }
-    .summary-card .label { color: var(--muted); font-size: 12px; margin-top: 3px; }
-    .timeline-card { background: rgba(2,6,23,.28); border: 1px solid rgba(148,163,184,.12); border-radius: 19px; padding: 16px; }
-    .axis {
-      display: grid; grid-template-columns: 1fr 190px; gap: 14px; align-items: end;
-      color: var(--muted); font-size: 12px; margin-bottom: 8px;
-    }
-    .axis .ticks { direction: ltr; display: flex; justify-content: space-between; padding: 0 3px; }
-    .axis .label-head { text-align: right; }
-    .lane { display: grid; grid-template-columns: 1fr 190px; gap: 14px; align-items: center; min-height: 44px; }
-    .lane + .lane { border-top: 1px solid rgba(148,163,184,.095); }
-    .lane-label { display: flex; align-items: center; gap: 10px; overflow: hidden; white-space: nowrap; }
-    .small-icon { width: 32px; height: 32px; border-radius: 11px; display:grid; place-items:center; background: var(--soft); border: 1px solid rgba(255,255,255,.08); font-size:16px; flex:none; }
-    .name { font-weight: 700; font-size: 13px; overflow:hidden; text-overflow:ellipsis; }
-    .area { color: var(--muted); font-size: 11px; margin-top:2px; }
-    .track {
-      position: relative; direction: ltr; height: 28px; border-radius: 999px;
-      background: linear-gradient(90deg, transparent calc(25% - 1px), var(--grid) calc(25% - 1px), var(--grid) calc(25% + 1px), transparent calc(25% + 1px)),
-                  linear-gradient(90deg, transparent calc(50% - 1px), var(--grid) calc(50% - 1px), var(--grid) calc(50% + 1px), transparent calc(50% + 1px)),
-                  linear-gradient(90deg, transparent calc(75% - 1px), var(--grid) calc(75% - 1px), var(--grid) calc(75% + 1px), transparent calc(75% + 1px)),
-                  rgba(15,23,42,.55);
-      overflow: hidden;
-      border: 1px solid rgba(148,163,184,.08);
-    }
-    .bar { position:absolute; top:5px; height:18px; border-radius:999px; box-shadow: 0 0 22px currentColor; opacity:.95; }
-    .bar.on { background: var(--on); color: rgba(34,197,94,.32); }
-    .bar.cool { background: var(--cool); color: rgba(56,189,248,.34); }
-    .bar.heat { background: var(--heat); color: rgba(251,146,60,.34); }
-    .bar.media { background: var(--media); color: rgba(167,139,250,.34); }
-    .bar.warn { background: var(--warn); color: rgba(250,204,21,.28); }
-    .now { position:absolute; inset:0 auto 0 87.5%; width:2px; background:#f8fafc; opacity:.82; box-shadow:0 0 14px #f8fafc; }
-    .now-label { position:absolute; top:-24px; left: calc(87.5% - 17px); direction:rtl; font-size:10px; color:#f8fafc; background:rgba(15,23,42,.92); border:1px solid rgba(255,255,255,.14); border-radius:999px; padding:3px 7px; }
-    .legend { display:flex; gap:12px; color:#cbd5e1; font-size:12px; margin-top:13px; flex-wrap:wrap; }
-    .dot { width:10px;height:10px;border-radius:999px;display:inline-block;margin-left:5px;vertical-align:-1px; }
-    .dot.on{background:var(--on)} .dot.cool{background:var(--cool)} .dot.heat{background:var(--heat)} .dot.media{background:var(--media)} .dot.warn{background:var(--warn)}
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Activity History Card Mockups — Home Assistant</title>
+    <style>
+      :root {
+        --page-bg: #080b12;
+        --card-bg: #111827;
+        --card-bg-2: #0f172a;
+        --card-border: rgba(148, 163, 184, 0.16);
+        --muted: #94a3b8;
+        --text: #e5e7eb;
+        --soft: rgba(255, 255, 255, 0.055);
+        --soft-2: rgba(255, 255, 255, 0.09);
+        --grid: rgba(148, 163, 184, 0.15);
+        --accent: #38bdf8;
+        --on: #22c55e;
+        --cool: #38bdf8;
+        --heat: #fb923c;
+        --media: #a78bfa;
+        --warn: #facc15;
+        --off: rgba(148, 163, 184, 0.22);
+        --radius: 24px;
+        --shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+        --font:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Noto Sans Hebrew", "Noto Sans", Arial, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background:
+          radial-gradient(
+            circle at top right,
+            rgba(56, 189, 248, 0.13),
+            transparent 38%
+          ),
+          radial-gradient(
+            circle at 10% 20%,
+            rgba(167, 139, 250, 0.13),
+            transparent 40%
+          ),
+          var(--page-bg);
+        color: var(--text);
+        font-family: var(--font);
+        padding: 36px;
+      }
+      .page-title {
+        max-width: 1260px;
+        margin: 0 auto 22px;
+      }
+      h1 {
+        margin: 0;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+      }
+      .subtitle {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 16px;
+      }
+      .mockups {
+        display: grid;
+        gap: 30px;
+        max-width: 1260px;
+        margin: 0 auto;
+      }
+      .mockup-wrap {
+        display: grid;
+        gap: 12px;
+      }
+      .mockup-title {
+        color: #cbd5e1;
+        font-size: 17px;
+        font-weight: 700;
+        margin-right: 8px;
+      }
+      .ha-card {
+        width: 1180px;
+        min-height: 600px;
+        border-radius: var(--radius);
+        background:
+          linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.055),
+            rgba(255, 255, 255, 0.025)
+          ),
+          var(--card-bg);
+        border: 1px solid var(--card-border);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        padding: 22px;
+        position: relative;
+      }
+      .ha-card::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent
+        );
+        opacity: 0.9;
+      }
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 18px;
+      }
+      .title-block {
+        display: flex;
+        gap: 13px;
+        align-items: center;
+        min-width: 0;
+      }
+      .card-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 16px;
+        background: linear-gradient(
+          135deg,
+          rgba(56, 189, 248, 0.26),
+          rgba(167, 139, 250, 0.2)
+        );
+        display: grid;
+        place-items: center;
+        font-size: 23px;
+        flex: none;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .title {
+        font-size: 25px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+      }
+      .sub {
+        color: var(--muted);
+        margin-top: 5px;
+        font-size: 13px;
+      }
+      .controls {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: end;
+      }
+      .chip,
+      .control-chip {
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        background: rgba(15, 23, 42, 0.82);
+        border-radius: 999px;
+        padding: 8px 12px;
+        color: #cbd5e1;
+        font-size: 13px;
+        display: inline-flex;
+        gap: 7px;
+        align-items: center;
+        white-space: nowrap;
+      }
+      .control-chip.active {
+        background: rgba(56, 189, 248, 0.16);
+        color: #e0f2fe;
+        border-color: rgba(56, 189, 248, 0.42);
+      }
+      .summary {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+      .summary-card {
+        background: rgba(15, 23, 42, 0.68);
+        border: 1px solid rgba(148, 163, 184, 0.13);
+        border-radius: 18px;
+        padding: 12px 14px;
+      }
+      .summary-card .value {
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        direction: ltr;
+        text-align: right;
+      }
+      .summary-card .label {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 3px;
+      }
+      .timeline-card {
+        background: rgba(2, 6, 23, 0.28);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        border-radius: 19px;
+        padding: 16px;
+      }
+      .axis {
+        display: grid;
+        grid-template-columns: 1fr 190px;
+        gap: 14px;
+        align-items: end;
+        color: var(--muted);
+        font-size: 12px;
+        margin-bottom: 8px;
+      }
+      .axis .ticks {
+        direction: ltr;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 3px;
+      }
+      .axis .label-head {
+        text-align: right;
+      }
+      .lane {
+        display: grid;
+        grid-template-columns: 1fr 190px;
+        gap: 14px;
+        align-items: center;
+        min-height: 44px;
+      }
+      .lane + .lane {
+        border-top: 1px solid rgba(148, 163, 184, 0.095);
+      }
+      .lane-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      .small-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 11px;
+        display: grid;
+        place-items: center;
+        background: var(--soft);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 16px;
+        flex: none;
+      }
+      .name {
+        font-weight: 700;
+        font-size: 13px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .area {
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 2px;
+      }
+      .track {
+        position: relative;
+        direction: ltr;
+        height: 28px;
+        border-radius: 999px;
+        background:
+          linear-gradient(
+            90deg,
+            transparent calc(25% - 1px),
+            var(--grid) calc(25% - 1px),
+            var(--grid) calc(25% + 1px),
+            transparent calc(25% + 1px)
+          ),
+          linear-gradient(
+            90deg,
+            transparent calc(50% - 1px),
+            var(--grid) calc(50% - 1px),
+            var(--grid) calc(50% + 1px),
+            transparent calc(50% + 1px)
+          ),
+          linear-gradient(
+            90deg,
+            transparent calc(75% - 1px),
+            var(--grid) calc(75% - 1px),
+            var(--grid) calc(75% + 1px),
+            transparent calc(75% + 1px)
+          ),
+          rgba(15, 23, 42, 0.55);
+        overflow: hidden;
+        border: 1px solid rgba(148, 163, 184, 0.08);
+      }
+      .bar {
+        position: absolute;
+        top: 5px;
+        height: 18px;
+        border-radius: 999px;
+        box-shadow: 0 0 22px currentColor;
+        opacity: 0.95;
+      }
+      .bar.on {
+        background: var(--on);
+        color: rgba(34, 197, 94, 0.32);
+      }
+      .bar.cool {
+        background: var(--cool);
+        color: rgba(56, 189, 248, 0.34);
+      }
+      .bar.heat {
+        background: var(--heat);
+        color: rgba(251, 146, 60, 0.34);
+      }
+      .bar.media {
+        background: var(--media);
+        color: rgba(167, 139, 250, 0.34);
+      }
+      .bar.warn {
+        background: var(--warn);
+        color: rgba(250, 204, 21, 0.28);
+      }
+      .now {
+        position: absolute;
+        inset: 0 auto 0 87.5%;
+        width: 2px;
+        background: #f8fafc;
+        opacity: 0.82;
+        box-shadow: 0 0 14px #f8fafc;
+      }
+      .now-label {
+        position: absolute;
+        top: -24px;
+        left: calc(87.5% - 17px);
+        direction: rtl;
+        font-size: 10px;
+        color: #f8fafc;
+        background: rgba(15, 23, 42, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 999px;
+        padding: 3px 7px;
+      }
+      .legend {
+        display: flex;
+        gap: 12px;
+        color: #cbd5e1;
+        font-size: 12px;
+        margin-top: 13px;
+        flex-wrap: wrap;
+      }
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        display: inline-block;
+        margin-left: 5px;
+        vertical-align: -1px;
+      }
+      .dot.on {
+        background: var(--on);
+      }
+      .dot.cool {
+        background: var(--cool);
+      }
+      .dot.heat {
+        background: var(--heat);
+      }
+      .dot.media {
+        background: var(--media);
+      }
+      .dot.warn {
+        background: var(--warn);
+      }
 
-    /* Mockup 2 */
-    .split { display:grid; grid-template-columns: 310px 1fr; gap:16px; direction:ltr; }
-    .side-panel, .main-panel { direction:rtl; background:rgba(2,6,23,.28); border:1px solid rgba(148,163,184,.12); border-radius:19px; padding:16px; }
-    .side-panel h3, .main-panel h3 { margin:0 0 12px; font-size:16px; }
-    .area-list { display:grid; gap:10px; }
-    .area-pill { padding:12px; border-radius:16px; background:rgba(15,23,42,.72); border:1px solid rgba(148,163,184,.12); }
-    .area-pill-top { display:flex; align-items:center; justify-content:space-between; gap:10px; }
-    .area-name { font-weight:800; }
-    .area-time { direction:ltr; font-weight:800; color:#e0f2fe; }
-    .mini-heat { margin-top:9px; height:10px; border-radius:999px; direction:ltr; display:flex; overflow:hidden; background:rgba(148,163,184,.14); }
-    .mini-heat span { flex:1; border-left:1px solid rgba(2,6,23,.25); }
-    .heat0{background:rgba(148,163,184,.12)} .heat1{background:rgba(56,189,248,.18)} .heat2{background:rgba(56,189,248,.34)} .heat3{background:rgba(34,197,94,.45)} .heat4{background:rgba(167,139,250,.52)}
-    .matrix { display:grid; grid-template-columns: 1fr 130px; gap:10px; }
-    .matrix-row { display:contents; }
-    .matrix-label { align-self:center; display:flex; align-items:center; gap:9px; font-size:13px; font-weight:700; }
-    .blocks { direction:ltr; display:grid; grid-template-columns: repeat(24, 1fr); gap:3px; }
-    .block { height:25px; border-radius:7px; background:rgba(148,163,184,.12); border:1px solid rgba(255,255,255,.025); }
-    .block.h1{background:rgba(56,189,248,.20)} .block.h2{background:rgba(56,189,248,.36)} .block.h3{background:rgba(34,197,94,.48)} .block.h4{background:rgba(167,139,250,.56)} .block.h5{background:rgba(251,146,60,.58)}
-    .matrix-axis { direction:ltr; display:flex; justify-content:space-between; color:var(--muted); font-size:11px; margin: 12px 140px 0 0; }
-    .insights { display:grid; gap:9px; margin-top:14px; }
-    .insight { display:flex; gap:10px; align-items:flex-start; background:rgba(15,23,42,.55); border:1px solid rgba(148,163,184,.11); border-radius:15px; padding:10px; color:#cbd5e1; font-size:12px; }
+      /* Mockup 2 */
+      .split {
+        display: grid;
+        grid-template-columns: 310px 1fr;
+        gap: 16px;
+        direction: ltr;
+      }
+      .side-panel,
+      .main-panel {
+        direction: rtl;
+        background: rgba(2, 6, 23, 0.28);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        border-radius: 19px;
+        padding: 16px;
+      }
+      .side-panel h3,
+      .main-panel h3 {
+        margin: 0 0 12px;
+        font-size: 16px;
+      }
+      .area-list {
+        display: grid;
+        gap: 10px;
+      }
+      .area-pill {
+        padding: 12px;
+        border-radius: 16px;
+        background: rgba(15, 23, 42, 0.72);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+      }
+      .area-pill-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .area-name {
+        font-weight: 800;
+      }
+      .area-time {
+        direction: ltr;
+        font-weight: 800;
+        color: #e0f2fe;
+      }
+      .mini-heat {
+        margin-top: 9px;
+        height: 10px;
+        border-radius: 999px;
+        direction: ltr;
+        display: flex;
+        overflow: hidden;
+        background: rgba(148, 163, 184, 0.14);
+      }
+      .mini-heat span {
+        flex: 1;
+        border-left: 1px solid rgba(2, 6, 23, 0.25);
+      }
+      .heat0 {
+        background: rgba(148, 163, 184, 0.12);
+      }
+      .heat1 {
+        background: rgba(56, 189, 248, 0.18);
+      }
+      .heat2 {
+        background: rgba(56, 189, 248, 0.34);
+      }
+      .heat3 {
+        background: rgba(34, 197, 94, 0.45);
+      }
+      .heat4 {
+        background: rgba(167, 139, 250, 0.52);
+      }
+      .matrix {
+        display: grid;
+        grid-template-columns: 1fr 130px;
+        gap: 10px;
+      }
+      .matrix-row {
+        display: contents;
+      }
+      .matrix-label {
+        align-self: center;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .blocks {
+        direction: ltr;
+        display: grid;
+        grid-template-columns: repeat(24, 1fr);
+        gap: 3px;
+      }
+      .block {
+        height: 25px;
+        border-radius: 7px;
+        background: rgba(148, 163, 184, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.025);
+      }
+      .block.h1 {
+        background: rgba(56, 189, 248, 0.2);
+      }
+      .block.h2 {
+        background: rgba(56, 189, 248, 0.36);
+      }
+      .block.h3 {
+        background: rgba(34, 197, 94, 0.48);
+      }
+      .block.h4 {
+        background: rgba(167, 139, 250, 0.56);
+      }
+      .block.h5 {
+        background: rgba(251, 146, 60, 0.58);
+      }
+      .matrix-axis {
+        direction: ltr;
+        display: flex;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 11px;
+        margin: 12px 140px 0 0;
+      }
+      .insights {
+        display: grid;
+        gap: 9px;
+        margin-top: 14px;
+      }
+      .insight {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        background: rgba(15, 23, 42, 0.55);
+        border: 1px solid rgba(148, 163, 184, 0.11);
+        border-radius: 15px;
+        padding: 10px;
+        color: #cbd5e1;
+        font-size: 12px;
+      }
 
-    /* Mockup 3 */
-    .detail-grid { display:grid; grid-template-columns: 1fr 330px; gap:16px; direction:ltr; }
-    .detail-left, .detail-right { direction:rtl; background:rgba(2,6,23,.28); border:1px solid rgba(148,163,184,.12); border-radius:19px; padding:16px; }
-    .detail-top { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:12px; }
-    .entity-title { display:flex; gap:12px; align-items:center; }
-    .entity-title .big-icon { width:56px; height:56px; border-radius:18px; background:rgba(56,189,248,.17); border:1px solid rgba(56,189,248,.25); display:grid; place-items:center; font-size:28px; }
-    .status-badge { display:inline-flex; gap:7px; align-items:center; border-radius:999px; padding:8px 11px; font-size:12px; background:rgba(56,189,248,.15); color:#e0f2fe; border:1px solid rgba(56,189,248,.3); }
-    .big-timeline { height:74px; border-radius:20px; position:relative; direction:ltr; background:rgba(15,23,42,.55); border:1px solid rgba(148,163,184,.09); overflow:hidden; margin-bottom:12px; }
-    .big-timeline .bar { top:18px; height:38px; }
-    .temp-chart { position:relative; height:220px; border-radius:20px; background:linear-gradient(180deg, rgba(15,23,42,.62), rgba(15,23,42,.38)); border:1px solid rgba(148,163,184,.11); overflow:hidden; }
-    .temp-chart svg { width:100%; height:100%; direction:ltr; display:block; }
-    .temp-chart .ylabels { position:absolute; inset:14px 14px 14px auto; color:var(--muted); font-size:11px; display:flex; flex-direction:column; justify-content:space-between; }
-    .range-row { display:flex; justify-content:space-between; color:var(--muted); direction:ltr; font-size:11px; padding:7px 4px 0; }
-    .stat-list { display:grid; gap:10px; }
-    .stat-item { background:rgba(15,23,42,.68); border:1px solid rgba(148,163,184,.11); border-radius:17px; padding:12px; }
-    .stat-item .stat-value { font-weight:900; font-size:23px; direction:ltr; text-align:right; }
-    .stat-item .stat-label { color:var(--muted); font-size:12px; margin-top:3px; }
-    .events { margin-top:14px; display:grid; gap:7px; }
-    .event { display:grid; grid-template-columns: 70px 1fr; gap:10px; align-items:center; font-size:12px; color:#cbd5e1; padding:8px 0; border-top:1px solid rgba(148,163,184,.1); }
-    .event .time { direction:ltr; color:var(--muted); }
+      /* Mockup 3 */
+      .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 330px;
+        gap: 16px;
+        direction: ltr;
+      }
+      .detail-left,
+      .detail-right {
+        direction: rtl;
+        background: rgba(2, 6, 23, 0.28);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        border-radius: 19px;
+        padding: 16px;
+      }
+      .detail-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 12px;
+      }
+      .entity-title {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .entity-title .big-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 18px;
+        background: rgba(56, 189, 248, 0.17);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        display: grid;
+        place-items: center;
+        font-size: 28px;
+      }
+      .status-badge {
+        display: inline-flex;
+        gap: 7px;
+        align-items: center;
+        border-radius: 999px;
+        padding: 8px 11px;
+        font-size: 12px;
+        background: rgba(56, 189, 248, 0.15);
+        color: #e0f2fe;
+        border: 1px solid rgba(56, 189, 248, 0.3);
+      }
+      .big-timeline {
+        height: 74px;
+        border-radius: 20px;
+        position: relative;
+        direction: ltr;
+        background: rgba(15, 23, 42, 0.55);
+        border: 1px solid rgba(148, 163, 184, 0.09);
+        overflow: hidden;
+        margin-bottom: 12px;
+      }
+      .big-timeline .bar {
+        top: 18px;
+        height: 38px;
+      }
+      .temp-chart {
+        position: relative;
+        height: 220px;
+        border-radius: 20px;
+        background: linear-gradient(
+          180deg,
+          rgba(15, 23, 42, 0.62),
+          rgba(15, 23, 42, 0.38)
+        );
+        border: 1px solid rgba(148, 163, 184, 0.11);
+        overflow: hidden;
+      }
+      .temp-chart svg {
+        width: 100%;
+        height: 100%;
+        direction: ltr;
+        display: block;
+      }
+      .temp-chart .ylabels {
+        position: absolute;
+        inset: 14px 14px 14px auto;
+        color: var(--muted);
+        font-size: 11px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .range-row {
+        display: flex;
+        justify-content: space-between;
+        color: var(--muted);
+        direction: ltr;
+        font-size: 11px;
+        padding: 7px 4px 0;
+      }
+      .stat-list {
+        display: grid;
+        gap: 10px;
+      }
+      .stat-item {
+        background: rgba(15, 23, 42, 0.68);
+        border: 1px solid rgba(148, 163, 184, 0.11);
+        border-radius: 17px;
+        padding: 12px;
+      }
+      .stat-item .stat-value {
+        font-weight: 900;
+        font-size: 23px;
+        direction: ltr;
+        text-align: right;
+      }
+      .stat-item .stat-label {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 3px;
+      }
+      .events {
+        margin-top: 14px;
+        display: grid;
+        gap: 7px;
+      }
+      .event {
+        display: grid;
+        grid-template-columns: 70px 1fr;
+        gap: 10px;
+        align-items: center;
+        font-size: 12px;
+        color: #cbd5e1;
+        padding: 8px 0;
+        border-top: 1px solid rgba(148, 163, 184, 0.1);
+      }
+      .event .time {
+        direction: ltr;
+        color: var(--muted);
+      }
 
-    /* Mockup 4 */
-    .correlation { display:grid; grid-template-columns: 1fr 300px; gap:16px; direction:ltr; }
-    .corr-main, .corr-feed { direction:rtl; background:rgba(2,6,23,.28); border:1px solid rgba(148,163,184,.12); border-radius:19px; padding:16px; }
-    .section-head { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px; }
-    .section-head h3 { margin:0; font-size:16px; }
-    .group-title { margin:14px 0 8px; font-weight:800; color:#dbeafe; display:flex; align-items:center; gap:8px; }
-    .event-feed { display:grid; gap:9px; max-height:465px; overflow:hidden; }
-    .feed-item { background:rgba(15,23,42,.63); border:1px solid rgba(148,163,184,.11); border-radius:15px; padding:10px; }
-    .feed-time { color:#7dd3fc; font-weight:800; direction:ltr; text-align:right; font-size:12px; }
-    .feed-title { font-weight:700; font-size:13px; margin-top:5px; }
-    .feed-sub { color:var(--muted); font-size:11px; margin-top:3px; }
-    .hover-card { position:absolute; left:375px; top:196px; width:245px; direction:rtl; background:rgba(15,23,42,.96); border:1px solid rgba(125,211,252,.28); border-radius:18px; padding:12px; box-shadow:0 22px 50px rgba(0,0,0,.38); }
-    .hover-card:before { content:""; position:absolute; top:-7px; left:45px; width:12px; height:12px; background:rgba(15,23,42,.96); transform:rotate(45deg); border-left:1px solid rgba(125,211,252,.28); border-top:1px solid rgba(125,211,252,.28); }
-    .hover-title { font-weight:900; }
-    .hover-meta { color:var(--muted); font-size:12px; margin-top:5px; line-height:1.5; }
-    .footer-note { position:absolute; left:22px; bottom:16px; color:rgba(203,213,225,.55); font-size:11px; direction:ltr; }
-  </style>
-</head>
-<body>
-  <div class="page-title">
-    <h1>הדמיות לכרטיס Activity History — Home Assistant</h1>
-    <div class="subtitle">ארבעה כיווני UI לפיתוח Custom Lovelace Card: ציר זמן, אזורים, Drill‑down וקורלציה בין רכיבים.</div>
-  </div>
+      /* Mockup 4 */
+      .correlation {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 16px;
+        direction: ltr;
+      }
+      .corr-main,
+      .corr-feed {
+        direction: rtl;
+        background: rgba(2, 6, 23, 0.28);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        border-radius: 19px;
+        padding: 16px;
+      }
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+      .section-head h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+      .group-title {
+        margin: 14px 0 8px;
+        font-weight: 800;
+        color: #dbeafe;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .event-feed {
+        display: grid;
+        gap: 9px;
+        max-height: 465px;
+        overflow: hidden;
+      }
+      .feed-item {
+        background: rgba(15, 23, 42, 0.63);
+        border: 1px solid rgba(148, 163, 184, 0.11);
+        border-radius: 15px;
+        padding: 10px;
+      }
+      .feed-time {
+        color: #7dd3fc;
+        font-weight: 800;
+        direction: ltr;
+        text-align: right;
+        font-size: 12px;
+      }
+      .feed-title {
+        font-weight: 700;
+        font-size: 13px;
+        margin-top: 5px;
+      }
+      .feed-sub {
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 3px;
+      }
+      .hover-card {
+        position: absolute;
+        left: 375px;
+        top: 196px;
+        width: 245px;
+        direction: rtl;
+        background: rgba(15, 23, 42, 0.96);
+        border: 1px solid rgba(125, 211, 252, 0.28);
+        border-radius: 18px;
+        padding: 12px;
+        box-shadow: 0 22px 50px rgba(0, 0, 0, 0.38);
+      }
+      .hover-card:before {
+        content: "";
+        position: absolute;
+        top: -7px;
+        left: 45px;
+        width: 12px;
+        height: 12px;
+        background: rgba(15, 23, 42, 0.96);
+        transform: rotate(45deg);
+        border-left: 1px solid rgba(125, 211, 252, 0.28);
+        border-top: 1px solid rgba(125, 211, 252, 0.28);
+      }
+      .hover-title {
+        font-weight: 900;
+      }
+      .hover-meta {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 5px;
+        line-height: 1.5;
+      }
+      .footer-note {
+        position: absolute;
+        left: 22px;
+        bottom: 16px;
+        color: rgba(203, 213, 225, 0.55);
+        font-size: 11px;
+        direction: ltr;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-title">
+      <h1>הדמיות לכרטיס Activity History — Home Assistant</h1>
+      <div class="subtitle">
+        ארבעה כיווני UI לפיתוח Custom Lovelace Card: ציר זמן, אזורים, Drill‑down
+        וקורלציה בין רכיבים.
+      </div>
+    </div>
 
-  <div class="mockups">
-    <section class="mockup-wrap" id="mockup-1">
-      <div class="mockup-title">1) תצוגת Swimlanes — הכי ברור למצב ON/OFF לפי רכיב ואזור</div>
-      <div class="ha-card">
-        <div class="header">
-          <div class="title-block">
-            <div class="card-icon">📊</div>
-            <div><div class="title">היסטוריית פעילות הבית</div><div class="sub">טווח: 24 שעות · מקובץ לפי אזור · עדכון חי</div></div>
+    <div class="mockups">
+      <section class="mockup-wrap" id="mockup-1">
+        <div class="mockup-title">
+          1) תצוגת Swimlanes — הכי ברור למצב ON/OFF לפי רכיב ואזור
+        </div>
+        <div class="ha-card">
+          <div class="header">
+            <div class="title-block">
+              <div class="card-icon">📊</div>
+              <div>
+                <div class="title">היסטוריית פעילות הבית</div>
+                <div class="sub">טווח: 24 שעות · מקובץ לפי אזור · עדכון חי</div>
+              </div>
+            </div>
+            <div class="controls">
+              <span class="control-chip active">24ש׳</span
+              ><span class="control-chip">היום</span
+              ><span class="control-chip">אתמול</span
+              ><span class="control-chip">טווח מותאם</span
+              ><span class="control-chip">⚙️ פילטרים</span>
+            </div>
           </div>
-          <div class="controls">
-            <span class="control-chip active">24ש׳</span><span class="control-chip">היום</span><span class="control-chip">אתמול</span><span class="control-chip">טווח מותאם</span><span class="control-chip">⚙️ פילטרים</span>
+          <div class="summary">
+            <div class="summary-card">
+              <div class="value">7:42</div>
+              <div class="label">סה״כ פעילות מזגנים</div>
+            </div>
+            <div class="summary-card">
+              <div class="value">4:18</div>
+              <div class="label">מוזיקה / מדיה</div>
+            </div>
+            <div class="summary-card">
+              <div class="value">18</div>
+              <div class="label">הדלקות מתגים</div>
+            </div>
+            <div class="summary-card">
+              <div class="value">21:34</div>
+              <div class="label">שיא פעילות אחרון</div>
+            </div>
           </div>
+          <div class="timeline-card">
+            <div class="axis">
+              <div class="ticks">
+                <span>00:00</span><span>06:00</span><span>12:00</span
+                ><span>18:00</span><span>עכשיו</span>
+              </div>
+              <div class="label-head">רכיב / אזור</div>
+            </div>
+            <div class="lane">
+              <div class="track">
+                <span class="bar on" style="left: 8%; width: 7%"></span
+                ><span class="bar on" style="left: 34%; width: 8%"></span
+                ><span class="bar on" style="left: 72%; width: 16%"></span
+                ><span class="now"></span><span class="now-label">עכשיו</span>
+              </div>
+              <div class="lane-label">
+                <span class="small-icon">💡</span>
+                <div>
+                  <div class="name">תאורת סלון</div>
+                  <div class="area">סלון · switch</div>
+                </div>
+              </div>
+            </div>
+            <div class="lane">
+              <div class="track">
+                <span class="bar cool" style="left: 28%; width: 14%"></span
+                ><span class="bar cool" style="left: 64%; width: 23%"></span>
+              </div>
+              <div class="lane-label">
+                <span class="small-icon">❄️</span>
+                <div>
+                  <div class="name">מזגן סלון</div>
+                  <div class="area">סלון · climate</div>
+                </div>
+              </div>
+            </div>
+            <div class="lane">
+              <div class="track">
+                <span class="bar media" style="left: 57%; width: 19%"></span
+                ><span class="bar media" style="left: 80%; width: 7%"></span>
+              </div>
+              <div class="lane-label">
+                <span class="small-icon">🎵</span>
+                <div>
+                  <div class="name">Spotify סלון</div>
+                  <div class="area">סלון · playing</div>
+                </div>
+              </div>
+            </div>
+            <div class="lane">
+              <div class="track">
+                <span class="bar on" style="left: 18%; width: 4%"></span
+                ><span class="bar on" style="left: 47%; width: 3%"></span
+                ><span class="bar on" style="left: 73%; width: 9%"></span>
+              </div>
+              <div class="lane-label">
+                <span class="small-icon">☕</span>
+                <div>
+                  <div class="name">שקע מכונת קפה</div>
+                  <div class="area">מטבח · switch</div>
+                </div>
+              </div>
+            </div>
+            <div class="lane">
+              <div class="track">
+                <span class="bar heat" style="left: 4%; width: 11%"></span
+                ><span class="bar cool" style="left: 59%; width: 18%"></span>
+              </div>
+              <div class="lane-label">
+                <span class="small-icon">🌡️</span>
+                <div>
+                  <div class="name">מזגן חדר ילדים</div>
+                  <div class="area">חדר ילדים · climate</div>
+                </div>
+              </div>
+            </div>
+            <div class="lane">
+              <div class="track">
+                <span class="bar on" style="left: 69%; width: 5%"></span
+                ><span class="bar on" style="left: 78%; width: 4%"></span
+                ><span class="bar warn" style="left: 83%; width: 2.5%"></span>
+              </div>
+              <div class="lane-label">
+                <span class="small-icon">🪟</span>
+                <div>
+                  <div class="name">תריס מטבח</div>
+                  <div class="area">מטבח · cover</div>
+                </div>
+              </div>
+            </div>
+            <div class="legend">
+              <span><i class="dot on"></i>דולק</span
+              ><span><i class="dot cool"></i>קירור</span
+              ><span><i class="dot heat"></i>חימום</span
+              ><span><i class="dot media"></i>מנגן</span
+              ><span><i class="dot warn"></i>אירוע קצר / חריג</span>
+            </div>
+          </div>
+          <div class="footer-note">Mockup 1 · Swimlane timeline</div>
         </div>
-        <div class="summary">
-          <div class="summary-card"><div class="value">7:42</div><div class="label">סה״כ פעילות מזגנים</div></div>
-          <div class="summary-card"><div class="value">4:18</div><div class="label">מוזיקה / מדיה</div></div>
-          <div class="summary-card"><div class="value">18</div><div class="label">הדלקות מתגים</div></div>
-          <div class="summary-card"><div class="value">21:34</div><div class="label">שיא פעילות אחרון</div></div>
-        </div>
-        <div class="timeline-card">
-          <div class="axis"><div class="ticks"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>עכשיו</span></div><div class="label-head">רכיב / אזור</div></div>
-          <div class="lane"><div class="track"><span class="bar on" style="left:8%;width:7%"></span><span class="bar on" style="left:34%;width:8%"></span><span class="bar on" style="left:72%;width:16%"></span><span class="now"></span><span class="now-label">עכשיו</span></div><div class="lane-label"><span class="small-icon">💡</span><div><div class="name">תאורת סלון</div><div class="area">סלון · switch</div></div></div></div>
-          <div class="lane"><div class="track"><span class="bar cool" style="left:28%;width:14%"></span><span class="bar cool" style="left:64%;width:23%"></span></div><div class="lane-label"><span class="small-icon">❄️</span><div><div class="name">מזגן סלון</div><div class="area">סלון · climate</div></div></div></div>
-          <div class="lane"><div class="track"><span class="bar media" style="left:57%;width:19%"></span><span class="bar media" style="left:80%;width:7%"></span></div><div class="lane-label"><span class="small-icon">🎵</span><div><div class="name">Spotify סלון</div><div class="area">סלון · playing</div></div></div></div>
-          <div class="lane"><div class="track"><span class="bar on" style="left:18%;width:4%"></span><span class="bar on" style="left:47%;width:3%"></span><span class="bar on" style="left:73%;width:9%"></span></div><div class="lane-label"><span class="small-icon">☕</span><div><div class="name">שקע מכונת קפה</div><div class="area">מטבח · switch</div></div></div></div>
-          <div class="lane"><div class="track"><span class="bar heat" style="left:4%;width:11%"></span><span class="bar cool" style="left:59%;width:18%"></span></div><div class="lane-label"><span class="small-icon">🌡️</span><div><div class="name">מזגן חדר ילדים</div><div class="area">חדר ילדים · climate</div></div></div></div>
-          <div class="lane"><div class="track"><span class="bar on" style="left:69%;width:5%"></span><span class="bar on" style="left:78%;width:4%"></span><span class="bar warn" style="left:83%;width:2.5%"></span></div><div class="lane-label"><span class="small-icon">🪟</span><div><div class="name">תריס מטבח</div><div class="area">מטבח · cover</div></div></div></div>
-          <div class="legend"><span><i class="dot on"></i>דולק</span><span><i class="dot cool"></i>קירור</span><span><i class="dot heat"></i>חימום</span><span><i class="dot media"></i>מנגן</span><span><i class="dot warn"></i>אירוע קצר / חריג</span></div>
-        </div>
-        <div class="footer-note">Mockup 1 · Swimlane timeline</div>
-      </div>
-    </section>
+      </section>
 
-    <section class="mockup-wrap" id="mockup-2">
-      <div class="mockup-title">2) תצוגת אזורים — להבין במהירות איפה הייתה פעילות בבית</div>
-      <div class="ha-card">
-        <div class="header">
-          <div class="title-block"><div class="card-icon">🏠</div><div><div class="title">מפת פעילות לפי אזורים</div><div class="sub">חלוקה לשעות · עוצמה לפי מספר רכיבים פעילים בכל אזור</div></div></div>
-          <div class="controls"><span class="control-chip active">היום</span><span class="control-chip">מתגים</span><span class="control-chip">מיזוג</span><span class="control-chip">מדיה</span><span class="control-chip">ייצוא CSV</span></div>
+      <section class="mockup-wrap" id="mockup-2">
+        <div class="mockup-title">
+          2) תצוגת אזורים — להבין במהירות איפה הייתה פעילות בבית
         </div>
-        <div class="split">
-          <aside class="side-panel">
-            <h3>סיכום אזורים</h3>
-            <div class="area-list">
-              <div class="area-pill"><div class="area-pill-top"><span class="area-name">סלון</span><span class="area-time">9:12</span></div><div class="mini-heat"><span class="heat0"></span><span class="heat1"></span><span class="heat1"></span><span class="heat3"></span><span class="heat4"></span><span class="heat3"></span></div></div>
-              <div class="area-pill"><div class="area-pill-top"><span class="area-name">מטבח</span><span class="area-time">3:48</span></div><div class="mini-heat"><span class="heat0"></span><span class="heat3"></span><span class="heat1"></span><span class="heat1"></span><span class="heat2"></span><span class="heat0"></span></div></div>
-              <div class="area-pill"><div class="area-pill-top"><span class="area-name">חדר ילדים</span><span class="area-time">5:21</span></div><div class="mini-heat"><span class="heat2"></span><span class="heat2"></span><span class="heat0"></span><span class="heat0"></span><span class="heat3"></span><span class="heat2"></span></div></div>
-              <div class="area-pill"><div class="area-pill-top"><span class="area-name">חדר שינה</span><span class="area-time">2:05</span></div><div class="mini-heat"><span class="heat1"></span><span class="heat1"></span><span class="heat0"></span><span class="heat0"></span><span class="heat1"></span><span class="heat0"></span></div></div>
+        <div class="ha-card">
+          <div class="header">
+            <div class="title-block">
+              <div class="card-icon">🏠</div>
+              <div>
+                <div class="title">מפת פעילות לפי אזורים</div>
+                <div class="sub">
+                  חלוקה לשעות · עוצמה לפי מספר רכיבים פעילים בכל אזור
+                </div>
+              </div>
             </div>
-            <div class="insights"><div class="insight">💡 <span>הסלון היה האזור הפעיל ביותר בין 18:00–22:00.</span></div><div class="insight">❄️ <span>מיזוג פעיל במקביל בשני אזורים במשך 42 דקות.</span></div></div>
-          </aside>
-          <main class="main-panel">
-            <h3>Heatmap יומי לפי שעה</h3>
-            <div class="matrix">
-              <div class="blocks"> <span class="block"></span><span class="block"></span><span class="block h1"></span><span class="block h1"></span><span class="block"></span><span class="block h1"></span><span class="block h2"></span><span class="block h1"></span><span class="block"></span><span class="block"></span><span class="block h1"></span><span class="block h2"></span><span class="block h2"></span><span class="block h1"></span><span class="block h2"></span><span class="block h3"></span><span class="block h3"></span><span class="block h4"></span><span class="block h4"></span><span class="block h4"></span><span class="block h3"></span><span class="block h2"></span><span class="block h1"></span><span class="block"></span></div><div class="matrix-label"><span class="small-icon">🛋️</span>סלון</div>
-              <div class="blocks"> <span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block h2"></span><span class="block h3"></span><span class="block h3"></span><span class="block h2"></span><span class="block h1"></span><span class="block"></span><span class="block h1"></span><span class="block h1"></span><span class="block"></span><span class="block"></span><span class="block h1"></span><span class="block h1"></span><span class="block h2"></span><span class="block h2"></span><span class="block h1"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span></div><div class="matrix-label"><span class="small-icon">🍳</span>מטבח</div>
-              <div class="blocks"> <span class="block h2"></span><span class="block h2"></span><span class="block h2"></span><span class="block h1"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block h1"></span><span class="block h1"></span><span class="block h1"></span><span class="block h2"></span><span class="block h2"></span><span class="block h3"></span><span class="block h3"></span><span class="block h2"></span><span class="block h2"></span><span class="block h1"></span><span class="block h1"></span><span class="block h1"></span></div><div class="matrix-label"><span class="small-icon">🧸</span>חדר ילדים</div>
-              <div class="blocks"> <span class="block h1"></span><span class="block h1"></span><span class="block h1"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block h1"></span><span class="block h1"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block h1"></span><span class="block h1"></span><span class="block h1"></span><span class="block"></span><span class="block"></span><span class="block h1"></span><span class="block h1"></span></div><div class="matrix-label"><span class="small-icon">🛏️</span>חדר שינה</div>
-              <div class="blocks"> <span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block h1"></span><span class="block h1"></span><span class="block h1"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block h1"></span><span class="block h2"></span><span class="block h2"></span><span class="block h2"></span><span class="block h1"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span><span class="block"></span></div><div class="matrix-label"><span class="small-icon">🚿</span>אמבטיה</div>
+            <div class="controls">
+              <span class="control-chip active">היום</span
+              ><span class="control-chip">מתגים</span
+              ><span class="control-chip">מיזוג</span
+              ><span class="control-chip">מדיה</span
+              ><span class="control-chip">ייצוא CSV</span>
             </div>
-            <div class="matrix-axis"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>
-            <div class="legend"><span><i class="dot cool"></i>פעילות נמוכה</span><span><i class="dot on"></i>פעילות בינונית</span><span><i class="dot media"></i>פעילות גבוהה</span><span><i class="dot heat"></i>חריגה/עומס</span></div>
-          </main>
+          </div>
+          <div class="split">
+            <aside class="side-panel">
+              <h3>סיכום אזורים</h3>
+              <div class="area-list">
+                <div class="area-pill">
+                  <div class="area-pill-top">
+                    <span class="area-name">סלון</span
+                    ><span class="area-time">9:12</span>
+                  </div>
+                  <div class="mini-heat">
+                    <span class="heat0"></span><span class="heat1"></span
+                    ><span class="heat1"></span><span class="heat3"></span
+                    ><span class="heat4"></span><span class="heat3"></span>
+                  </div>
+                </div>
+                <div class="area-pill">
+                  <div class="area-pill-top">
+                    <span class="area-name">מטבח</span
+                    ><span class="area-time">3:48</span>
+                  </div>
+                  <div class="mini-heat">
+                    <span class="heat0"></span><span class="heat3"></span
+                    ><span class="heat1"></span><span class="heat1"></span
+                    ><span class="heat2"></span><span class="heat0"></span>
+                  </div>
+                </div>
+                <div class="area-pill">
+                  <div class="area-pill-top">
+                    <span class="area-name">חדר ילדים</span
+                    ><span class="area-time">5:21</span>
+                  </div>
+                  <div class="mini-heat">
+                    <span class="heat2"></span><span class="heat2"></span
+                    ><span class="heat0"></span><span class="heat0"></span
+                    ><span class="heat3"></span><span class="heat2"></span>
+                  </div>
+                </div>
+                <div class="area-pill">
+                  <div class="area-pill-top">
+                    <span class="area-name">חדר שינה</span
+                    ><span class="area-time">2:05</span>
+                  </div>
+                  <div class="mini-heat">
+                    <span class="heat1"></span><span class="heat1"></span
+                    ><span class="heat0"></span><span class="heat0"></span
+                    ><span class="heat1"></span><span class="heat0"></span>
+                  </div>
+                </div>
+              </div>
+              <div class="insights">
+                <div class="insight">
+                  💡 <span>הסלון היה האזור הפעיל ביותר בין 18:00–22:00.</span>
+                </div>
+                <div class="insight">
+                  ❄️ <span>מיזוג פעיל במקביל בשני אזורים במשך 42 דקות.</span>
+                </div>
+              </div>
+            </aside>
+            <main class="main-panel">
+              <h3>Heatmap יומי לפי שעה</h3>
+              <div class="matrix">
+                <div class="blocks">
+                  <span class="block"></span><span class="block"></span
+                  ><span class="block h1"></span><span class="block h1"></span
+                  ><span class="block"></span><span class="block h1"></span
+                  ><span class="block h2"></span><span class="block h1"></span
+                  ><span class="block"></span><span class="block"></span
+                  ><span class="block h1"></span><span class="block h2"></span
+                  ><span class="block h2"></span><span class="block h1"></span
+                  ><span class="block h2"></span><span class="block h3"></span
+                  ><span class="block h3"></span><span class="block h4"></span
+                  ><span class="block h4"></span><span class="block h4"></span
+                  ><span class="block h3"></span><span class="block h2"></span
+                  ><span class="block h1"></span><span class="block"></span>
+                </div>
+                <div class="matrix-label">
+                  <span class="small-icon">🛋️</span>סלון
+                </div>
+                <div class="blocks">
+                  <span class="block"></span><span class="block"></span
+                  ><span class="block"></span><span class="block"></span
+                  ><span class="block h2"></span><span class="block h3"></span
+                  ><span class="block h3"></span><span class="block h2"></span
+                  ><span class="block h1"></span><span class="block"></span
+                  ><span class="block h1"></span><span class="block h1"></span
+                  ><span class="block"></span><span class="block"></span
+                  ><span class="block h1"></span><span class="block h1"></span
+                  ><span class="block h2"></span><span class="block h2"></span
+                  ><span class="block h1"></span><span class="block"></span
+                  ><span class="block"></span><span class="block"></span
+                  ><span class="block"></span><span class="block"></span>
+                </div>
+                <div class="matrix-label">
+                  <span class="small-icon">🍳</span>מטבח
+                </div>
+                <div class="blocks">
+                  <span class="block h2"></span><span class="block h2"></span
+                  ><span class="block h2"></span><span class="block h1"></span
+                  ><span class="block"></span><span class="block"></span
+                  ><span class="block"></span><span class="block"></span
+                  ><span class="block"></span><span class="block"></span
+                  ><span class="block"></span><span class="block"></span
+                  ><span class="block h1"></span><span class="block h1"></span
+                  ><span class="block h1"></span><span class="block h2"></span
+                  ><span class="block h2"></span><span class="block h3"></span
+                  ><span class="block h3"></span><span class="block h2"></span
+                  ><span class="block h2"></span><span class="block h1"></span
+                  ><span class="block h1"></span><span class="block h1"></span>
+                </div>
+                <div class="matrix-label">
+                  <span class="small-icon">🧸</span>חדר ילדים
+                </div>
+                <div class="blocks">
+                  <span class="block h1"></span><span class="block h1"></span
+                  ><span class="block h1"></span><span class="block"></span
+                  ><span class="block"></span><span class="block"></span
+                  ><span class="block h1"></span><span class="block h1"></span
+                  ><span class="block"></span><span class="block"></span
+                  ><span class="block"></span><span class="block"></span
+                  ><span class="block"></span><span class="block"></span
+                  ><span class="block"></span><span class="block"></span
+                  ><span class="block"></span><span class="block h1"></span
+                  ><span class="block h1"></span><span class="block h1"></span
+                  ><span class="block"></span><span class="block"></span
+                  ><span class="block h1"></span><span class="block h1"></span>
+                </div>
+                <div class="matrix-label">
+                  <span class="small-icon">🛏️</span>חדר שינה
+                </div>
+                <div class="blocks">
+                  <span class="block"></span><span class="block"></span
+                  ><span class="block"></span><span class="block"></span
+                  ><span class="block"></span><span class="block h1"></span
+                  ><span class="block h1"></span><span class="block h1"></span
+                  ><span class="block"></span><span class="block"></span
+                  ><span class="block"></span><span class="block"></span
+                  ><span class="block"></span><span class="block"></span
+                  ><span class="block h1"></span><span class="block h2"></span
+                  ><span class="block h2"></span><span class="block h2"></span
+                  ><span class="block h1"></span><span class="block"></span
+                  ><span class="block"></span><span class="block"></span
+                  ><span class="block"></span><span class="block"></span>
+                </div>
+                <div class="matrix-label">
+                  <span class="small-icon">🚿</span>אמבטיה
+                </div>
+              </div>
+              <div class="matrix-axis">
+                <span>00</span><span>06</span><span>12</span><span>18</span
+                ><span>24</span>
+              </div>
+              <div class="legend">
+                <span><i class="dot cool"></i>פעילות נמוכה</span
+                ><span><i class="dot on"></i>פעילות בינונית</span
+                ><span><i class="dot media"></i>פעילות גבוהה</span
+                ><span><i class="dot heat"></i>חריגה/עומס</span>
+              </div>
+            </main>
+          </div>
+          <div class="footer-note">Mockup 2 · Area heatmap</div>
         </div>
-        <div class="footer-note">Mockup 2 · Area heatmap</div>
-      </div>
-    </section>
+      </section>
 
-    <section class="mockup-wrap" id="mockup-3">
-      <div class="mockup-title">3) Drill‑down לרכיב — כשנכנסים למזגן/מוזיקה/מתג ספציפי</div>
-      <div class="ha-card">
-        <div class="header">
-          <div class="title-block"><div class="card-icon">🔎</div><div><div class="title">פרטי פעילות רכיב</div><div class="sub">מבט עומק על ישות אחת עם מצבים, טמפרטורות ואירועים</div></div></div>
-          <div class="controls"><span class="control-chip">‹ חזור לכל הבית</span><span class="control-chip active">מזגן סלון</span><span class="control-chip">24ש׳</span><span class="control-chip">השווה לאתמול</span></div>
+      <section class="mockup-wrap" id="mockup-3">
+        <div class="mockup-title">
+          3) Drill‑down לרכיב — כשנכנסים למזגן/מוזיקה/מתג ספציפי
         </div>
-        <div class="detail-grid">
-          <main class="detail-left">
-            <div class="detail-top"><div class="entity-title"><div class="big-icon">❄️</div><div><div class="title">מזגן סלון</div><div class="sub">climate.living_room_ac · אזור: סלון</div></div></div><div class="status-badge">● קירור פעיל · 23.5°</div></div>
-            <div class="big-timeline"><span class="bar cool" style="left:11%;width:13%"></span><span class="bar cool" style="left:44%;width:9%"></span><span class="bar cool" style="left:67%;width:21%"></span><span class="bar heat" style="left:3%;width:5%"></span><span class="now"></span><span class="now-label">עכשיו</span></div>
-            <div class="range-row"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div>
-            <div class="temp-chart">
-              <div class="ylabels"><span>28°</span><span>26°</span><span>24°</span><span>22°</span></div>
-              <svg viewBox="0 0 760 220" preserveAspectRatio="none" aria-label="temperature chart">
-                <defs>
-                  <linearGradient id="fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#38bdf8" stop-opacity=".28"/><stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/></linearGradient>
-                </defs>
-                <path d="M0 48 H760 M0 96 H760 M0 144 H760 M0 192 H760" stroke="rgba(148,163,184,.13)" stroke-width="1"/>
-                <path d="M0 92 C90 86 110 116 170 112 C240 108 260 65 340 70 C420 76 430 135 500 128 C575 122 600 72 665 76 C710 80 735 94 760 88 L760 220 L0 220 Z" fill="url(#fill)"/>
-                <path d="M0 92 C90 86 110 116 170 112 C240 108 260 65 340 70 C420 76 430 135 500 128 C575 122 600 72 665 76 C710 80 735 94 760 88" fill="none" stroke="#38bdf8" stroke-width="4" stroke-linecap="round"/>
-                <path d="M0 132 C90 128 120 126 170 124 C240 122 260 124 340 124 C420 124 430 126 500 126 C575 126 600 124 665 124 C710 124 735 124 760 124" fill="none" stroke="rgba(250,204,21,.9)" stroke-width="2" stroke-dasharray="8 8"/>
-              </svg>
+        <div class="ha-card">
+          <div class="header">
+            <div class="title-block">
+              <div class="card-icon">🔎</div>
+              <div>
+                <div class="title">פרטי פעילות רכיב</div>
+                <div class="sub">
+                  מבט עומק על ישות אחת עם מצבים, טמפרטורות ואירועים
+                </div>
+              </div>
             </div>
-          </main>
-          <aside class="detail-right">
-            <div class="stat-list">
-              <div class="stat-item"><div class="stat-value">6:17</div><div class="stat-label">זמן קירור בפועל</div></div>
-              <div class="stat-item"><div class="stat-value">4</div><div class="stat-label">מחזורי הפעלה</div></div>
-              <div class="stat-item"><div class="stat-value">1:53</div><div class="stat-label">הפעלה רצופה ארוכה ביותר</div></div>
-              <div class="stat-item"><div class="stat-value">23.8°</div><div class="stat-label">טמפ׳ ממוצעת בזמן פעילות</div></div>
+            <div class="controls">
+              <span class="control-chip">‹ חזור לכל הבית</span
+              ><span class="control-chip active">מזגן סלון</span
+              ><span class="control-chip">24ש׳</span
+              ><span class="control-chip">השווה לאתמול</span>
             </div>
-            <div class="events">
-              <div class="event"><span class="time">21:34</span><span>התחיל קירור · יעד 23°</span></div>
-              <div class="event"><span class="time">19:41</span><span>נעצר · הגיע ליעד</span></div>
-              <div class="event"><span class="time">18:09</span><span>התחיל קירור · סלון</span></div>
-              <div class="event"><span class="time">07:12</span><span>חימום קצר · 18 דקות</span></div>
-            </div>
-          </aside>
+          </div>
+          <div class="detail-grid">
+            <main class="detail-left">
+              <div class="detail-top">
+                <div class="entity-title">
+                  <div class="big-icon">❄️</div>
+                  <div>
+                    <div class="title">מזגן סלון</div>
+                    <div class="sub">climate.living_room_ac · אזור: סלון</div>
+                  </div>
+                </div>
+                <div class="status-badge">● קירור פעיל · 23.5°</div>
+              </div>
+              <div class="big-timeline">
+                <span class="bar cool" style="left: 11%; width: 13%"></span
+                ><span class="bar cool" style="left: 44%; width: 9%"></span
+                ><span class="bar cool" style="left: 67%; width: 21%"></span
+                ><span class="bar heat" style="left: 3%; width: 5%"></span
+                ><span class="now"></span><span class="now-label">עכשיו</span>
+              </div>
+              <div class="range-row">
+                <span>00:00</span><span>06:00</span><span>12:00</span
+                ><span>18:00</span><span>24:00</span>
+              </div>
+              <div class="temp-chart">
+                <div class="ylabels">
+                  <span>28°</span><span>26°</span><span>24°</span
+                  ><span>22°</span>
+                </div>
+                <svg
+                  viewBox="0 0 760 220"
+                  preserveAspectRatio="none"
+                  aria-label="temperature chart"
+                >
+                  <defs>
+                    <linearGradient id="fill" x1="0" x2="0" y1="0" y2="1">
+                      <stop
+                        offset="0%"
+                        stop-color="#38bdf8"
+                        stop-opacity=".28"
+                      />
+                      <stop
+                        offset="100%"
+                        stop-color="#38bdf8"
+                        stop-opacity="0"
+                      />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d="M0 48 H760 M0 96 H760 M0 144 H760 M0 192 H760"
+                    stroke="rgba(148,163,184,.13)"
+                    stroke-width="1"
+                  />
+                  <path
+                    d="M0 92 C90 86 110 116 170 112 C240 108 260 65 340 70 C420 76 430 135 500 128 C575 122 600 72 665 76 C710 80 735 94 760 88 L760 220 L0 220 Z"
+                    fill="url(#fill)"
+                  />
+                  <path
+                    d="M0 92 C90 86 110 116 170 112 C240 108 260 65 340 70 C420 76 430 135 500 128 C575 122 600 72 665 76 C710 80 735 94 760 88"
+                    fill="none"
+                    stroke="#38bdf8"
+                    stroke-width="4"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M0 132 C90 128 120 126 170 124 C240 122 260 124 340 124 C420 124 430 126 500 126 C575 126 600 124 665 124 C710 124 735 124 760 124"
+                    fill="none"
+                    stroke="rgba(250,204,21,.9)"
+                    stroke-width="2"
+                    stroke-dasharray="8 8"
+                  />
+                </svg>
+              </div>
+            </main>
+            <aside class="detail-right">
+              <div class="stat-list">
+                <div class="stat-item">
+                  <div class="stat-value">6:17</div>
+                  <div class="stat-label">זמן קירור בפועל</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-value">4</div>
+                  <div class="stat-label">מחזורי הפעלה</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-value">1:53</div>
+                  <div class="stat-label">הפעלה רצופה ארוכה ביותר</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-value">23.8°</div>
+                  <div class="stat-label">טמפ׳ ממוצעת בזמן פעילות</div>
+                </div>
+              </div>
+              <div class="events">
+                <div class="event">
+                  <span class="time">21:34</span
+                  ><span>התחיל קירור · יעד 23°</span>
+                </div>
+                <div class="event">
+                  <span class="time">19:41</span><span>נעצר · הגיע ליעד</span>
+                </div>
+                <div class="event">
+                  <span class="time">18:09</span><span>התחיל קירור · סלון</span>
+                </div>
+                <div class="event">
+                  <span class="time">07:12</span
+                  ><span>חימום קצר · 18 דקות</span>
+                </div>
+              </div>
+            </aside>
+          </div>
+          <div class="footer-note">Mockup 3 · Entity drill-down</div>
         </div>
-        <div class="footer-note">Mockup 3 · Entity drill-down</div>
-      </div>
-    </section>
+      </section>
 
-    <section class="mockup-wrap" id="mockup-4">
-      <div class="mockup-title">4) קורלציה + לוג אירועים — להבין רצף פעילות בין כמה רכיבים</div>
-      <div class="ha-card">
-        <div class="header">
-          <div class="title-block"><div class="card-icon">🧭</div><div><div class="title">רצף פעילות וקורלציה</div><div class="sub">מי נדלק לפני מי, ומה קרה באותו חלון זמן</div></div></div>
-          <div class="controls"><span class="control-chip active">18:00–24:00</span><span class="control-chip">קבץ לפי סוג</span><span class="control-chip">הצג חריגים</span><span class="control-chip">מצב נקי</span></div>
+      <section class="mockup-wrap" id="mockup-4">
+        <div class="mockup-title">
+          4) קורלציה + לוג אירועים — להבין רצף פעילות בין כמה רכיבים
         </div>
-        <div class="correlation">
-          <main class="corr-main">
-            <div class="section-head"><h3>ציר זמן לפי סוג רכיב</h3><span class="chip">חלון נבחר: ערב</span></div>
-            <div class="axis"><div class="ticks"><span>18:00</span><span>19:30</span><span>21:00</span><span>22:30</span><span>24:00</span></div><div></div></div>
-            <div class="group-title">💡 מתגים ותאורה</div>
-            <div class="lane"><div class="track"><span class="bar on" style="left:6%;width:18%"></span><span class="bar on" style="left:38%;width:51%"></span><span class="now" style="left:86%"></span></div><div class="lane-label"><span class="small-icon">💡</span><div><div class="name">תאורת סלון</div><div class="area">סלון</div></div></div></div>
-            <div class="lane"><div class="track"><span class="bar on" style="left:2%;width:8%"></span><span class="bar on" style="left:57%;width:13%"></span></div><div class="lane-label"><span class="small-icon">☕</span><div><div class="name">שקע מטבח</div><div class="area">מטבח</div></div></div></div>
-            <div class="group-title">❄️ מיזוג</div>
-            <div class="lane"><div class="track"><span class="bar cool" style="left:12%;width:22%"></span><span class="bar cool" style="left:54%;width:34%"></span></div><div class="lane-label"><span class="small-icon">❄️</span><div><div class="name">מזגן סלון</div><div class="area">סלון</div></div></div></div>
-            <div class="lane"><div class="track"><span class="bar cool" style="left:70%;width:18%"></span></div><div class="lane-label"><span class="small-icon">🌙</span><div><div class="name">מזגן חדר שינה</div><div class="area">חדר שינה</div></div></div></div>
-            <div class="group-title">🎵 מדיה</div>
-            <div class="lane"><div class="track"><span class="bar media" style="left:19%;width:48%"></span><span class="bar media" style="left:72%;width:13%"></span></div><div class="lane-label"><span class="small-icon">🎵</span><div><div class="name">מערכת שמע</div><div class="area">סלון</div></div></div></div>
-            <div class="hover-card"><div class="hover-title">מזגן סלון · קירור</div><div class="hover-meta">21:34–23:27 · 1:53 שעות<br>חפיפה עם מוזיקה: 41 דקות<br>חפיפה עם תאורה: 1:53 שעות</div></div>
-          </main>
-          <aside class="corr-feed">
-            <div class="section-head"><h3>לוג נקי</h3><span class="chip">12 אירועים</span></div>
-            <div class="event-feed">
-              <div class="feed-item"><div class="feed-time">23:27</div><div class="feed-title">מזגן סלון כבה</div><div class="feed-sub">משך פעילות: 1:53</div></div>
-              <div class="feed-item"><div class="feed-time">22:46</div><div class="feed-title">Spotify חזר לנגן</div><div class="feed-sub">חפיפה עם תאורה ומיזוג</div></div>
-              <div class="feed-item"><div class="feed-time">21:34</div><div class="feed-title">מזגן סלון התחיל קירור</div><div class="feed-sub">טמפ׳ נוכחית 25.8°</div></div>
-              <div class="feed-item"><div class="feed-time">20:58</div><div class="feed-title">תאורת סלון נדלקה</div><div class="feed-sub">הופעלה ידנית</div></div>
-              <div class="feed-item"><div class="feed-time">19:12</div><div class="feed-title">מוזיקה התחילה בסלון</div><div class="feed-sub">media_player.spotify</div></div>
-              <div class="feed-item"><div class="feed-time">18:06</div><div class="feed-title">שקע מטבח נדלק</div><div class="feed-sub">פעילות קצרה: 28 דק׳</div></div>
+        <div class="ha-card">
+          <div class="header">
+            <div class="title-block">
+              <div class="card-icon">🧭</div>
+              <div>
+                <div class="title">רצף פעילות וקורלציה</div>
+                <div class="sub">מי נדלק לפני מי, ומה קרה באותו חלון זמן</div>
+              </div>
             </div>
-          </aside>
+            <div class="controls">
+              <span class="control-chip active">18:00–24:00</span
+              ><span class="control-chip">קבץ לפי סוג</span
+              ><span class="control-chip">הצג חריגים</span
+              ><span class="control-chip">מצב נקי</span>
+            </div>
+          </div>
+          <div class="correlation">
+            <main class="corr-main">
+              <div class="section-head">
+                <h3>ציר זמן לפי סוג רכיב</h3>
+                <span class="chip">חלון נבחר: ערב</span>
+              </div>
+              <div class="axis">
+                <div class="ticks">
+                  <span>18:00</span><span>19:30</span><span>21:00</span
+                  ><span>22:30</span><span>24:00</span>
+                </div>
+                <div></div>
+              </div>
+              <div class="group-title">💡 מתגים ותאורה</div>
+              <div class="lane">
+                <div class="track">
+                  <span class="bar on" style="left: 6%; width: 18%"></span
+                  ><span class="bar on" style="left: 38%; width: 51%"></span
+                  ><span class="now" style="left: 86%"></span>
+                </div>
+                <div class="lane-label">
+                  <span class="small-icon">💡</span>
+                  <div>
+                    <div class="name">תאורת סלון</div>
+                    <div class="area">סלון</div>
+                  </div>
+                </div>
+              </div>
+              <div class="lane">
+                <div class="track">
+                  <span class="bar on" style="left: 2%; width: 8%"></span
+                  ><span class="bar on" style="left: 57%; width: 13%"></span>
+                </div>
+                <div class="lane-label">
+                  <span class="small-icon">☕</span>
+                  <div>
+                    <div class="name">שקע מטבח</div>
+                    <div class="area">מטבח</div>
+                  </div>
+                </div>
+              </div>
+              <div class="group-title">❄️ מיזוג</div>
+              <div class="lane">
+                <div class="track">
+                  <span class="bar cool" style="left: 12%; width: 22%"></span
+                  ><span class="bar cool" style="left: 54%; width: 34%"></span>
+                </div>
+                <div class="lane-label">
+                  <span class="small-icon">❄️</span>
+                  <div>
+                    <div class="name">מזגן סלון</div>
+                    <div class="area">סלון</div>
+                  </div>
+                </div>
+              </div>
+              <div class="lane">
+                <div class="track">
+                  <span class="bar cool" style="left: 70%; width: 18%"></span>
+                </div>
+                <div class="lane-label">
+                  <span class="small-icon">🌙</span>
+                  <div>
+                    <div class="name">מזגן חדר שינה</div>
+                    <div class="area">חדר שינה</div>
+                  </div>
+                </div>
+              </div>
+              <div class="group-title">🎵 מדיה</div>
+              <div class="lane">
+                <div class="track">
+                  <span class="bar media" style="left: 19%; width: 48%"></span
+                  ><span class="bar media" style="left: 72%; width: 13%"></span>
+                </div>
+                <div class="lane-label">
+                  <span class="small-icon">🎵</span>
+                  <div>
+                    <div class="name">מערכת שמע</div>
+                    <div class="area">סלון</div>
+                  </div>
+                </div>
+              </div>
+              <div class="hover-card">
+                <div class="hover-title">מזגן סלון · קירור</div>
+                <div class="hover-meta">
+                  21:34–23:27 · 1:53 שעות<br />חפיפה עם מוזיקה: 41 דקות<br />חפיפה
+                  עם תאורה: 1:53 שעות
+                </div>
+              </div>
+            </main>
+            <aside class="corr-feed">
+              <div class="section-head">
+                <h3>לוג נקי</h3>
+                <span class="chip">12 אירועים</span>
+              </div>
+              <div class="event-feed">
+                <div class="feed-item">
+                  <div class="feed-time">23:27</div>
+                  <div class="feed-title">מזגן סלון כבה</div>
+                  <div class="feed-sub">משך פעילות: 1:53</div>
+                </div>
+                <div class="feed-item">
+                  <div class="feed-time">22:46</div>
+                  <div class="feed-title">Spotify חזר לנגן</div>
+                  <div class="feed-sub">חפיפה עם תאורה ומיזוג</div>
+                </div>
+                <div class="feed-item">
+                  <div class="feed-time">21:34</div>
+                  <div class="feed-title">מזגן סלון התחיל קירור</div>
+                  <div class="feed-sub">טמפ׳ נוכחית 25.8°</div>
+                </div>
+                <div class="feed-item">
+                  <div class="feed-time">20:58</div>
+                  <div class="feed-title">תאורת סלון נדלקה</div>
+                  <div class="feed-sub">הופעלה ידנית</div>
+                </div>
+                <div class="feed-item">
+                  <div class="feed-time">19:12</div>
+                  <div class="feed-title">מוזיקה התחילה בסלון</div>
+                  <div class="feed-sub">media_player.spotify</div>
+                </div>
+                <div class="feed-item">
+                  <div class="feed-time">18:06</div>
+                  <div class="feed-title">שקע מטבח נדלק</div>
+                  <div class="feed-sub">פעילות קצרה: 28 דק׳</div>
+                </div>
+              </div>
+            </aside>
+          </div>
+          <div class="footer-note">Mockup 4 · Correlation timeline</div>
         </div>
-        <div class="footer-note">Mockup 4 · Correlation timeline</div>
-      </div>
-    </section>
-  </div>
-</body>
+      </section>
+    </div>
+  </body>
 </html>

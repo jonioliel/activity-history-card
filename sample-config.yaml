@@ -5,7 +5,7 @@ debug: false
 mock_data: false # true מציג נתוני דוגמה בלי היסטוריית Home Assistant
 
 hours_to_show: 24
-live: true
+live: false
 refresh_interval_seconds: 300
 rtl: auto
 display_mode: panel # card | panel | fullscreen
@@ -24,7 +24,19 @@ min_duration_seconds: 20
 merge_gap_seconds: 15
 mobile_breakpoint: 760
 
-max_visible_rows: 48
+smart_filter: true
+hide_empty_rows: true
+hide_empty_groups: true
+min_row_active_seconds: 30
+max_rows_per_group: 12
+max_total_rows: 60
+show_technical_entities: false
+show_config_entities: false
+show_diagnostic_entities: false
+show_entity_id_when_name_missing: false
+summary_scope: visible # visible | all
+
+max_visible_rows: 60
 collapse_groups: false
 default_collapsed_groups: []
 timeline_height: min(62svh, 680px)

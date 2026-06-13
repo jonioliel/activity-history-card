@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { resolveEntityMetas, resolveEntityMetasWithDiagnostics } from "../src/entity-resolver";
+import {
+  resolveEntityMetas,
+  resolveEntityMetasWithDiagnostics,
+} from "../src/entity-resolver";
 import type { HomeAssistant } from "../src/types";
 
 function makeHass(): HomeAssistant {
@@ -40,8 +43,24 @@ function makeHass(): HomeAssistant {
         last_changed: "2026-01-01T00:00:00.000Z",
         last_updated: "2026-01-01T00:00:00.000Z",
       },
+      "switch.config_mode": {
+        entity_id: "switch.config_mode",
+        state: "off",
+        attributes: { friendly_name: "מצב הגדרה" },
+        last_changed: "2026-01-01T00:00:00.000Z",
+        last_updated: "2026-01-01T00:00:00.000Z",
+      },
+      "switch.diagnostic_mode": {
+        entity_id: "switch.diagnostic_mode",
+        state: "off",
+        attributes: { friendly_name: "מצב אבחון" },
+        last_changed: "2026-01-01T00:00:00.000Z",
+        last_updated: "2026-01-01T00:00:00.000Z",
+      },
     },
-    callWS: async <T = unknown>({ type }: Record<string, unknown>): Promise<T> => {
+    callWS: async <T = unknown>({
+      type,
+    }: Record<string, unknown>): Promise<T> => {
       let result: unknown = [];
       if (type === "config/area_registry/list") {
         result = [{ area_id: "kitchen", name: "מטבח" }];
@@ -53,15 +72,45 @@ function makeHass(): HomeAssistant {
           { id: "device-sensor", area_id: "kitchen", labels: [] },
           { id: "device-motion", area_id: "kitchen", labels: [] },
           { id: "device-lock", area_id: "kitchen", labels: [] },
+          { id: "device-config", area_id: "kitchen", labels: [] },
+          { id: "device-diagnostic", area_id: "kitchen", labels: [] },
         ];
       }
       if (type === "config/entity_registry/list") {
         result = [
-          { entity_id: "light.kitchen", device_id: "device-light", labels: ["show"] },
+          {
+            entity_id: "light.kitchen",
+            device_id: "device-light",
+            labels: ["show"],
+          },
           { entity_id: "switch.safe", device_id: "device-safe", labels: [] },
-          { entity_id: "sensor.temperature", device_id: "device-sensor", labels: [] },
-          { entity_id: "binary_sensor.motion", device_id: "device-motion", labels: [] },
-          { entity_id: "lock.front_door", device_id: "device-lock", labels: [] },
+          {
+            entity_id: "sensor.temperature",
+            device_id: "device-sensor",
+            labels: [],
+          },
+          {
+            entity_id: "binary_sensor.motion",
+            device_id: "device-motion",
+            labels: [],
+          },
+          {
+            entity_id: "lock.front_door",
+            device_id: "device-lock",
+            labels: [],
+          },
+          {
+            entity_id: "switch.config_mode",
+            device_id: "device-config",
+            labels: [],
+            entity_category: "config",
+          },
+          {
+            entity_id: "switch.diagnostic_mode",
+            device_id: "device-diagnostic",
+            labels: [],
+            entity_category: "diagnostic",
+          },
         ];
       }
       if (type === "config/label_registry/list") {
@@ -80,30 +129,92 @@ function makeHass(): HomeAssistant {
 
 describe("resolveEntityMetas", () => {
   it("does not auto-discover entities when auto_discover is false", async () => {
-    const rows = await resolveEntityMetas({ type: "custom:activity-history-card", auto_discover: false }, makeHass());
+    const rows = await resolveEntityMetas(
+      { type: "custom:activity-history-card", auto_discover: false },
+      makeHass(),
+    );
 
     expect(rows).toEqual([]);
   });
 
   it("does not generate mock entities when mock_data is false", async () => {
-    const rows = await resolveEntityMetas({ type: "custom:activity-history-card", mock_data: false }, undefined);
+    const rows = await resolveEntityMetas(
+      { type: "custom:activity-history-card", mock_data: false },
+      undefined,
+    );
 
     expect(rows).toEqual([]);
   });
 
   it("discovers area-assigned supported entities and skips default sensor noise", async () => {
-    const rows = await resolveEntityMetas({ type: "custom:activity-history-card", auto_discover: true }, makeHass());
-    expect(rows.map((row) => row.entity_id)).toEqual(["light.kitchen", "switch.safe"]);
+    const rows = await resolveEntityMetas(
+      { type: "custom:activity-history-card", auto_discover: true },
+      makeHass(),
+    );
+    expect(rows.map((row) => row.entity_id)).toEqual([
+      "light.kitchen",
+      "switch.safe",
+    ]);
     expect(rows[0]?.area).toBe("מטבח");
   });
 
   it("allows noisy domains only when domains are explicitly configured", async () => {
     const rows = await resolveEntityMetas(
-      { type: "custom:activity-history-card", auto_discover: true, domains: ["binary_sensor", "lock"] },
+      {
+        type: "custom:activity-history-card",
+        auto_discover: true,
+        domains: ["binary_sensor", "lock"],
+      },
       makeHass(),
     );
 
-    expect(rows.map((row) => row.entity_id)).toEqual(["binary_sensor.motion", "lock.front_door"]);
+    expect(rows.map((row) => row.entity_id)).toEqual([
+      "binary_sensor.motion",
+      "lock.front_door",
+    ]);
+  });
+
+  it("skips config and diagnostic registry entities unless configured", async () => {
+    const defaultRows = await resolveEntityMetas(
+      { type: "custom:activity-history-card", auto_discover: true },
+      makeHass(),
+    );
+    expect(defaultRows.map((row) => row.entity_id)).not.toContain(
+      "switch.config_mode",
+    );
+    expect(defaultRows.map((row) => row.entity_id)).not.toContain(
+      "switch.diagnostic_mode",
+    );
+
+    const expandedRows = await resolveEntityMetas(
+      {
+        type: "custom:activity-history-card",
+        auto_discover: true,
+        show_config_entities: true,
+        show_diagnostic_entities: true,
+      },
+      makeHass(),
+    );
+    expect(expandedRows.map((row) => row.entity_id)).toEqual([
+      "light.kitchen",
+      "switch.safe",
+      "switch.config_mode",
+      "switch.diagnostic_mode",
+    ]);
+  });
+
+  it("keeps explicitly configured config entities available for manual views", async () => {
+    const rows = await resolveEntityMetas(
+      {
+        type: "custom:activity-history-card",
+        auto_discover: false,
+        entities: ["switch.config_mode"],
+      },
+      makeHass(),
+    );
+
+    expect(rows.map((row) => row.entity_id)).toEqual(["switch.config_mode"]);
+    expect(rows[0]?.entity_category).toBe("config");
   });
 
   it("supports include and exclude entity globs", async () => {
@@ -164,9 +275,12 @@ describe("resolveEntityMetas", () => {
           last_updated: "2026-01-01T00:00:00.000Z",
         },
       },
-      callWS: async <T = unknown>({ type }: Record<string, unknown>): Promise<T> => {
+      callWS: async <T = unknown>({
+        type,
+      }: Record<string, unknown>): Promise<T> => {
         let result: unknown = [];
-        if (type === "config/area_registry/list") result = [{ area_id: "kitchen", name: "מטבח" }];
+        if (type === "config/area_registry/list")
+          result = [{ area_id: "kitchen", name: "מטבח" }];
         if (type === "config/device_registry/list") {
           result = [
             { id: "dishwasher", area_id: "kitchen", name_by_user: "מדיח כלים" },
@@ -175,8 +289,18 @@ describe("resolveEntityMetas", () => {
         }
         if (type === "config/entity_registry/list") {
           result = [
-            { entity_id: "switch.dishwasher_power", device_id: "dishwasher", name: "", original_name: "Power" },
-            { entity_id: "switch.blank_name", device_id: "blank-device", name: "", original_name: "" },
+            {
+              entity_id: "switch.dishwasher_power",
+              device_id: "dishwasher",
+              name: "",
+              original_name: "Power",
+            },
+            {
+              entity_id: "switch.blank_name",
+              device_id: "blank-device",
+              name: "",
+              original_name: "",
+            },
           ];
         }
         return result as T;
@@ -186,10 +310,17 @@ describe("resolveEntityMetas", () => {
       },
     };
 
-    const rows = await resolveEntityMetas({ type: "custom:activity-history-card", auto_discover: true }, hass);
+    const rows = await resolveEntityMetas(
+      { type: "custom:activity-history-card", auto_discover: true },
+      hass,
+    );
 
-    expect(rows.find((row) => row.entity_id === "switch.dishwasher_power")?.name).toBe("מדיח כלים - Power");
-    expect(rows.find((row) => row.entity_id === "switch.blank_name")?.name).toBe("מכונת כביסה - blank name");
+    expect(
+      rows.find((row) => row.entity_id === "switch.dishwasher_power")?.name,
+    ).toBe("מדיח כלים - Power");
+    expect(
+      rows.find((row) => row.entity_id === "switch.blank_name")?.name,
+    ).toBe("מכונת כביסה - blank name");
   });
 
   it("reports registry fallback when Home Assistant registries are unavailable", async () => {
@@ -216,9 +347,15 @@ describe("resolveEntityMetas", () => {
       hass,
     );
 
-    expect(entities.map((row) => row.entity_id)).toEqual(["light.attribute_area"]);
+    expect(entities.map((row) => row.entity_id)).toEqual([
+      "light.attribute_area",
+    ]);
     expect(diagnostics.fallbackUsed).toBe(true);
-    expect(diagnostics.unavailableReasons).toContain("area_registry_unavailable");
-    expect(diagnostics.unavailableReasons).toContain("entity_registry_unavailable");
+    expect(diagnostics.unavailableReasons).toContain(
+      "area_registry_unavailable",
+    );
+    expect(diagnostics.unavailableReasons).toContain(
+      "entity_registry_unavailable",
+    );
   });
 });

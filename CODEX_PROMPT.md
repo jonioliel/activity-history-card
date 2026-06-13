@@ -231,10 +231,10 @@ type: custom:activity-history-card
 title: היסטוריית פעילות חכמה
 hours_to_show: 24
 live: true
-rtl: auto                         # auto | true | false
-display_mode: panel               # card | panel | fullscreen
-default_view: swimlane            # swimlane | heatmap | detail | correlation
-group_by: area                    # area | domain | floor | entity | none
+rtl: auto # auto | true | false
+display_mode: panel # card | panel | fullscreen
+default_view: swimlane # swimlane | heatmap | detail | correlation
+group_by: area # area | domain | floor | entity | none
 show_summary: true
 show_insights: true
 show_now_line: true

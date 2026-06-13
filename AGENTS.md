@@ -3,6 +3,7 @@
 Build a production-ready Home Assistant Lovelace custom card named `activity-history-card`.
 
 Use:
+
 - TypeScript
 - Lit
 - Vite
@@ -12,6 +13,7 @@ Use:
 Do not use React.
 
 Main priorities:
+
 1. Reliable Home Assistant custom card behavior.
 2. Full RTL support, especially Hebrew.
 3. Excellent mobile layout.
@@ -21,6 +23,7 @@ Main priorities:
 7. Clean dark Home Assistant design based on the provided mockups.
 
 Required Home Assistant card methods:
+
 - setConfig(config)
 - set hass(hass)
 - getCardSize()
@@ -28,6 +31,7 @@ Required Home Assistant card methods:
 - disconnectedCallback()
 
 MVP scope:
+
 - mock data mode
 - real history client architecture
 - swimlane timeline

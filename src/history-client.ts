@@ -1,8 +1,18 @@
-import type { ActivityHistoryCardConfig, EntityMeta, HistoryStateRecord, HomeAssistant, TimeRange } from "./types";
+import type {
+  ActivityHistoryCardConfig,
+  EntityMeta,
+  HistoryStateRecord,
+  HomeAssistant,
+  TimeRange,
+} from "./types";
 
 export function needsAttributes(entity: EntityMeta): boolean {
   if (entity.config?.attributes?.length) return true;
-  if (entity.config?.active_attributes && Object.keys(entity.config.active_attributes).length) return true;
+  if (
+    entity.config?.active_attributes &&
+    Object.keys(entity.config.active_attributes).length
+  )
+    return true;
   return ["climate", "humidifier", "water_heater"].includes(entity.domain);
 }
 
@@ -15,14 +25,21 @@ export async function fetchHistory(
   const { withAttributes, withoutAttributes } = getHistoryRequestPlan(entities);
 
   const batches = await Promise.all([
-    withoutAttributes.length ? fetchHistoryBatch(hass, withoutAttributes, range, config, true) : Promise.resolve({}),
-    withAttributes.length ? fetchHistoryBatch(hass, withAttributes, range, config, false) : Promise.resolve({}),
+    withoutAttributes.length
+      ? fetchHistoryBatch(hass, withoutAttributes, range, config, true)
+      : Promise.resolve({}),
+    withAttributes.length
+      ? fetchHistoryBatch(hass, withAttributes, range, config, false)
+      : Promise.resolve({}),
   ]);
 
   return Object.assign({}, ...batches);
 }
 
-export function getHistoryRequestPlan(entities: EntityMeta[]): { withAttributes: EntityMeta[]; withoutAttributes: EntityMeta[] } {
+export function getHistoryRequestPlan(entities: EntityMeta[]): {
+  withAttributes: EntityMeta[];
+  withoutAttributes: EntityMeta[];
+} {
   return {
     withAttributes: entities.filter(needsAttributes),
     withoutAttributes: entities.filter((entity) => !needsAttributes(entity)),
@@ -50,7 +67,10 @@ async function fetchHistoryBatch(
   return normalizeHistoryResponse(response, entityIds);
 }
 
-export function normalizeHistoryResponse(response: unknown, requestedEntityIds: string[]): Record<string, HistoryStateRecord[]> {
+export function normalizeHistoryResponse(
+  response: unknown,
+  requestedEntityIds: string[],
+): Record<string, HistoryStateRecord[]> {
   const result: Record<string, HistoryStateRecord[]> = {};
 
   if (Array.isArray(response)) {
@@ -65,7 +85,9 @@ export function normalizeHistoryResponse(response: unknown, requestedEntityIds: 
   }
 
   if (response && typeof response === "object") {
-    for (const [entityId, value] of Object.entries(response as Record<string, unknown>)) {
+    for (const [entityId, value] of Object.entries(
+      response as Record<string, unknown>,
+    )) {
       if (!Array.isArray(value)) continue;
       result[entityId] = normalizeHistoryArray(value, entityId);
     }
@@ -74,7 +96,10 @@ export function normalizeHistoryResponse(response: unknown, requestedEntityIds: 
   return result;
 }
 
-function normalizeHistoryArray(raw: unknown[], fallbackEntityId?: string): HistoryStateRecord[] {
+function normalizeHistoryArray(
+  raw: unknown[],
+  fallbackEntityId?: string,
+): HistoryStateRecord[] {
   let lastEntityId = fallbackEntityId;
   return raw
     .map((item) => {
@@ -82,7 +107,11 @@ function normalizeHistoryArray(raw: unknown[], fallbackEntityId?: string): Histo
       const record = item as Record<string, unknown>;
       const entityId = stringValue(record.entity_id) ?? lastEntityId;
       if (entityId) lastEntityId = entityId;
-      const lastChanged = stringValue(record.last_changed) ?? stringValue(record.lc) ?? stringValue(record.last_updated) ?? stringValue(record.lu);
+      const lastChanged =
+        stringValue(record.last_changed) ??
+        stringValue(record.lc) ??
+        stringValue(record.last_updated) ??
+        stringValue(record.lu);
       const state = stringValue(record.state) ?? stringValue(record.s);
       if (!entityId || !state || !lastChanged) return undefined;
       const attrs = objectValue(record.attributes) ?? objectValue(record.a);
@@ -92,7 +121,8 @@ function normalizeHistoryArray(raw: unknown[], fallbackEntityId?: string): Histo
         last_changed: lastChanged,
       };
       if (attrs) normalized.attributes = attrs;
-      const lastUpdated = stringValue(record.last_updated) ?? stringValue(record.lu);
+      const lastUpdated =
+        stringValue(record.last_updated) ?? stringValue(record.lu);
       if (lastUpdated) normalized.last_updated = lastUpdated;
       return normalized;
     })
@@ -104,5 +134,7 @@ function stringValue(value: unknown): string | undefined {
 }
 
 function objectValue(value: unknown): Record<string, unknown> | undefined {
-  return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : undefined;
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : undefined;
 }

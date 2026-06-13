@@ -14,7 +14,10 @@ export const DEFAULT_ACTIVE_STATES: Record<string, string[]> = {
   lock: ["locking", "unlocking"],
 };
 
-export const DEFAULT_ACTIVE_ATTRIBUTES: Record<string, Record<string, string[]>> = {
+export const DEFAULT_ACTIVE_ATTRIBUTES: Record<
+  string,
+  Record<string, string[]>
+> = {
   climate: {
     hvac_action: ["cooling", "heating", "drying", "fan"],
   },
@@ -53,6 +56,17 @@ export const DEFAULT_CONFIG: Required<
     | "min_duration_seconds"
     | "merge_gap_seconds"
     | "max_visible_rows"
+    | "smart_filter"
+    | "hide_empty_rows"
+    | "hide_empty_groups"
+    | "min_row_active_seconds"
+    | "max_rows_per_group"
+    | "max_total_rows"
+    | "show_technical_entities"
+    | "show_config_entities"
+    | "show_diagnostic_entities"
+    | "show_entity_id_when_name_missing"
+    | "summary_scope"
     | "collapse_groups"
     | "timeline_height"
     | "mobile_breakpoint"
@@ -75,7 +89,18 @@ export const DEFAULT_CONFIG: Required<
   refresh_interval_seconds: 300,
   min_duration_seconds: 20,
   merge_gap_seconds: 15,
-  max_visible_rows: 48,
+  max_visible_rows: 60,
+  smart_filter: true,
+  hide_empty_rows: true,
+  hide_empty_groups: true,
+  min_row_active_seconds: 30,
+  max_rows_per_group: 12,
+  max_total_rows: 60,
+  show_technical_entities: false,
+  show_config_entities: false,
+  show_diagnostic_entities: false,
+  show_entity_id_when_name_missing: false,
+  summary_scope: "visible",
   collapse_groups: false,
   timeline_height: "min(62svh, 680px)",
   mobile_breakpoint: 760,

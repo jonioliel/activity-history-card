@@ -2,14 +2,25 @@ import { CATEGORY_LABELS_HE, DOMAIN_LABELS_HE } from "./defaults";
 import { formatDuration, formatTime } from "./format";
 import type { TimelineRow, TimelineSegment } from "./types";
 
-export function formatEntityLine(row: TimelineRow | undefined, debug = false): string {
+export function formatEntityLine(
+  row: TimelineRow | undefined,
+  debug = false,
+): string {
   if (!row) return "אין מספיק נתונים";
-  return [row.entity.area, DOMAIN_LABELS_HE[row.entity.domain] ?? row.entity.domain, debug ? row.entity.entity_id : undefined]
+  return [
+    row.entity.area,
+    DOMAIN_LABELS_HE[row.entity.domain] ?? row.entity.domain,
+    debug ? row.entity.entity_id : undefined,
+  ]
     .filter(Boolean)
     .join(" · ");
 }
 
-export function formatSegmentSummary(row: TimelineRow, segment: TimelineSegment, debug = false): Array<[string, string]> {
+export function formatSegmentSummary(
+  row: TimelineRow,
+  segment: TimelineSegment,
+  debug = false,
+): Array<[string, string]> {
   const values: Array<[string, string]> = [
     ["רכיב", row.entity.name],
     ["אזור", row.entity.area ?? "ללא אזור"],

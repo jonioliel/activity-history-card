@@ -30,7 +30,9 @@ describe("display text", () => {
     expect(formatEntityLine(row, false)).not.toContain("switch.raw_router_id");
     expect(formatEntityLine(row, true)).toContain("switch.raw_router_id");
 
-    const withoutDebug = formatSegmentSummary(row, segment, false).flat().join(" ");
+    const withoutDebug = formatSegmentSummary(row, segment, false)
+      .flat()
+      .join(" ");
     const withDebug = formatSegmentSummary(row, segment, true).flat().join(" ");
     expect(withoutDebug).not.toContain("switch.raw_router_id");
     expect(withDebug).toContain("switch.raw_router_id");

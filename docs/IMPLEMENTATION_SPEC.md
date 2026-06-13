@@ -166,21 +166,21 @@ Canvas is fast but weaker for accessibility and tooltips. Start with SVG/DOM. Ad
 Sensible defaults:
 
 ```ts
-hours_to_show: 24
-live: true
-rtl: auto
-display_mode: card
-group_by: area
-show_summary: true
-show_insights: true
-show_now_line: true
-show_legend: true
-show_fullscreen_button: true
-significant_changes_only: true
-minimal_response: true
-min_duration_seconds: 20
-merge_gap_seconds: 15
-mobile_breakpoint: 760
+hours_to_show: 24;
+live: true;
+rtl: auto;
+display_mode: card;
+group_by: area;
+show_summary: true;
+show_insights: true;
+show_now_line: true;
+show_legend: true;
+show_fullscreen_button: true;
+significant_changes_only: true;
+minimal_response: true;
+min_duration_seconds: 20;
+merge_gap_seconds: 15;
+mobile_breakpoint: 760;
 ```
 
 ## Filter behavior

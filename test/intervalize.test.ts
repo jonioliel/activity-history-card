@@ -20,13 +20,27 @@ describe("intervalizeHistory", () => {
   it("creates active segments from state changes", () => {
     const history: Record<string, HistoryStateRecord[]> = {
       "switch.test": [
-        { entity_id: "switch.test", state: "off", last_changed: "2026-01-01T00:00:00.000Z" },
-        { entity_id: "switch.test", state: "on", last_changed: "2026-01-01T00:30:00.000Z" },
-        { entity_id: "switch.test", state: "off", last_changed: "2026-01-01T01:00:00.000Z" },
+        {
+          entity_id: "switch.test",
+          state: "off",
+          last_changed: "2026-01-01T00:00:00.000Z",
+        },
+        {
+          entity_id: "switch.test",
+          state: "on",
+          last_changed: "2026-01-01T00:30:00.000Z",
+        },
+        {
+          entity_id: "switch.test",
+          state: "off",
+          last_changed: "2026-01-01T01:00:00.000Z",
+        },
       ],
     };
 
-    const [row] = intervalizeHistory(history, [entity], range, { type: "custom:activity-history-card" });
+    const [row] = intervalizeHistory(history, [entity], range, {
+      type: "custom:activity-history-card",
+    });
     expect(row?.segments.some((segment) => segment.active)).toBe(true);
     expect(row?.totalActiveMs).toBe(30 * 60 * 1000);
   });
@@ -53,7 +67,9 @@ describe("intervalizeHistory", () => {
   });
 
   it("returns an empty row safely when there is no history and no current state", () => {
-    const [row] = intervalizeHistory({}, [entity], range, { type: "custom:activity-history-card" });
+    const [row] = intervalizeHistory({}, [entity], range, {
+      type: "custom:activity-history-card",
+    });
 
     expect(row?.segments).toHaveLength(0);
     expect(row?.totalActiveMs).toBe(0);
@@ -63,27 +79,55 @@ describe("intervalizeHistory", () => {
   it("classifies unknown and unavailable states as inactive unknown segments", () => {
     const history: Record<string, HistoryStateRecord[]> = {
       "switch.test": [
-        { entity_id: "switch.test", state: "unknown", last_changed: "2026-01-01T00:00:00.000Z" },
-        { entity_id: "switch.test", state: "unavailable", last_changed: "2026-01-01T01:00:00.000Z" },
+        {
+          entity_id: "switch.test",
+          state: "unknown",
+          last_changed: "2026-01-01T00:00:00.000Z",
+        },
+        {
+          entity_id: "switch.test",
+          state: "unavailable",
+          last_changed: "2026-01-01T01:00:00.000Z",
+        },
       ],
     };
 
-    const [row] = intervalizeHistory(history, [entity], range, { type: "custom:activity-history-card" });
+    const [row] = intervalizeHistory(history, [entity], range, {
+      type: "custom:activity-history-card",
+    });
 
-    expect(row?.segments.every((segment) => segment.category === "unknown" && !segment.active)).toBe(true);
+    expect(
+      row?.segments.every(
+        (segment) => segment.category === "unknown" && !segment.active,
+      ),
+    ).toBe(true);
     expect(row?.totalActiveMs).toBe(0);
   });
 
   it("deduplicates duplicate state records", () => {
     const history: Record<string, HistoryStateRecord[]> = {
       "switch.test": [
-        { entity_id: "switch.test", state: "on", last_changed: "2026-01-01T00:00:00.000Z" },
-        { entity_id: "switch.test", state: "on", last_changed: "2026-01-01T00:10:00.000Z" },
-        { entity_id: "switch.test", state: "off", last_changed: "2026-01-01T01:00:00.000Z" },
+        {
+          entity_id: "switch.test",
+          state: "on",
+          last_changed: "2026-01-01T00:00:00.000Z",
+        },
+        {
+          entity_id: "switch.test",
+          state: "on",
+          last_changed: "2026-01-01T00:10:00.000Z",
+        },
+        {
+          entity_id: "switch.test",
+          state: "off",
+          last_changed: "2026-01-01T01:00:00.000Z",
+        },
       ],
     };
 
-    const [row] = intervalizeHistory(history, [entity], range, { type: "custom:activity-history-card" });
+    const [row] = intervalizeHistory(history, [entity], range, {
+      type: "custom:activity-history-card",
+    });
 
     expect(row?.segments.filter((segment) => segment.active)).toHaveLength(1);
     expect(row?.totalActiveMs).toBe(60 * 60 * 1000);
@@ -92,12 +136,23 @@ describe("intervalizeHistory", () => {
   it("drops active segments shorter than min_duration_seconds", () => {
     const history: Record<string, HistoryStateRecord[]> = {
       "switch.test": [
-        { entity_id: "switch.test", state: "on", last_changed: "2026-01-01T00:00:00.000Z" },
-        { entity_id: "switch.test", state: "off", last_changed: "2026-01-01T00:00:10.000Z" },
+        {
+          entity_id: "switch.test",
+          state: "on",
+          last_changed: "2026-01-01T00:00:00.000Z",
+        },
+        {
+          entity_id: "switch.test",
+          state: "off",
+          last_changed: "2026-01-01T00:00:10.000Z",
+        },
       ],
     };
 
-    const [row] = intervalizeHistory(history, [entity], range, { type: "custom:activity-history-card", min_duration_seconds: 20 });
+    const [row] = intervalizeHistory(history, [entity], range, {
+      type: "custom:activity-history-card",
+      min_duration_seconds: 20,
+    });
 
     expect(row?.segments.some((segment) => segment.active)).toBe(false);
     expect(row?.totalActiveMs).toBe(0);
@@ -113,13 +168,30 @@ describe("intervalizeHistory", () => {
     };
     const history: Record<string, HistoryStateRecord[]> = {
       "media_player.test": [
-        { entity_id: "media_player.test", state: "playing", attributes: { media_title: "A" }, last_changed: "2026-01-01T00:00:00.000Z" },
-        { entity_id: "media_player.test", state: "playing", attributes: { media_title: "B" }, last_changed: "2026-01-01T00:30:00.000Z" },
-        { entity_id: "media_player.test", state: "idle", last_changed: "2026-01-01T01:00:00.000Z" },
+        {
+          entity_id: "media_player.test",
+          state: "playing",
+          attributes: { media_title: "A" },
+          last_changed: "2026-01-01T00:00:00.000Z",
+        },
+        {
+          entity_id: "media_player.test",
+          state: "playing",
+          attributes: { media_title: "B" },
+          last_changed: "2026-01-01T00:30:00.000Z",
+        },
+        {
+          entity_id: "media_player.test",
+          state: "idle",
+          last_changed: "2026-01-01T01:00:00.000Z",
+        },
       ],
     };
 
-    const [row] = intervalizeHistory(history, [mediaEntity], range, { type: "custom:activity-history-card", merge_gap_seconds: 0 });
+    const [row] = intervalizeHistory(history, [mediaEntity], range, {
+      type: "custom:activity-history-card",
+      merge_gap_seconds: 0,
+    });
 
     expect(row?.segments.filter((segment) => segment.active)).toHaveLength(1);
     expect(row?.totalActiveMs).toBe(60 * 60 * 1000);
@@ -135,15 +207,29 @@ describe("intervalizeHistory", () => {
     };
     const history: Record<string, HistoryStateRecord[]> = {
       "cover.test": [
-        { entity_id: "cover.test", state: "open", last_changed: "2026-01-01T00:00:00.000Z" },
-        { entity_id: "cover.test", state: "closing", last_changed: "2026-01-01T01:00:00.000Z" },
+        {
+          entity_id: "cover.test",
+          state: "open",
+          last_changed: "2026-01-01T00:00:00.000Z",
+        },
+        {
+          entity_id: "cover.test",
+          state: "closing",
+          last_changed: "2026-01-01T01:00:00.000Z",
+        },
       ],
     };
 
-    const [row] = intervalizeHistory(history, [coverEntity], range, { type: "custom:activity-history-card" });
+    const [row] = intervalizeHistory(history, [coverEntity], range, {
+      type: "custom:activity-history-card",
+    });
 
-    expect(row?.segments.find((segment) => segment.state === "open")?.active).toBe(false);
-    expect(row?.segments.find((segment) => segment.state === "closing")?.active).toBe(true);
+    expect(
+      row?.segments.find((segment) => segment.state === "open")?.active,
+    ).toBe(false);
+    expect(
+      row?.segments.find((segment) => segment.state === "closing")?.active,
+    ).toBe(true);
   });
 
   it("allows cover open as active when overridden per entity", () => {
@@ -155,10 +241,18 @@ describe("intervalizeHistory", () => {
       config: { entity: "cover.test", active_states: ["open"] },
     };
     const history: Record<string, HistoryStateRecord[]> = {
-      "cover.test": [{ entity_id: "cover.test", state: "open", last_changed: "2026-01-01T00:00:00.000Z" }],
+      "cover.test": [
+        {
+          entity_id: "cover.test",
+          state: "open",
+          last_changed: "2026-01-01T00:00:00.000Z",
+        },
+      ],
     };
 
-    const [row] = intervalizeHistory(history, [coverEntity], range, { type: "custom:activity-history-card" });
+    const [row] = intervalizeHistory(history, [coverEntity], range, {
+      type: "custom:activity-history-card",
+    });
 
     expect(row?.segments[0]?.active).toBe(true);
   });
@@ -173,12 +267,24 @@ describe("intervalizeHistory", () => {
     };
     const history: Record<string, HistoryStateRecord[]> = {
       "climate.test": [
-        { entity_id: "climate.test", state: "cool", attributes: { hvac_action: "idle" }, last_changed: "2026-01-01T00:00:00.000Z" },
-        { entity_id: "climate.test", state: "cool", attributes: { hvac_action: "cooling" }, last_changed: "2026-01-01T01:00:00.000Z" },
+        {
+          entity_id: "climate.test",
+          state: "cool",
+          attributes: { hvac_action: "idle" },
+          last_changed: "2026-01-01T00:00:00.000Z",
+        },
+        {
+          entity_id: "climate.test",
+          state: "cool",
+          attributes: { hvac_action: "cooling" },
+          last_changed: "2026-01-01T01:00:00.000Z",
+        },
       ],
     };
 
-    const [row] = intervalizeHistory(history, [climateEntity], range, { type: "custom:activity-history-card" });
+    const [row] = intervalizeHistory(history, [climateEntity], range, {
+      type: "custom:activity-history-card",
+    });
 
     expect(row?.segments[0]?.active).toBe(false);
     expect(row?.segments[1]?.active).toBe(true);
@@ -187,11 +293,21 @@ describe("intervalizeHistory", () => {
   it("filters rows by area, domain, search and active-only mode", () => {
     const history: Record<string, HistoryStateRecord[]> = {
       "switch.test": [
-        { entity_id: "switch.test", state: "on", last_changed: "2026-01-01T00:00:00.000Z" },
-        { entity_id: "switch.test", state: "off", last_changed: "2026-01-01T01:00:00.000Z" },
+        {
+          entity_id: "switch.test",
+          state: "on",
+          last_changed: "2026-01-01T00:00:00.000Z",
+        },
+        {
+          entity_id: "switch.test",
+          state: "off",
+          last_changed: "2026-01-01T01:00:00.000Z",
+        },
       ],
     };
-    const rows = intervalizeHistory(history, [entity], range, { type: "custom:activity-history-card" });
+    const rows = intervalizeHistory(history, [entity], range, {
+      type: "custom:activity-history-card",
+    });
 
     const filtered = filterRows(rows, {
       search: "בדיקה",

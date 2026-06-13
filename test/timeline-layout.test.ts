@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { getTimelineDensity, limitTimelineGroups } from "../src/timeline-layout";
+import {
+  getTimelineDensity,
+  limitTimelineGroups,
+} from "../src/timeline-layout";
 import type { TimelineGroup, TimelineRow } from "../src/types";
 
 function row(index: number): TimelineRow {

@@ -19,9 +19,18 @@ export function intervalizeHistory(
   currentStates: Record<string, HassEntity> = {},
 ): TimelineRow[] {
   return entities.map((entity) => {
-    const records = withCurrentStateBoundary(historyByEntity[entity.entity_id] ?? [], currentStates[entity.entity_id], range, entity.entity_id)
+    const records = withCurrentStateBoundary(
+      historyByEntity[entity.entity_id] ?? [],
+      currentStates[entity.entity_id],
+      range,
+      entity.entity_id,
+    )
       .filter((record) => record.state != null && record.last_changed)
-      .sort((a, b) => new Date(a.last_changed).getTime() - new Date(b.last_changed).getTime());
+      .sort(
+        (a, b) =>
+          new Date(a.last_changed).getTime() -
+          new Date(b.last_changed).getTime(),
+      );
 
     const deduped = dedupeRecords(records);
     const segments = recordsToSegments(deduped, entity, range, config);
@@ -30,7 +39,10 @@ export function intervalizeHistory(
     return {
       entity,
       segments,
-      totalActiveMs: activeSegments.reduce((sum, segment) => sum + segment.durationMs, 0),
+      totalActiveMs: activeSegments.reduce(
+        (sum, segment) => sum + segment.durationMs,
+        0,
+      ),
       eventCount: activeSegments.length,
       currentState: segments.at(-1)?.state,
       currentCategory: segments.at(-1)?.category,
@@ -47,14 +59,28 @@ function withCurrentStateBoundary(
   const out = [...records];
   if (!current) return out;
 
-  const currentChangedMs = new Date(current.last_changed || current.last_updated).getTime();
-  const boundaryMs = Number.isFinite(currentChangedMs) ? Math.min(Math.max(currentChangedMs, range.start.getTime()), range.end.getTime()) : range.start.getTime();
+  const currentChangedMs = new Date(
+    current.last_changed || current.last_updated,
+  ).getTime();
+  const boundaryMs = Number.isFinite(currentChangedMs)
+    ? Math.min(
+        Math.max(currentChangedMs, range.start.getTime()),
+        range.end.getTime(),
+      )
+    : range.start.getTime();
   const last = out
     .filter((record) => record.entity_id === entityId)
-    .sort((a, b) => new Date(a.last_changed).getTime() - new Date(b.last_changed).getTime())
+    .sort(
+      (a, b) =>
+        new Date(a.last_changed).getTime() - new Date(b.last_changed).getTime(),
+    )
     .at(-1);
 
-  if (!last || new Date(last.last_changed).getTime() < boundaryMs || last.state !== current.state) {
+  if (
+    !last ||
+    new Date(last.last_changed).getTime() < boundaryMs ||
+    last.state !== current.state
+  ) {
     out.push({
       entity_id: entityId,
       state: current.state,
@@ -72,18 +98,24 @@ export function classifyState(
   state: string,
   attributes: Record<string, unknown> | undefined,
 ): { category: StateCategory; active: boolean } {
-  if (state === "unknown" || state === "unavailable") return { category: "unknown", active: false };
+  if (state === "unknown" || state === "unavailable")
+    return { category: "unknown", active: false };
 
   const domain = entity.domain || getDomain(entity.entity_id);
   const configActiveStates = entity.config?.active_states;
-  const activeStates = configActiveStates ?? DEFAULT_ACTIVE_STATES[domain] ?? ["on"];
-  const activeAttributes = entity.config?.active_attributes ?? DEFAULT_ACTIVE_ATTRIBUTES[domain] ?? {};
+  const activeStates = configActiveStates ??
+    DEFAULT_ACTIVE_STATES[domain] ?? ["on"];
+  const activeAttributes =
+    entity.config?.active_attributes ?? DEFAULT_ACTIVE_ATTRIBUTES[domain] ?? {};
 
   if (domain === "climate" && !entity.config?.active_states) {
     const hvacAction = attributes?.hvac_action;
     if (typeof hvacAction === "string" && hvacAction.trim()) {
       const values = activeAttributes.hvac_action ?? [];
-      return { category: categoryFromState(domain, hvacAction), active: values.includes(hvacAction) };
+      return {
+        category: categoryFromState(domain, hvacAction),
+        active: values.includes(hvacAction),
+      };
     }
   }
 
@@ -120,7 +152,11 @@ function recordsToSegments(
     const segEnd = Math.min(rawEnd, endMs);
     if (segEnd <= segStart) continue;
 
-    const classification = classifyState(entity, current.state, current.attributes);
+    const classification = classifyState(
+      entity,
+      current.state,
+      current.attributes,
+    );
     const durationMs = segEnd - segStart;
 
     segments.push({
@@ -136,14 +172,23 @@ function recordsToSegments(
   }
 
   const merged = mergeAdjacentSegments(segments, config.merge_gap_seconds ?? 0);
-  return merged.filter((segment) => !segment.active || !config.min_duration_seconds || segment.durationMs >= config.min_duration_seconds * 1000);
+  return merged.filter(
+    (segment) =>
+      !segment.active ||
+      !config.min_duration_seconds ||
+      segment.durationMs >= config.min_duration_seconds * 1000,
+  );
 }
 
 function dedupeRecords(records: HistoryStateRecord[]): HistoryStateRecord[] {
   const out: HistoryStateRecord[] = [];
   for (const record of records) {
     const previous = out.at(-1);
-    if (previous && previous.state === record.state && effectiveAttributesKey(previous) === effectiveAttributesKey(record)) {
+    if (
+      previous &&
+      previous.state === record.state &&
+      effectiveAttributesKey(previous) === effectiveAttributesKey(record)
+    ) {
       continue;
     }
     out.push(record);
@@ -163,7 +208,10 @@ function effectiveAttributesKey(record: HistoryStateRecord): string {
   return JSON.stringify(keyAttrs);
 }
 
-function mergeAdjacentSegments(segments: TimelineSegment[], mergeGapSeconds: number): TimelineSegment[] {
+function mergeAdjacentSegments(
+  segments: TimelineSegment[],
+  mergeGapSeconds: number,
+): TimelineSegment[] {
   if (!segments.length) return segments;
   const gapMs = Math.max(0, mergeGapSeconds) * 1000;
   const out: TimelineSegment[] = [];
@@ -187,12 +235,17 @@ function mergeAdjacentSegments(segments: TimelineSegment[], mergeGapSeconds: num
 
 function categoryFromState(domain: string, state: string): StateCategory {
   if (state === "unknown" || state === "unavailable") return "unknown";
-  if (["off", "closed", "idle", "paused", "standby"].includes(state)) return state === "idle" ? "idle" : "off";
+  if (["off", "closed", "idle", "paused", "standby"].includes(state))
+    return state === "idle" ? "idle" : "off";
   if (["cool", "cooling"].includes(state)) return "cooling";
   if (["heat", "heating"].includes(state)) return "heating";
   if (["playing"].includes(state)) return "playing";
   if (["opening", "open"].includes(state)) return "opening";
   if (["closing"].includes(state)) return "closing";
-  if (domain === "climate" && ["drying", "fan", "fan_only", "dry"].includes(state)) return "idle";
+  if (
+    domain === "climate" &&
+    ["drying", "fan", "fan_only", "dry"].includes(state)
+  )
+    return "idle";
   return "on";
 }

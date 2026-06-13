@@ -2,20 +2,38 @@ import { html, type TemplateResult } from "lit";
 import { CATEGORY_LABELS_HE } from "../defaults";
 import { renderEntityIcon, renderGroupIcon } from "../entity-icons";
 import { formatDuration, formatTime, timeToPercent } from "../format";
+import { formatCurationSummary } from "../row-curation";
 import { limitTimelineGroups } from "../timeline-layout";
-import type { ActivityHistoryCardConfig, ActivitySummary, TimelineGroup, TimeRange } from "../types";
+import type {
+  ActivityHistoryCardConfig,
+  ActivitySummary,
+  RowCurationDiagnostics,
+  TimelineGroup,
+  TimeRange,
+} from "../types";
 
 export interface SwimlaneRendererOptions {
   groups: TimelineGroup[];
   range: TimeRange;
   config: ActivityHistoryCardConfig;
   summary: ActivitySummary;
-  onSegmentClick?: (event: Event, entityId: string, segmentIndex: number) => void;
+  curation?: RowCurationDiagnostics;
+  onSegmentClick?: (
+    event: Event,
+    entityId: string,
+    segmentIndex: number,
+  ) => void;
 }
 
-export function renderSwimlaneTimeline(options: SwimlaneRendererOptions): TemplateResult {
-  const display = limitTimelineGroups(options.groups, options.config.max_visible_rows);
+export function renderSwimlaneTimeline(
+  options: SwimlaneRendererOptions,
+): TemplateResult {
+  const display = limitTimelineGroups(
+    options.groups,
+    options.config.max_visible_rows,
+  );
   const ticks = buildTicks(options.range);
+  const curationSummary = formatCurationSummary(options.curation);
   const now = new Date();
   const nowPercent = timeToPercent(now, options.range);
   const showNow =
@@ -27,14 +45,21 @@ export function renderSwimlaneTimeline(options: SwimlaneRendererOptions): Templa
     <section
       class=${`ahc-timeline-card ahc-timeline-card--${display.density}`}
       aria-label="ציר זמן פעילות"
-      style=${options.config.timeline_height ? `--ahc-timeline-height:${options.config.timeline_height}` : ""}
+      style=${options.config.timeline_height
+        ? `--ahc-timeline-height:${options.config.timeline_height}`
+        : ""}
     >
       <div class="ahc-timeline-toolbar">
         <h3 class="ahc-timeline-title">ציר זמן פעילות</h3>
         <span class="ahc__metric-subtitle">
           ${formatTime(options.range.start)} – ${formatTime(options.range.end)}
-          ${display.hiddenRowCount ? ` · מציג ${display.visibleRowCount} מתוך ${display.totalRowCount}` : ""}
+          ${display.hiddenRowCount
+            ? ` · מציג ${display.visibleRowCount} מתוך ${display.totalRowCount}`
+            : ""}
         </span>
+        ${curationSummary
+          ? html`<span class="ahc-curation-note">${curationSummary}</span>`
+          : null}
       </div>
       <div class="ahc-timeline-scroll">
         <div class="ahc-timeline">
@@ -42,27 +67,58 @@ export function renderSwimlaneTimeline(options: SwimlaneRendererOptions): Templa
             <div class="ahc-timeline__axis-spacer">רכיב / אזור</div>
             <div class="ahc-timeline__ticks">
               ${ticks.map(
-                (tick) => html`<span class="ahc-timeline__tick" style="left:${tick.percent}%">${tick.label}</span>`,
+                (tick) =>
+                  html`<span
+                    class="ahc-timeline__tick"
+                    style="left:${tick.percent}%"
+                    >${tick.label}</span
+                  >`,
               )}
             </div>
           </div>
           <div class="ahc-timeline__groups">
             ${display.groups.map((group) => {
-              const collapsed = groupShouldStartCollapsed(group, options.config);
+              const collapsed = groupShouldStartCollapsed(
+                group,
+                options.config,
+              );
               return html`
-                <details class="ahc-group" aria-label=${group.title} ?open=${!collapsed}>
+                <details
+                  class="ahc-group"
+                  aria-label=${group.title}
+                  ?open=${!collapsed}
+                >
                   <summary class="ahc-group__header">
-                    <span class="ahc-group__title">${renderGroupIcon(group)}<span>${group.title}</span></span>
-                    <span class="ahc-group__meta">${formatDuration(group.totalActiveMs)} • ${group.subtitle ?? ""}</span>
+                    <span class="ahc-group__title"
+                      >${renderGroupIcon(group)}<span
+                        >${group.title}</span
+                      ></span
+                    >
+                    <span class="ahc-group__meta"
+                      >${formatDuration(group.totalActiveMs)} •
+                      ${group.subtitle ?? ""}</span
+                    >
                   </summary>
                   ${group.rows.map(
                     (row) => html`
                       <div class="ahc-row">
                         <div class="ahc-row__label">
                           ${renderEntityIcon(row.entity)}
-                          <span class="ahc-row__name" title=${options.config.debug ? row.entity.entity_id : row.entity.name}>${row.entity.name}</span>
+                          <span
+                            class="ahc-row__name"
+                            title=${options.config.debug
+                              ? row.entity.entity_id
+                              : row.entity.name}
+                            >${row.entity.name}</span
+                          >
                           ${row.currentCategory
-                            ? html`<span class="ahc-row__state-chip" data-state=${row.currentCategory}>${CATEGORY_LABELS_HE[row.currentCategory]}</span>`
+                            ? html`<span
+                                class="ahc-row__state-chip"
+                                data-state=${row.currentCategory}
+                                >${CATEGORY_LABELS_HE[
+                                  row.currentCategory
+                                ]}</span
+                              >`
                             : null}
                         </div>
                         <div class="ahc-row__track">
@@ -73,18 +129,40 @@ export function renderSwimlaneTimeline(options: SwimlaneRendererOptions): Templa
                             role="img"
                             aria-label=${`ציר זמן עבור ${row.entity.name}`}
                           >
-                            <line class="ahc-row__svg-track" x1="1" x2="99" y1="16" y2="16"></line>
+                            <line
+                              class="ahc-row__svg-track"
+                              x1="1"
+                              x2="99"
+                              y1="16"
+                              y2="16"
+                            ></line>
                             ${row.segments.map((segment, index) => {
-                              const left = timeToPercent(segment.start, options.range);
-                              const right = timeToPercent(segment.end, options.range);
-                              const width = Math.max(0.35, right - left);
-                              if (!segment.active && segment.category !== "unknown" && segment.category !== "off" && segment.category !== "idle") return null;
+                              const left = timeToPercent(
+                                segment.start,
+                                options.range,
+                              );
+                              const right = timeToPercent(
+                                segment.end,
+                                options.range,
+                              );
+                              const width = Math.max(0.65, right - left);
+                              if (
+                                !segment.active &&
+                                segment.category !== "unknown" &&
+                                segment.category !== "off" &&
+                                segment.category !== "idle"
+                              )
+                                return null;
                               const label = `${row.entity.name}, ${CATEGORY_LABELS_HE[segment.category]}, ${formatTime(segment.start)} עד ${formatTime(segment.end)}, ${formatDuration(segment.durationMs)}`;
                               return html`
                                 <rect
-                                  class=${segment.active ? "ahc-segment-svg" : "ahc-segment-svg ahc-segment-svg--inactive"}
+                                  class=${segment.active
+                                    ? "ahc-segment-svg"
+                                    : "ahc-segment-svg ahc-segment-svg--inactive"}
                                   data-category=${segment.category}
-                                  data-active=${segment.active ? "true" : "false"}
+                                  data-active=${segment.active
+                                    ? "true"
+                                    : "false"}
                                   x=${left}
                                   y=${segment.active ? "9" : "12"}
                                   width=${width}
@@ -93,11 +171,23 @@ export function renderSwimlaneTimeline(options: SwimlaneRendererOptions): Templa
                                   tabindex="0"
                                   role="button"
                                   aria-label=${label}
-                                  @click=${(event: Event) => options.onSegmentClick?.(event, row.entity.entity_id, index)}
+                                  @click=${(event: Event) =>
+                                    options.onSegmentClick?.(
+                                      event,
+                                      row.entity.entity_id,
+                                      index,
+                                    )}
                                   @keydown=${(event: KeyboardEvent) => {
-                                    if (event.key === "Enter" || event.key === " ") {
+                                    if (
+                                      event.key === "Enter" ||
+                                      event.key === " "
+                                    ) {
                                       event.preventDefault();
-                                      options.onSegmentClick?.(event, row.entity.entity_id, index);
+                                      options.onSegmentClick?.(
+                                        event,
+                                        row.entity.entity_id,
+                                        index,
+                                      );
                                     }
                                   }}
                                 >
@@ -110,13 +200,19 @@ export function renderSwimlaneTimeline(options: SwimlaneRendererOptions): Templa
                       </div>
                     `,
                   )}
-                  ${!group.rows.length ? html`<div class="ahc-group__empty">אין שורות גלויות בקבוצה הזו</div>` : null}
+                  ${!group.rows.length
+                    ? html`<div class="ahc-group__empty">
+                        אין שורות גלויות בקבוצה הזו
+                      </div>`
+                    : null}
                 </details>
               `;
             })}
           </div>
           ${showNow
-            ? html`<div class="ahc-now-line" style="left:${nowPercent}%"><span class="ahc-now-line__label">עכשיו</span></div>`
+            ? html`<div class="ahc-now-line" style="left:${nowPercent}%">
+                <span class="ahc-now-line__label">עכשיו</span>
+              </div>`
             : null}
         </div>
       </div>
@@ -125,7 +221,10 @@ export function renderSwimlaneTimeline(options: SwimlaneRendererOptions): Templa
   `;
 }
 
-function groupShouldStartCollapsed(group: TimelineGroup, config: ActivityHistoryCardConfig): boolean {
+function groupShouldStartCollapsed(
+  group: TimelineGroup,
+  config: ActivityHistoryCardConfig,
+): boolean {
   const configured = new Set(config.default_collapsed_groups ?? []);
   if (configured.has(group.id) || configured.has(group.title)) return true;
   return Boolean(config.collapse_groups && group.totalActiveMs <= 0);
@@ -143,20 +242,32 @@ function renderLegend(): TemplateResult {
   ];
   return html`<div class="ahc-legend" aria-label="מקרא">
     ${items.map(
-      ([category, color]) => html`<span class="ahc-legend__item"><span class="ahc-legend__swatch" style="--swatch:${color}"></span>${CATEGORY_LABELS_HE[category]}</span>`,
+      ([category, color]) =>
+        html`<span class="ahc-legend__item"
+          ><span class="ahc-legend__swatch" style="--swatch:${color}"></span
+          >${CATEGORY_LABELS_HE[category]}</span
+        >`,
     )}
   </div>`;
 }
 
-function buildTicks(range: TimeRange): Array<{ label: string; percent: number }> {
-  const totalHours = Math.max(1, (range.end.getTime() - range.start.getTime()) / 3600000);
+function buildTicks(
+  range: TimeRange,
+): Array<{ label: string; percent: number }> {
+  const totalHours = Math.max(
+    1,
+    (range.end.getTime() - range.start.getTime()) / 3600000,
+  );
   const stepHours = totalHours <= 24 ? 3 : totalHours <= 72 ? 6 : 24;
   const ticks: Array<{ label: string; percent: number }> = [];
   const start = new Date(range.start);
   start.setMinutes(0, 0, 0);
   while (start < range.end) {
     if (start >= range.start) {
-      ticks.push({ label: formatTime(start), percent: timeToPercent(start, range) });
+      ticks.push({
+        label: formatTime(start),
+        percent: timeToPercent(start, range),
+      });
     }
     start.setHours(start.getHours() + stepHours);
   }

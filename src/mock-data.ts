@@ -6,7 +6,12 @@ interface MockEntitySeed {
   area: string;
   domain: string;
   icon: string;
-  pattern: Array<{ startHour: number; endHour: number; state: string; attributes?: Record<string, unknown> }>;
+  pattern: Array<{
+    startHour: number;
+    endHour: number;
+    state: string;
+    attributes?: Record<string, unknown>;
+  }>;
 }
 
 const MOCK_ENTITIES: MockEntitySeed[] = [
@@ -29,9 +34,24 @@ const MOCK_ENTITIES: MockEntitySeed[] = [
     domain: "climate",
     icon: "❄",
     pattern: [
-      { startHour: -21, endHour: -18, state: "cool", attributes: { hvac_action: "cooling", current_temperature: 24 } },
-      { startHour: -12, endHour: -9, state: "cool", attributes: { hvac_action: "cooling", current_temperature: 23 } },
-      { startHour: -4, endHour: -0.5, state: "cool", attributes: { hvac_action: "cooling", current_temperature: 24 } },
+      {
+        startHour: -21,
+        endHour: -18,
+        state: "cool",
+        attributes: { hvac_action: "cooling", current_temperature: 24 },
+      },
+      {
+        startHour: -12,
+        endHour: -9,
+        state: "cool",
+        attributes: { hvac_action: "cooling", current_temperature: 23 },
+      },
+      {
+        startHour: -4,
+        endHour: -0.5,
+        state: "cool",
+        attributes: { hvac_action: "cooling", current_temperature: 24 },
+      },
     ],
   },
   {
@@ -41,9 +61,24 @@ const MOCK_ENTITIES: MockEntitySeed[] = [
     domain: "media_player",
     icon: "♫",
     pattern: [
-      { startHour: -18, endHour: -15.5, state: "playing", attributes: { media_title: "Morning mix" } },
-      { startHour: -8, endHour: -6.5, state: "playing", attributes: { media_title: "Evening playlist" } },
-      { startHour: -2.4, endHour: -1.2, state: "playing", attributes: { media_title: "Focus" } },
+      {
+        startHour: -18,
+        endHour: -15.5,
+        state: "playing",
+        attributes: { media_title: "Morning mix" },
+      },
+      {
+        startHour: -8,
+        endHour: -6.5,
+        state: "playing",
+        attributes: { media_title: "Evening playlist" },
+      },
+      {
+        startHour: -2.4,
+        endHour: -1.2,
+        state: "playing",
+        attributes: { media_title: "Focus" },
+      },
     ],
   },
   {
@@ -110,8 +145,18 @@ const MOCK_ENTITIES: MockEntitySeed[] = [
     domain: "climate",
     icon: "❄",
     pattern: [
-      { startHour: -10, endHour: -6.2, state: "cool", attributes: { hvac_action: "cooling", current_temperature: 23 } },
-      { startHour: -2.5, endHour: -0.2, state: "cool", attributes: { hvac_action: "cooling", current_temperature: 23 } },
+      {
+        startHour: -10,
+        endHour: -6.2,
+        state: "cool",
+        attributes: { hvac_action: "cooling", current_temperature: 23 },
+      },
+      {
+        startHour: -2.5,
+        endHour: -0.2,
+        state: "cool",
+        attributes: { hvac_action: "cooling", current_temperature: 23 },
+      },
     ],
   },
   {
@@ -138,7 +183,9 @@ export function getMockEntities(): EntityMeta[] {
   }));
 }
 
-export function getMockHistory(range: TimeRange): Record<string, HistoryStateRecord[]> {
+export function getMockHistory(
+  range: TimeRange,
+): Record<string, HistoryStateRecord[]> {
   const result: Record<string, HistoryStateRecord[]> = {};
   const endMs = range.end.getTime();
 
@@ -150,14 +197,37 @@ export function getMockHistory(range: TimeRange): Record<string, HistoryStateRec
     for (const segment of entity.pattern) {
       const startMs = endMs + segment.startHour * 3600000;
       const stopMs = endMs + segment.endHour * 3600000;
-      if (stopMs <= range.start.getTime() || startMs >= range.end.getTime()) continue;
-      records.push(makeRecord(entity.entity_id, segment.state, Math.max(startMs, range.start.getTime()), segment.attributes));
-      records.push(makeRecord(entity.entity_id, "off", Math.min(stopMs, range.end.getTime()), undefined));
+      if (stopMs <= range.start.getTime() || startMs >= range.end.getTime())
+        continue;
+      records.push(
+        makeRecord(
+          entity.entity_id,
+          segment.state,
+          Math.max(startMs, range.start.getTime()),
+          segment.attributes,
+        ),
+      );
+      records.push(
+        makeRecord(
+          entity.entity_id,
+          "off",
+          Math.min(stopMs, range.end.getTime()),
+          undefined,
+        ),
+      );
     }
 
     result[entity.entity_id] = records
-      .sort((a, b) => new Date(a.last_changed).getTime() - new Date(b.last_changed).getTime())
-      .filter((record, index, sorted) => index === 0 || record.last_changed !== sorted[index - 1]?.last_changed);
+      .sort(
+        (a, b) =>
+          new Date(a.last_changed).getTime() -
+          new Date(b.last_changed).getTime(),
+      )
+      .filter(
+        (record, index, sorted) =>
+          index === 0 ||
+          record.last_changed !== sorted[index - 1]?.last_changed,
+      );
   }
 
   return result;
