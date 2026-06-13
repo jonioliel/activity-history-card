@@ -1,0 +1,71 @@
+type: custom:activity-history-card
+title: היסטוריית פעילות חכמה
+hours_to_show: 24
+live: true
+rtl: auto
+display_mode: panel # card | panel | fullscreen
+default_view: swimlane # swimlane | heatmap | detail | correlation
+group_by: area # area | domain | floor | entity | none
+show_summary: true
+show_insights: true
+show_now_line: true
+show_legend: true
+show_fullscreen_button: true
+significant_changes_only: true
+minimal_response: true
+min_duration_seconds: 20
+merge_gap_seconds: 15
+mobile_breakpoint: 760
+filters:
+  show: true
+  show_search: true
+  show_area_chips: true
+  show_domain_chips: true
+  show_state_mode: true
+  default_domains:
+    - light
+    - switch
+    - climate
+    - media_player
+    - cover
+    - fan
+  default_areas: []
+  active_only: false
+entities:
+  - entity: light.living_room_main
+    name: תאורת סלון
+    area: סלון
+    active_states: ["on"]
+  - entity: climate.living_room_ac
+    name: מזגן סלון
+    area: סלון
+    active_states: ["cool", "heat", "dry", "fan_only"]
+    active_attributes:
+      hvac_action: ["cooling", "heating", "drying", "fan"]
+    attributes:
+      - current_temperature
+      - temperature
+      - hvac_action
+  - entity: media_player.living_room_spotify
+    name: Spotify סלון
+    area: סלון
+    active_states: ["playing"]
+  - entity: switch.kitchen_coffee_machine
+    name: מכונת קפה
+    area: מטבח
+    active_states: ["on"]
+  - entity: cover.kitchen_blinds
+    name: תריס מטבח
+    area: מטבח
+    active_states: ["opening", "closing", "open"]
+exclude_entities:
+  - sensor.*
+colors:
+  on: "var(--success-color)"
+  off: "var(--disabled-text-color)"
+  cooling: "#38bdf8"
+  heating: "#fb923c"
+  playing: "#a78bfa"
+  opening: "#facc15"
+  idle: "#64748b"
+  unknown: "#94a3b8"

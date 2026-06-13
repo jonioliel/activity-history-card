@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Activity History Card Mockups</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #020617;
+      --surface: #0f172a;
+      --surface-2: #111c31;
+      --border: rgba(96, 165, 250, .28);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: radial-gradient(circle at 100% 0, rgba(56,189,248,.14), transparent 34%), var(--bg);
+      color: var(--text);
+      padding: 24px;
+    }
+    header {
+      max-width: 1200px;
+      margin: 0 auto 24px;
+      display: grid;
+      gap: 8px;
+    }
+    h1 { margin: 0; font-size: clamp(1.6rem, 3vw, 2.6rem); }
+    p { margin: 0; color: var(--muted); line-height: 1.6; }
+    .grid {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+      gap: 18px;
+    }
+    figure {
+      margin: 0;
+      background: linear-gradient(180deg, rgba(15,23,42,.92), rgba(15,23,42,.70));
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 16px 52px rgba(0,0,0,.32);
+    }
+    img {
+      width: 100%;
+      display: block;
+      background: #020617;
+    }
+    figcaption {
+      display: grid;
+      gap: 4px;
+      padding: 14px 16px 18px;
+      border-top: 1px solid rgba(148,163,184,.16);
+    }
+    strong { color: var(--text); }
+    code { color: var(--accent); direction: ltr; unicode-bidi: isolate; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>הדמיות Activity History Card</h1>
+    <p>גלריית רפרנס לפיתוח הכרטיס ב-Codex. ההדמיות החדשות מדגישות RTL, סינון, מסך מלא ומובייל.</p>
+  </header>
+  <main class="grid">
+    <figure><img src="05-desktop-fullscreen-rtl-panel.png" alt="Desktop full screen RTL panel"><figcaption><strong>Desktop full-screen RTL</strong><code>05-desktop-fullscreen-rtl-panel.png</code></figcaption></figure>
+    <figure><img src="06-mobile-overview-rtl.png" alt="Mobile overview RTL"><figcaption><strong>Mobile overview RTL</strong><code>06-mobile-overview-rtl.png</code></figcaption></figure>
+    <figure><img src="07-mobile-advanced-filter-sheet-rtl.png" alt="Mobile advanced filter sheet RTL"><figcaption><strong>Mobile filter sheet RTL</strong><code>07-mobile-advanced-filter-sheet-rtl.png</code></figcaption></figure>
+    <figure><img src="08-mobile-entity-detail-rtl.png" alt="Mobile entity detail RTL"><figcaption><strong>Mobile entity detail RTL</strong><code>08-mobile-entity-detail-rtl.png</code></figcaption></figure>
+    <figure><img src="01-desktop-swimlanes-original.png" alt="Original desktop swimlanes"><figcaption><strong>Original swimlane MVP</strong><code>01-desktop-swimlanes-original.png</code></figcaption></figure>
+    <figure><img src="02-desktop-area-heatmap-original.png" alt="Original desktop heatmap"><figcaption><strong>Area heatmap concept</strong><code>02-desktop-area-heatmap-original.png</code></figcaption></figure>
+    <figure><img src="03-desktop-entity-drilldown-original.png" alt="Original entity drilldown"><figcaption><strong>Entity drill-down concept</strong><code>03-desktop-entity-drilldown-original.png</code></figcaption></figure>
+    <figure><img src="04-desktop-correlation-event-log-original.png" alt="Original correlation and event log"><figcaption><strong>Correlation and event log concept</strong><code>04-desktop-correlation-event-log-original.png</code></figcaption></figure>
+  </main>
+</body>
+</html>
