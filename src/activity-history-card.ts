@@ -286,7 +286,8 @@ export class ActivityHistoryCard extends LitElement {
 
   private _renderMainContent(): TemplateResult {
     if (this._loading) {
-      return html`<div class="ahc-state-card"><div><h3 class="ahc-state-card__title">טוען היסטוריה...</h3><p>מושך נתוני פעילות מ-Home Assistant.</p></div></div>`;
+      const message = !this._hass && !this._usingMockData ? "ממתין לחיבור Home Assistant." : "מושך נתוני פעילות מ-Home Assistant.";
+      return html`<div class="ahc-state-card"><div><h3 class="ahc-state-card__title">טוען היסטוריה...</h3><p>${message}</p></div></div>`;
     }
     if (this._error) {
       return html`<div class="ahc-state-card"><div><h3 class="ahc-state-card__title">שגיאה בטעינת ההיסטוריה</h3><p>${this._error}</p></div></div>`;
@@ -438,7 +439,15 @@ export class ActivityHistoryCard extends LitElement {
   private async _fetchAndRender(): Promise<void> {
     if (!this._config) return;
 
-    const useMockData = this._config.mock_data === true || !this._hass;
+    const useMockData = this._config.mock_data === true;
+    if (!this._hass && !useMockData) {
+      this._usingMockData = false;
+      this._loading = true;
+      this._error = undefined;
+      this.requestUpdate();
+      return;
+    }
+
     const entities = useMockData ? getMockEntities() : resolveEntityMetas(this._config, this._hass);
     const range = this._resolveRange();
     const key = JSON.stringify({

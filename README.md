@@ -61,13 +61,34 @@ docs/legacy-mockups-gallery.html# גלריית ההדמיות המקורית
    `https://github.com/jonioliel/activity-history-card`
 3. בחר Category: `Dashboard`.
 4. התקן את הכרטיס.
-5. הוסף כרטיס Lovelace:
+5. הוסף כרטיס Lovelace עם ישויות אמיתיות מהבית שלך:
+
+```yaml
+type: custom:activity-history-card
+mock_data: false
+display_mode: panel
+hours_to_show: 24
+entities:
+  - entity: light.living_room_main
+    name: תאורת סלון
+    area: סלון
+  - entity: climate.living_room_ac
+    name: מזגן סלון
+    area: סלון
+  - entity: media_player.living_room_spotify
+    name: Spotify סלון
+    area: סלון
+```
+
+לבדיקה מהירה בלי נתוני Recorder אפשר להפעיל נתוני דוגמה:
 
 ```yaml
 type: custom:activity-history-card
 mock_data: true
 display_mode: panel
 ```
+
+אם מופיעים אזורים כמו סלון, מטבח וחדרי ילדים בלי קשר לבית שלך, כנראה שהכרטיס עדיין מוגדר עם `mock_data: true`.
 
 הקובץ ש-HACS מתקין הוא:
 

@@ -37,7 +37,7 @@ Implemented:
   - `getCardSize()`
   - `getGridOptions()`
   - `disconnectedCallback()`
-- Mock data mode with `mock_data: true`
+- Mock data mode with `mock_data: true`; mock data must not be used unless explicitly configured
 - Home Assistant history fetching via `history/history_during_period`
 - Conservative entity auto-discovery only when `domains` or `areas` are configured
 - Swimlane timeline grouped by area or domain
@@ -107,7 +107,23 @@ Use HACS as a custom repository:
 3. Repository: `https://github.com/jonioliel/activity-history-card`
 4. Category: Dashboard.
 5. Download the card.
-6. Add a Lovelace card:
+6. Add a Lovelace card with real Home Assistant entities:
+
+```yaml
+type: custom:activity-history-card
+mock_data: false
+display_mode: panel
+hours_to_show: 24
+entities:
+  - entity: light.living_room_main
+    name: תאורת סלון
+    area: סלון
+  - entity: climate.living_room_ac
+    name: מזגן סלון
+    area: סלון
+```
+
+For preview without Home Assistant Recorder data, explicitly use:
 
 ```yaml
 type: custom:activity-history-card
@@ -115,7 +131,7 @@ mock_data: true
 display_mode: panel
 ```
 
-For real Home Assistant data, use `mock_data: false` or omit it, and configure `entities`, `domains`, or `areas`.
+If the card shows generic areas such as סלון, מטבח, and חדרי ילדים that do not match the user's home, check for `mock_data: true` in the Lovelace YAML.
 
 ## Safe Continuation Prompt
 
