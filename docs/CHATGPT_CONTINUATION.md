@@ -124,7 +124,7 @@ npm run build
 Latest verified results:
 
 - `npm run typecheck` passed
-- `npm run test` passed, 36 tests
+- `npm run test` passed, 37 tests
 - `npm run build` passed
 
 The generated `dist/activity-history-card.js` is intentionally tracked for HACS. `dist/activity-history-card.js.map` remains ignored.
@@ -139,6 +139,7 @@ The latest pass focused on making the swimlane MVP closer to the desktop/mobile 
 - The desktop summary strip is more compact and includes the last event as a first-class metric.
 - `debug: true` diagnostics are visually compact when collapsed.
 - Default `max_visible_rows` changed from `80` to `48` for better readability in large real homes.
+- Generic or blank switch names from Home Assistant registry now fall back safely and are prefixed with the device name when useful, for example `מדיח כלים - Power`.
 
 ## HACS Install Path
 

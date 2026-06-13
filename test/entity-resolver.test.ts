@@ -146,6 +146,52 @@ describe("resolveEntityMetas", () => {
     expect(rows.map((row) => row.entity_id)).toEqual(["light.kitchen"]);
   });
 
+  it("adds device context to generic switch names from the registry", async () => {
+    const hass: HomeAssistant = {
+      states: {
+        "switch.dishwasher_power": {
+          entity_id: "switch.dishwasher_power",
+          state: "on",
+          attributes: { friendly_name: "Power" },
+          last_changed: "2026-01-01T00:00:00.000Z",
+          last_updated: "2026-01-01T00:00:00.000Z",
+        },
+        "switch.blank_name": {
+          entity_id: "switch.blank_name",
+          state: "off",
+          attributes: { friendly_name: "" },
+          last_changed: "2026-01-01T00:00:00.000Z",
+          last_updated: "2026-01-01T00:00:00.000Z",
+        },
+      },
+      callWS: async <T = unknown>({ type }: Record<string, unknown>): Promise<T> => {
+        let result: unknown = [];
+        if (type === "config/area_registry/list") result = [{ area_id: "kitchen", name: "מטבח" }];
+        if (type === "config/device_registry/list") {
+          result = [
+            { id: "dishwasher", area_id: "kitchen", name_by_user: "מדיח כלים" },
+            { id: "blank-device", area_id: "kitchen", name: "מכונת כביסה" },
+          ];
+        }
+        if (type === "config/entity_registry/list") {
+          result = [
+            { entity_id: "switch.dishwasher_power", device_id: "dishwasher", name: "", original_name: "Power" },
+            { entity_id: "switch.blank_name", device_id: "blank-device", name: "", original_name: "" },
+          ];
+        }
+        return result as T;
+      },
+      connection: {
+        subscribeMessage: async () => () => undefined,
+      },
+    };
+
+    const rows = await resolveEntityMetas({ type: "custom:activity-history-card", auto_discover: true }, hass);
+
+    expect(rows.find((row) => row.entity_id === "switch.dishwasher_power")?.name).toBe("מדיח כלים - Power");
+    expect(rows.find((row) => row.entity_id === "switch.blank_name")?.name).toBe("מכונת כביסה - blank name");
+  });
+
   it("reports registry fallback when Home Assistant registries are unavailable", async () => {
     const hass: HomeAssistant = {
       states: {

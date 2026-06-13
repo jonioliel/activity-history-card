@@ -113,7 +113,6 @@ function discoverAreaEntities(
 
       entities.push({
         entity: entry.entity_id,
-        name: entry.name ?? entry.original_name ?? undefined,
         area: areaName,
         domain,
       });
@@ -164,13 +163,17 @@ function toEntityMeta(
   const friendly = stateObj ? hass?.formatEntityName?.(stateObj) : undefined;
   const attrName = stateObj?.attributes?.friendly_name;
 
-  const registryName = registryEntity?.name ?? registryEntity?.original_name ?? undefined;
-  const friendlyName = typeof friendly === "string" && friendly.trim() ? friendly : undefined;
-  const attributeName = typeof attrName === "string" && attrName.trim() ? attrName : undefined;
+  const configuredName = stringAttr(entry.name);
+  const registryName = stringAttr(registryEntity?.name) ?? stringAttr(registryEntity?.original_name);
+  const deviceName = stringAttr(device?.name_by_user) ?? stringAttr(device?.name);
+  const friendlyName = stringAttr(friendly);
+  const attributeName = stringAttr(attrName);
+  const fallbackName = humanizeEntityId(entry.entity);
+  const displayName = configuredName ?? enrichEntityName(friendlyName ?? attributeName ?? registryName ?? fallbackName, deviceName, entry.entity, domain);
 
   return {
     entity_id: entry.entity,
-    name: entry.name ?? friendlyName ?? attributeName ?? registryName ?? humanizeEntityId(entry.entity),
+    name: displayName,
     area,
     area_id: areaId,
     domain,
@@ -328,5 +331,47 @@ function normalizeToken(value: string): string {
 }
 
 function stringAttr(value: unknown): string | undefined {
-  return typeof value === "string" && value.trim() ? value : undefined;
+  return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+function enrichEntityName(name: string, deviceName: string | undefined, entityId: string, domain: string): string {
+  if (!deviceName || !name) return name;
+
+  const normalizedName = normalizeToken(name);
+  const normalizedDevice = normalizeToken(deviceName);
+  if (!normalizedName || !normalizedDevice) return name;
+  if (normalizedName.includes(normalizedDevice) || normalizedDevice.includes(normalizedName)) return name;
+
+  if (domain === "switch" && (isGenericEntityName(name) || isShortLatinName(name) || name === humanizeEntityId(entityId))) {
+    return `${deviceName} - ${name}`;
+  }
+
+  return name;
+}
+
+function isShortLatinName(value: string): boolean {
+  const trimmed = value.trim();
+  return trimmed.length <= 16 && /^[a-z0-9][a-z0-9 ._()/+-]*$/i.test(trimmed);
+}
+
+function isGenericEntityName(value: string): boolean {
+  const genericNames = new Set([
+    "power",
+    "switch",
+    "outlet",
+    "plug",
+    "extra dry",
+    "half load",
+    "remote start",
+    "child lock",
+    "door",
+    "light",
+    "fan",
+    "מתג",
+    "שקע",
+    "הפעלה",
+    "כיבוי",
+    "דולק",
+  ]);
+  return genericNames.has(normalizeToken(value));
 }

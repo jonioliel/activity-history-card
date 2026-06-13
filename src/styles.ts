@@ -58,6 +58,7 @@ export const activityHistoryCardStyles = css`
   --ahc-grid-line: rgba(148, 163, 184, 0.16);
   --ahc-row-hover: rgba(56, 189, 248, 0.08);
   --ahc-now: #60a5fa;
+  --ahc-label-width: clamp(280px, 17vw, 340px);
 
   --ahc-chip-height: 40px;
   --ahc-touch-target: 44px;
@@ -616,7 +617,7 @@ export const activityHistoryCardStyles = css`
 .ahc-timeline {
   direction: ltr;
   position: relative;
-  min-inline-size: 920px;
+  min-inline-size: 1040px;
   padding: 0;
 }
 
@@ -625,7 +626,7 @@ export const activityHistoryCardStyles = css`
   inset-block-start: 0;
   z-index: 3;
   display: grid;
-  grid-template-columns: 210px minmax(0, 1fr);
+  grid-template-columns: var(--ahc-label-width) minmax(0, 1fr);
   min-block-size: 48px;
   background: rgba(15, 23, 42, 0.92);
   backdrop-filter: blur(14px);
@@ -728,8 +729,8 @@ export const activityHistoryCardStyles = css`
 .ahc-row {
   direction: ltr;
   display: grid;
-  grid-template-columns: 210px minmax(0, 1fr);
-  min-block-size: 38px;
+  grid-template-columns: var(--ahc-label-width) minmax(0, 1fr);
+  min-block-size: 42px;
   border-block-start: 1px solid rgba(148, 163, 184, 0.09);
 }
 
@@ -746,7 +747,7 @@ export const activityHistoryCardStyles = css`
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--ahc-gap-xs);
-  padding-inline: var(--ahc-gap-md) var(--ahc-gap-sm);
+  padding-inline: 14px 12px;
   border-inline-end: 1px solid rgba(148, 163, 184, 0.12);
   background: rgba(4, 10, 24, 0.82);
   backdrop-filter: blur(10px);
@@ -804,7 +805,7 @@ ha-icon.ahc-group-icon {
   direction: ltr;
   position: relative;
   min-inline-size: 0;
-  min-block-size: 38px;
+  min-block-size: 42px;
   background-image: linear-gradient(to right, var(--ahc-grid-line) 1px, transparent 1px);
   background-size: calc(100% / 8) 100%;
 }
