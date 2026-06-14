@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { buildTimelineAxis } from "../src/renderers/timeline-axis";
 
+declare const process: {
+  env: {
+    TZ?: string;
+  };
+};
+
 describe("buildTimelineAxis", () => {
   it("uses comfortable density with no more than six major labels for 24h", () => {
     const axis = buildTimelineAxis(
@@ -86,6 +92,37 @@ describe("buildTimelineAxis", () => {
       expect(
         majors[index]!.percent - majors[index - 1]!.percent,
       ).toBeGreaterThan(6);
+    }
+  });
+
+  it("aligns major ticks to local clock time instead of UTC epoch", () => {
+    const previousTimezone = process.env.TZ;
+    process.env.TZ = "Asia/Jerusalem";
+
+    try {
+      const axis = buildTimelineAxis(
+        {
+          start: new Date("2026-06-13T18:08:00.000Z"),
+          end: new Date("2026-06-14T18:08:00.000Z"),
+        },
+        { maxMajorTicks: 8, now: new Date("2026-06-14T18:08:00.000Z") },
+      );
+      const labels = axis.ticks
+        .filter((tick) => tick.major)
+        .map((tick) => tick.label);
+
+      expect(labels).toEqual(
+        expect.arrayContaining(["00:00", "04:00", "08:00", "12:00", "16:00"]),
+      );
+      expect(labels).not.toEqual(
+        expect.arrayContaining(["03:00", "07:00", "11:00", "15:00"]),
+      );
+    } finally {
+      if (previousTimezone === undefined) {
+        delete process.env.TZ;
+      } else {
+        process.env.TZ = previousTimezone;
+      }
     }
   });
 });

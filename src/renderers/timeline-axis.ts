@@ -89,14 +89,71 @@ function chooseMajorStep(durationHours: number, maxMajorTicks: number): number {
 function alignedDatesBetween(range: TimeRange, stepMs: number): Date[] {
   const startMs = range.start.getTime();
   const endMs = range.end.getTime();
-  const firstMs = Math.ceil(startMs / stepMs) * stepMs;
   const dates: Date[] = [];
 
-  for (let ms = firstMs; ms < endMs; ms += stepMs) {
-    if (ms > startMs) dates.push(new Date(ms));
+  for (
+    let date = nextLocalAlignedDate(range.start, stepMs);
+    date.getTime() < endMs;
+    date = addLocalStep(date, stepMs)
+  ) {
+    if (date.getTime() > startMs) dates.push(new Date(date));
   }
 
   return dates;
+}
+
+function nextLocalAlignedDate(date: Date, stepMs: number): Date {
+  const stepHours = stepMs / HOUR_MS;
+  if (!Number.isInteger(stepHours) || stepHours < 1) {
+    return new Date(Math.ceil(date.getTime() / stepMs) * stepMs);
+  }
+
+  if (stepHours >= 24 && stepHours % 24 === 0) {
+    const stepDays = stepHours / 24;
+    const candidate = new Date(date);
+    candidate.setHours(0, 0, 0, 0);
+    if (candidate.getTime() <= date.getTime()) {
+      candidate.setDate(candidate.getDate() + 1);
+    }
+
+    while (localDayIndex(candidate) % stepDays !== 0) {
+      candidate.setDate(candidate.getDate() + 1);
+    }
+    return candidate;
+  }
+
+  const candidate = new Date(date);
+  candidate.setMinutes(0, 0, 0);
+  if (candidate.getTime() <= date.getTime()) {
+    candidate.setHours(candidate.getHours() + 1);
+  }
+
+  const remainder = candidate.getHours() % stepHours;
+  if (remainder !== 0) {
+    candidate.setHours(candidate.getHours() + stepHours - remainder);
+  }
+  candidate.setMinutes(0, 0, 0);
+  return candidate;
+}
+
+function addLocalStep(date: Date, stepMs: number): Date {
+  const stepHours = stepMs / HOUR_MS;
+  const next = new Date(date);
+
+  if (Number.isInteger(stepHours) && stepHours >= 24 && stepHours % 24 === 0) {
+    next.setDate(next.getDate() + stepHours / 24);
+    return next;
+  }
+
+  next.setHours(next.getHours() + stepHours);
+  return next;
+}
+
+function localDayIndex(date: Date): number {
+  return Math.floor(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) /
+      (24 * HOUR_MS),
+  );
 }
 
 function pickReadableMajorTicks(
