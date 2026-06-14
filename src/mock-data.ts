@@ -294,6 +294,41 @@ function buildAreaInventoryProfile(): MockEntitySeed[] {
       icon: "mdi:awning",
       pattern: [{ startHour: -7.1, endHour: -7, state: "opening" }],
     },
+    {
+      entity_id: "light.pool_ambient",
+      name: "תאורת בריכה",
+      area: "בריכה",
+      domain: "light",
+      icon: "mdi:pool",
+      pattern: [
+        { startHour: -20, endHour: -18.5, state: "on" },
+        { startHour: -4.5, endHour: -1.2, state: "on" },
+      ],
+    },
+    {
+      entity_id: "switch.pool_pump",
+      name: "משאבת בריכה",
+      area: "בריכה",
+      domain: "switch",
+      icon: "mdi:pump",
+      pattern: [{ startHour: -8, endHour: -3.5, state: "on" }],
+    },
+    {
+      entity_id: "fan.pool_airflow",
+      name: "מאוורר אזור בריכה",
+      area: "בריכה",
+      domain: "fan",
+      icon: "mdi:fan",
+      pattern: [],
+    },
+    {
+      entity_id: "cover.pool_cover",
+      name: "כיסוי בריכה",
+      area: "בריכה",
+      domain: "cover",
+      icon: "mdi:pool",
+      pattern: [{ startHour: -6.2, endHour: -6, state: "closing" }],
+    },
   ];
 }
 

@@ -125,7 +125,7 @@ function flattenTemplate(value: unknown): string {
 }
 
 describe("renderActivityDashboard", () => {
-  it("renders the dashboard shell, density area, aggregate bands, and row plots", () => {
+  it("renders the compact dashboard shell, timeline scroll, aggregate bands, and row plots", () => {
     const html = flattenTemplate(
       renderActivityDashboard({
         model: model(),
@@ -133,19 +133,60 @@ describe("renderActivityDashboard", () => {
       }),
     );
 
-    expect(html).toContain("ahc-dashboard__overview");
+    expect(html).toContain("ahc-dashboard__density");
+    expect(html).toContain("ahc-dashboard__timeline");
+    expect(html).toContain("ahc-dashboard__axis");
+    expect(html).toContain("ahc-dashboard__scroll");
     expect(html).toContain("ahc-area-card");
     expect(html).toContain("ahc-area-card__title");
     expect(html).toContain("ahc-area-card__aggregate");
     expect(html).toContain("ahc-area-card__content");
     expect(html).toContain("ahc-area-card__activity");
     expect(html).toContain("ahc-dashboard-group__aggregate");
+    expect(html).toContain("ahc-dashboard-group__body");
     expect(html).toContain("ahc-dashboard-row__plot");
-    expect(html).toContain("ahc-dashboard-row__inline-meta");
     expect(html).toContain("ahc-dashboard-segment--row");
+  });
+
+  it("collapses inventory by default for an all-areas dashboard", () => {
+    const html = flattenTemplate(
+      renderActivityDashboard({
+        model: model(),
+        config: { type: "custom:activity-history-card" },
+      }),
+    );
+
+    expect(html).toContain("data-inventory-expanded=false");
+    expect(html).not.toContain("ahc-area-inventory");
+    expect(html).toContain("אביזרים");
+  });
+
+  it("expands inventory by default for a single focused area", () => {
+    const html = flattenTemplate(
+      renderActivityDashboard({
+        model: model({ singleAreaFocused: true }),
+        config: { type: "custom:activity-history-card" },
+      }),
+    );
+
+    expect(html).toContain("data-inventory-expanded=true");
     expect(html).toContain("ahc-area-inventory");
     expect(html).toContain("data-state-tone=");
     expect(html).toContain("מנורת צד");
+  });
+
+  it("expands inventory when show all inventory is active without rendering legacy output", () => {
+    const html = flattenTemplate(
+      renderActivityDashboard({
+        model: model(),
+        config: { type: "custom:activity-history-card" },
+        showAllInventory: true,
+      }),
+    );
+
+    expect(html).toContain("data-inventory-expanded=true");
+    expect(html).toContain("ahc-area-inventory");
+    expect(html).not.toContain("ahc-timeline-card");
   });
 
   it("renders a compact dashboard empty state when no rows are visible", () => {

@@ -1266,3 +1266,105 @@
 .ahc--dense .ahc-row__state-chip {
   display: none;
 }
+
+/* Activity dashboard visual baseline */
+:host {
+  --ahc-insights-width: 340px;
+  --ahc-dashboard-label-width: 230px;
+  --ahc-dashboard-row-height: 34px;
+  --ahc-dashboard-segment-height: 10px;
+  --ahc-dashboard-segment-min-width: 5px;
+  --ahc-dashboard-group-header-height: 42px;
+}
+
+.ahc__hero,
+.ahc__toolbar,
+.ahc__summary-strip,
+.ahc__body,
+.ahc__main,
+.ahc__insights-panel {
+  min-inline-size: 0;
+}
+
+.ahc__body {
+  grid-template-columns: minmax(0, 1fr) var(--ahc-insights-width);
+  direction: ltr;
+  min-block-size: 0;
+}
+
+.ahc[dir="rtl"] .ahc__main {
+  direction: rtl;
+  grid-column: 1;
+}
+
+.ahc[dir="rtl"] .ahc__insights-panel {
+  direction: rtl;
+  grid-column: 2;
+}
+
+.ahc .ahc__body--no-insights .ahc__main {
+  grid-column: 1;
+}
+
+.ahc-dashboard {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  block-size: var(--ahc-dashboard-height, 100%);
+  min-block-size: min(520px, 62svh);
+  overflow: hidden;
+}
+
+.ahc-dashboard__density,
+.ahc-dashboard__axis,
+.ahc-dashboard__timeline,
+.ahc-dashboard__scroll {
+  min-inline-size: 0;
+}
+
+.ahc-dashboard__timeline {
+  display: grid;
+  grid-template-rows: 31px minmax(0, 1fr);
+  min-block-size: 0;
+  overflow: hidden;
+}
+
+.ahc-dashboard__scroll {
+  overflow: auto;
+}
+
+.ahc-dashboard-group__header {
+  min-block-size: var(--ahc-dashboard-group-header-height);
+}
+
+.ahc-dashboard-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--ahc-dashboard-label-width);
+  min-block-size: var(--ahc-dashboard-row-height);
+}
+
+.ahc-dashboard-row__plot {
+  grid-column: 1;
+  direction: ltr;
+}
+
+.ahc-dashboard-row__label {
+  grid-column: 2;
+  direction: rtl;
+}
+
+.ahc-dashboard-segment {
+  block-size: var(--ahc-dashboard-segment-height);
+}
+
+.ahc-dashboard-segment--min {
+  min-inline-size: var(--ahc-dashboard-segment-min-width);
+}
+
+.ahc-area-inventory {
+  max-block-size: 120px;
+  overflow: auto;
+}
+
+.ahc-inventory-chip {
+  min-block-size: 40px;
+}

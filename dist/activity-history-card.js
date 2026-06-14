@@ -3,18 +3,18 @@
  * Copyright 2019 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const Z = globalThis, ve = Z.ShadowRoot && (Z.ShadyCSS === void 0 || Z.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, be = Symbol(), ke = /* @__PURE__ */ new WeakMap();
+const Z = globalThis, be = Z.ShadowRoot && (Z.ShadyCSS === void 0 || Z.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, ve = Symbol(), $e = /* @__PURE__ */ new WeakMap();
 let Qe = class {
   constructor(e, a, i) {
-    if (this._$cssResult$ = !0, i !== be) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
+    if (this._$cssResult$ = !0, i !== ve) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
     this.cssText = e, this.t = a;
   }
   get styleSheet() {
     let e = this.o;
     const a = this.t;
-    if (ve && e === void 0) {
+    if (be && e === void 0) {
       const i = a !== void 0 && a.length === 1;
-      i && (e = ke.get(a)), e === void 0 && ((this.o = e = new CSSStyleSheet()).replaceSync(this.cssText), i && ke.set(a, e));
+      i && (e = $e.get(a)), e === void 0 && ((this.o = e = new CSSStyleSheet()).replaceSync(this.cssText), i && $e.set(a, e));
     }
     return e;
   }
@@ -22,20 +22,20 @@ let Qe = class {
     return this.cssText;
   }
 };
-const Et = (t) => new Qe(typeof t == "string" ? t : t + "", void 0, be), et = (t, ...e) => {
+const Et = (t) => new Qe(typeof t == "string" ? t : t + "", void 0, ve), et = (t, ...e) => {
   const a = t.length === 1 ? t[0] : e.reduce((i, n, s) => i + ((r) => {
     if (r._$cssResult$ === !0) return r.cssText;
     if (typeof r == "number") return r;
     throw Error("Value passed to 'css' function must be a 'css' function result: " + r + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
   })(n) + t[s + 1], t[0]);
-  return new Qe(a, t, be);
+  return new Qe(a, t, ve);
 }, Tt = (t, e) => {
-  if (ve) t.adoptedStyleSheets = e.map((a) => a instanceof CSSStyleSheet ? a : a.styleSheet);
+  if (be) t.adoptedStyleSheets = e.map((a) => a instanceof CSSStyleSheet ? a : a.styleSheet);
   else for (const a of e) {
     const i = document.createElement("style"), n = Z.litNonce;
     n !== void 0 && i.setAttribute("nonce", n), i.textContent = a.cssText, t.appendChild(i);
   }
-}, Ae = ve ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((e) => {
+}, Ae = be ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((e) => {
   let a = "";
   for (const i of e.cssRules) a += i.cssText;
   return Et(a);
@@ -45,7 +45,7 @@ const Et = (t) => new Qe(typeof t == "string" ? t : t + "", void 0, be), et = (t
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const { is: It, defineProperty: Ht, getOwnPropertyDescriptor: Dt, getOwnPropertyNames: Pt, getOwnPropertySymbols: Lt, getPrototypeOf: Nt } = Object, ae = globalThis, Ce = ae.trustedTypes, Bt = Ce ? Ce.emptyScript : "", Ft = ae.reactiveElementPolyfillSupport, V = (t, e) => t, ue = { toAttribute(t, e) {
+const { is: It, defineProperty: Ht, getOwnPropertyDescriptor: Dt, getOwnPropertyNames: Pt, getOwnPropertySymbols: Lt, getPrototypeOf: Nt } = Object, ae = globalThis, ze = ae.trustedTypes, Bt = ze ? ze.emptyScript : "", Ft = ae.reactiveElementPolyfillSupport, V = (t, e) => t, ue = { toAttribute(t, e) {
   switch (e) {
     case Boolean:
       t = t ? Bt : null;
@@ -73,7 +73,7 @@ const { is: It, defineProperty: Ht, getOwnPropertyDescriptor: Dt, getOwnProperty
       }
   }
   return a;
-} }, tt = (t, e) => !It(t, e), Re = { attribute: !0, type: String, converter: ue, reflect: !1, useDefault: !1, hasChanged: tt };
+} }, tt = (t, e) => !It(t, e), Ce = { attribute: !0, type: String, converter: ue, reflect: !1, useDefault: !1, hasChanged: tt };
 Symbol.metadata ??= Symbol("metadata"), ae.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
 let P = class extends HTMLElement {
   static addInitializer(e) {
@@ -82,7 +82,7 @@ let P = class extends HTMLElement {
   static get observedAttributes() {
     return this.finalize(), this._$Eh && [...this._$Eh.keys()];
   }
-  static createProperty(e, a = Re) {
+  static createProperty(e, a = Ce) {
     if (a.state && (a.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(e) && ((a = Object.create(a)).wrapped = !0), this.elementProperties.set(e, a), !a.noAccessor) {
       const i = Symbol(), n = this.getPropertyDescriptor(e, i, a);
       n !== void 0 && Ht(this.prototype, e, n);
@@ -100,7 +100,7 @@ let P = class extends HTMLElement {
     }, configurable: !0, enumerable: !0 };
   }
   static getPropertyOptions(e) {
-    return this.elementProperties.get(e) ?? Re;
+    return this.elementProperties.get(e) ?? Ce;
   }
   static _$Ei() {
     if (this.hasOwnProperty(V("elementProperties"))) return;
@@ -262,9 +262,9 @@ P.elementStyles = [], P.shadowRootOptions = { mode: "open" }, P[V("elementProper
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const fe = globalThis, ze = (t) => t, ee = fe.trustedTypes, Me = ee ? ee.createPolicy("lit-html", { createHTML: (t) => t }) : void 0, at = "$lit$", S = `lit$${Math.random().toFixed(9).slice(2)}$`, it = "?" + S, Ot = `<${it}>`, H = document, K = () => H.createComment(""), W = (t) => t === null || typeof t != "object" && typeof t != "function", ye = Array.isArray, Ut = (t) => ye(t) || typeof t?.[Symbol.iterator] == "function", se = `[ 	
+const fe = globalThis, Re = (t) => t, ee = fe.trustedTypes, Me = ee ? ee.createPolicy("lit-html", { createHTML: (t) => t }) : void 0, at = "$lit$", S = `lit$${Math.random().toFixed(9).slice(2)}$`, it = "?" + S, Ot = `<${it}>`, H = document, K = () => H.createComment(""), W = (t) => t === null || typeof t != "object" && typeof t != "function", ye = Array.isArray, jt = (t) => ye(t) || typeof t?.[Symbol.iterator] == "function", se = `[ 	
 \f\r]`, q = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Se = /-->/g, Ee = />/g, E = RegExp(`>|${se}(?:([^\\s"'>=/]+)(${se}*=${se}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), Te = /'/g, Ie = /"/g, nt = /^(?:script|style|textarea|title)$/i, jt = (t) => (e, ...a) => ({ _$litType$: t, strings: e, values: a }), h = jt(1), O = Symbol.for("lit-noChange"), g = Symbol.for("lit-nothing"), He = /* @__PURE__ */ new WeakMap(), T = H.createTreeWalker(H, 129);
+\f\r"'\`<>=]|("|')|))|$)`, "g"), Te = /'/g, Ie = /"/g, nt = /^(?:script|style|textarea|title)$/i, Ut = (t) => (e, ...a) => ({ _$litType$: t, strings: e, values: a }), h = Ut(1), O = Symbol.for("lit-noChange"), _ = Symbol.for("lit-nothing"), He = /* @__PURE__ */ new WeakMap(), T = H.createTreeWalker(H, 129);
 function st(t, e) {
   if (!ye(t) || !t.hasOwnProperty("raw")) throw Error("invalid template strings array");
   return Me !== void 0 ? Me.createHTML(e) : e;
@@ -276,8 +276,8 @@ const Gt = (t, e) => {
     const o = t[c];
     let l, d, u = -1, p = 0;
     for (; p < o.length && (r.lastIndex = p, d = r.exec(o), d !== null); ) p = r.lastIndex, r === q ? d[1] === "!--" ? r = Se : d[1] !== void 0 ? r = Ee : d[2] !== void 0 ? (nt.test(d[2]) && (n = RegExp("</" + d[2], "g")), r = E) : d[3] !== void 0 && (r = E) : r === E ? d[0] === ">" ? (r = n ?? q, u = -1) : d[1] === void 0 ? u = -2 : (u = r.lastIndex - d[2].length, l = d[1], r = d[3] === void 0 ? E : d[3] === '"' ? Ie : Te) : r === Ie || r === Te ? r = E : r === Se || r === Ee ? r = q : (r = E, n = void 0);
-    const _ = r === E && t[c + 1].startsWith("/>") ? " " : "";
-    s += r === q ? o + Ot : u >= 0 ? (i.push(l), o.slice(0, u) + at + o.slice(u) + S + _) : o + S + (u === -2 ? c : _);
+    const g = r === E && t[c + 1].startsWith("/>") ? " " : "";
+    s += r === q ? o + Ot : u >= 0 ? (i.push(l), o.slice(0, u) + at + o.slice(u) + S + g) : o + S + (u === -2 ? c : g);
   }
   return [st(t, s + (t[a] || "<?>") + (e === 2 ? "</svg>" : e === 3 ? "</math>" : "")), i];
 };
@@ -294,14 +294,14 @@ class Y {
     for (; (n = T.nextNode()) !== null && o.length < c; ) {
       if (n.nodeType === 1) {
         if (n.hasAttributes()) for (const u of n.getAttributeNames()) if (u.endsWith(at)) {
-          const p = d[r++], _ = n.getAttribute(u).split(S), f = /([.?@])?(.*)/.exec(p);
-          o.push({ type: 1, index: s, name: f[2], strings: _, ctor: f[1] === "." ? Vt : f[1] === "?" ? Kt : f[1] === "@" ? Wt : ie }), n.removeAttribute(u);
+          const p = d[r++], g = n.getAttribute(u).split(S), f = /([.?@])?(.*)/.exec(p);
+          o.push({ type: 1, index: s, name: f[2], strings: g, ctor: f[1] === "." ? Vt : f[1] === "?" ? Kt : f[1] === "@" ? Wt : ie }), n.removeAttribute(u);
         } else u.startsWith(S) && (o.push({ type: 6, index: s }), n.removeAttribute(u));
         if (nt.test(n.tagName)) {
           const u = n.textContent.split(S), p = u.length - 1;
           if (p > 0) {
             n.textContent = ee ? ee.emptyScript : "";
-            for (let _ = 0; _ < p; _++) n.append(u[_], K()), T.nextNode(), o.push({ type: 2, index: ++s });
+            for (let g = 0; g < p; g++) n.append(u[g], K()), T.nextNode(), o.push({ type: 2, index: ++s });
             n.append(u[p], K());
           }
         }
@@ -318,11 +318,11 @@ class Y {
     return i.innerHTML = e, i;
   }
 }
-function U(t, e, a = t, i) {
+function j(t, e, a = t, i) {
   if (e === O) return e;
   let n = i !== void 0 ? a._$Co?.[i] : a._$Cl;
   const s = W(e) ? void 0 : e._$litDirective$;
-  return n?.constructor !== s && (n?._$AO?.(!1), s === void 0 ? n = void 0 : (n = new s(t), n._$AT(t, a, i)), i !== void 0 ? (a._$Co ??= [])[i] = n : a._$Cl = n), n !== void 0 && (e = U(t, n._$AS(t, e.values), n, i)), e;
+  return n?.constructor !== s && (n?._$AO?.(!1), s === void 0 ? n = void 0 : (n = new s(t), n._$AT(t, a, i)), i !== void 0 ? (a._$Co ??= [])[i] = n : a._$Cl = n), n !== void 0 && (e = j(t, n._$AS(t, e.values), n, i)), e;
 }
 class qt {
   constructor(e, a) {
@@ -357,7 +357,7 @@ class X {
     return this._$AM?._$AU ?? this._$Cv;
   }
   constructor(e, a, i, n) {
-    this.type = 2, this._$AH = g, this._$AN = void 0, this._$AA = e, this._$AB = a, this._$AM = i, this.options = n, this._$Cv = n?.isConnected ?? !0;
+    this.type = 2, this._$AH = _, this._$AN = void 0, this._$AA = e, this._$AB = a, this._$AM = i, this.options = n, this._$Cv = n?.isConnected ?? !0;
   }
   get parentNode() {
     let e = this._$AA.parentNode;
@@ -371,7 +371,7 @@ class X {
     return this._$AB;
   }
   _$AI(e, a = this) {
-    e = U(this, e, a), W(e) ? e === g || e == null || e === "" ? (this._$AH !== g && this._$AR(), this._$AH = g) : e !== this._$AH && e !== O && this._(e) : e._$litType$ !== void 0 ? this.$(e) : e.nodeType !== void 0 ? this.T(e) : Ut(e) ? this.k(e) : this._(e);
+    e = j(this, e, a), W(e) ? e === _ || e == null || e === "" ? (this._$AH !== _ && this._$AR(), this._$AH = _) : e !== this._$AH && e !== O && this._(e) : e._$litType$ !== void 0 ? this.$(e) : e.nodeType !== void 0 ? this.T(e) : jt(e) ? this.k(e) : this._(e);
   }
   O(e) {
     return this._$AA.parentNode.insertBefore(e, this._$AB);
@@ -380,7 +380,7 @@ class X {
     this._$AH !== e && (this._$AR(), this._$AH = this.O(e));
   }
   _(e) {
-    this._$AH !== g && W(this._$AH) ? this._$AA.nextSibling.data = e : this.T(H.createTextNode(e)), this._$AH = e;
+    this._$AH !== _ && W(this._$AH) ? this._$AA.nextSibling.data = e : this.T(H.createTextNode(e)), this._$AH = e;
   }
   $(e) {
     const { values: a, _$litType$: i } = e, n = typeof i == "number" ? this._$AC(e) : (i.el === void 0 && (i.el = Y.createElement(st(i.h, i.h[0]), this.options)), i);
@@ -403,8 +403,8 @@ class X {
   }
   _$AR(e = this._$AA.nextSibling, a) {
     for (this._$AP?.(!1, !0, a); e !== this._$AB; ) {
-      const i = ze(e).nextSibling;
-      ze(e).remove(), e = i;
+      const i = Re(e).nextSibling;
+      Re(e).remove(), e = i;
     }
   }
   setConnected(e) {
@@ -419,21 +419,21 @@ class ie {
     return this._$AM._$AU;
   }
   constructor(e, a, i, n, s) {
-    this.type = 1, this._$AH = g, this._$AN = void 0, this.element = e, this.name = a, this._$AM = n, this.options = s, i.length > 2 || i[0] !== "" || i[1] !== "" ? (this._$AH = Array(i.length - 1).fill(new String()), this.strings = i) : this._$AH = g;
+    this.type = 1, this._$AH = _, this._$AN = void 0, this.element = e, this.name = a, this._$AM = n, this.options = s, i.length > 2 || i[0] !== "" || i[1] !== "" ? (this._$AH = Array(i.length - 1).fill(new String()), this.strings = i) : this._$AH = _;
   }
   _$AI(e, a = this, i, n) {
     const s = this.strings;
     let r = !1;
-    if (s === void 0) e = U(this, e, a, 0), r = !W(e) || e !== this._$AH && e !== O, r && (this._$AH = e);
+    if (s === void 0) e = j(this, e, a, 0), r = !W(e) || e !== this._$AH && e !== O, r && (this._$AH = e);
     else {
       const c = e;
       let o, l;
-      for (e = s[0], o = 0; o < s.length - 1; o++) l = U(this, c[i + o], a, o), l === O && (l = this._$AH[o]), r ||= !W(l) || l !== this._$AH[o], l === g ? e = g : e !== g && (e += (l ?? "") + s[o + 1]), this._$AH[o] = l;
+      for (e = s[0], o = 0; o < s.length - 1; o++) l = j(this, c[i + o], a, o), l === O && (l = this._$AH[o]), r ||= !W(l) || l !== this._$AH[o], l === _ ? e = _ : e !== _ && (e += (l ?? "") + s[o + 1]), this._$AH[o] = l;
     }
     r && !n && this.j(e);
   }
   j(e) {
-    e === g ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
+    e === _ ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
   }
 }
 class Vt extends ie {
@@ -441,7 +441,7 @@ class Vt extends ie {
     super(...arguments), this.type = 3;
   }
   j(e) {
-    this.element[this.name] = e === g ? void 0 : e;
+    this.element[this.name] = e === _ ? void 0 : e;
   }
 }
 class Kt extends ie {
@@ -449,7 +449,7 @@ class Kt extends ie {
     super(...arguments), this.type = 4;
   }
   j(e) {
-    this.element.toggleAttribute(this.name, !!e && e !== g);
+    this.element.toggleAttribute(this.name, !!e && e !== _);
   }
 }
 class Wt extends ie {
@@ -457,8 +457,8 @@ class Wt extends ie {
     super(e, a, i, n, s), this.type = 5;
   }
   _$AI(e, a = this) {
-    if ((e = U(this, e, a, 0) ?? g) === O) return;
-    const i = this._$AH, n = e === g && i !== g || e.capture !== i.capture || e.once !== i.once || e.passive !== i.passive, s = e !== g && (i === g || n);
+    if ((e = j(this, e, a, 0) ?? _) === O) return;
+    const i = this._$AH, n = e === _ && i !== _ || e.capture !== i.capture || e.once !== i.once || e.passive !== i.passive, s = e !== _ && (i === _ || n);
     n && this.element.removeEventListener(this.name, this, i), s && this.element.addEventListener(this.name, this, e), this._$AH = e;
   }
   handleEvent(e) {
@@ -473,7 +473,7 @@ class Yt {
     return this._$AM._$AU;
   }
   _$AI(e) {
-    U(this, e);
+    j(this, e);
   }
 }
 const Xt = fe.litHtmlPolyfillSupport;
@@ -548,7 +548,7 @@ const Qt = {
   idle: "var(--ahc-idle)",
   unknown: "var(--ahc-unknown)",
   unavailable: "var(--ahc-unknown)"
-}, v = {
+}, b = {
   title: "היסטוריית פעילות חכמה",
   auto_discover: !0,
   debug: !1,
@@ -612,7 +612,7 @@ const Qt = {
   "media_player",
   "cover",
   "fan"
-], C = {
+], z = {
   on: "דלוק",
   off: "כבוי",
   cooling: "קירור",
@@ -773,21 +773,21 @@ const ra = [
   "unavailable"
 ]);
 function re(t, e, a = {}) {
-  const i = a.showAll === !0 || e.activity_mode === "all", n = va(e, i), s = e.smart_filter !== !1 && n === "meaningful" && !i, r = e.show_inactive_baselines ?? v.show_inactive_baselines, c = /* @__PURE__ */ new Map(), o = pt(e), l = (_t(e.min_row_active_seconds) ?? v.min_row_active_seconds) * 1e3, d = Pe(e.max_rows_per_group) ?? v.max_rows_per_group, u = Pe(e.max_total_rows) ?? v.max_total_rows;
+  const i = a.showAll === !0 || e.activity_mode === "all", n = ba(e, i), s = e.smart_filter !== !1 && n === "meaningful" && !i, r = e.show_inactive_baselines ?? b.show_inactive_baselines, c = /* @__PURE__ */ new Map(), o = pt(e), l = (_t(e.min_row_active_seconds) ?? b.min_row_active_seconds) * 1e3, d = Pe(e.max_rows_per_group) ?? b.max_rows_per_group, u = Pe(e.max_total_rows) ?? b.max_total_rows;
   let p = 0;
-  const _ = [], f = [];
+  const g = [], f = [];
   for (const w of t) {
     const m = o.has(w.entity.entity_id);
     m && (p += 1);
-    const $ = s ? ha(w, e, l, m) : { row: w };
-    $.reason ? (f.push(w), c.set(w.entity.entity_id, $.reason)) : $.row && _.push($.row);
+    const k = s ? ha(w, e, l, m) : { row: w };
+    k.reason ? (f.push(w), c.set(w.entity.entity_id, k.reason)) : k.row && g.push(k.row);
   }
-  const x = s ? pa(_, f, c, {
+  const x = s ? pa(g, f, c, {
     groupBy: a.groupBy ?? "area",
     manualEntityIds: o,
     maxRowsPerGroup: d,
     maxTotalRows: u
-  }) : { rows: _, hiddenRows: f };
+  }) : { rows: g, hiddenRows: f };
   return {
     rows: x.rows,
     hiddenRows: x.hiddenRows,
@@ -853,7 +853,7 @@ function ha(t, e, a, i) {
   if (!i && !n.visible)
     return { reason: n.reason ?? "technical" };
   const s = da(t, a);
-  return s.length ? { row: ua(t, s) } : i ? { row: t } : (e.hide_empty_rows ?? v.hide_empty_rows) === !1 ? { row: t } : t.segments.length ? {
+  return s.length ? { row: ua(t, s) } : i ? { row: t } : (e.hide_empty_rows ?? b.hide_empty_rows) === !1 ? { row: t } : t.segments.length ? {
     reason: t.segments.some(
       (c) => lt(c) && c.durationMs < a
     ) ? "too_short" : "no_meaningful_activity"
@@ -882,12 +882,12 @@ function pa(t, e, a, i) {
     (u) => !i.manualEntityIds.has(u.entity.entity_id)
   ), r = /* @__PURE__ */ new Map();
   for (const u of oe(s)) {
-    const p = _a(u, i.groupBy), _ = r.get(p) ?? [];
-    if (_.length >= i.maxRowsPerGroup) {
+    const p = _a(u, i.groupBy), g = r.get(p) ?? [];
+    if (g.length >= i.maxRowsPerGroup) {
       e.push(u), a.set(u.entity.entity_id, "max_rows");
       continue;
     }
-    _.push(u), r.set(p, _);
+    g.push(u), r.set(p, g);
   }
   const c = [...r.values()].flat(), o = new Set(
     n.map((u) => u.entity.entity_id)
@@ -974,8 +974,8 @@ function ut(t, e) {
   }
   return t.includes(a);
 }
-function va(t, e) {
-  return e ? "all" : t.activity_mode ?? v.activity_mode;
+function ba(t, e) {
+  return e ? "all" : t.activity_mode ?? b.activity_mode;
 }
 function pt(t) {
   return new Set(
@@ -994,8 +994,8 @@ function Pe(t) {
 function te(t) {
   return t.trim().toLowerCase().replace(/[_./-]+/g, " ").replace(/\s+/g, " ");
 }
-const ba = ["ar", "fa", "he", "iw", "ur"];
-function j(t) {
+const va = ["ar", "fa", "he", "iw", "ur"];
+function U(t) {
   return t.includes(".") ? t.split(".")[0] ?? t : t;
 }
 function ce(t, e = /* @__PURE__ */ new Date()) {
@@ -1010,7 +1010,7 @@ function fa(t, e) {
   if (t === !0 || t === "rtl") return !0;
   if (t === !1 || t === "ltr") return !1;
   const a = (e || document.documentElement.lang || navigator.language || "").toLowerCase();
-  return ba.some(
+  return va.some(
     (i) => a === i || a.startsWith(`${i}-`)
   );
 }
@@ -1019,7 +1019,7 @@ function y(t) {
   const e = Math.round(t / 6e4), a = Math.floor(e / 60), i = e % 60;
   return a && i ? `${a}:${String(i).padStart(2, "0")} שעות` : a ? `${a} שעות` : `${i} דק׳`;
 }
-function b(t) {
+function v(t) {
   return new Intl.DateTimeFormat("he-IL", {
     hour: "2-digit",
     minute: "2-digit"
@@ -1042,19 +1042,19 @@ function gt(t) {
 }
 function L(t) {
   const e = t.flatMap((p) => p.rows), a = e.flatMap(
-    (p) => p.segments.filter((_) => _.active)
+    (p) => p.segments.filter((g) => g.active)
   ), i = a.reduce(
-    (p, _) => p + _.durationMs,
+    (p, g) => p + g.durationMs,
     0
   ), n = e.filter((p) => p.totalActiveMs > 0), s = a.length, r = Date.now(), c = e.filter(
     (p) => p.segments.some(
-      (_) => _.active && _.start.getTime() <= r && _.end.getTime() >= r - 9e4
+      (g) => g.active && g.start.getTime() <= r && g.end.getTime() >= r - 9e4
     )
   ).length, o = [...a].sort(
-    (p, _) => _.start.getTime() - p.start.getTime()
+    (p, g) => g.start.getTime() - p.start.getTime()
   )[0], l = o ? e.find((p) => p.entity.entity_id === o.entity_id) : void 0, d = [...n].sort(
-    (p, _) => _.totalActiveMs - p.totalActiveMs
-  )[0], u = [...t].filter((p) => p.totalActiveMs > 0).sort((p, _) => _.totalActiveMs - p.totalActiveMs)[0];
+    (p, g) => g.totalActiveMs - p.totalActiveMs
+  )[0], u = [...t].filter((p) => p.totalActiveMs > 0).sort((p, g) => g.totalActiveMs - p.totalActiveMs)[0];
   return {
     totalActiveMs: i,
     activeEntityCount: n.length,
@@ -1108,22 +1108,22 @@ function we(t, e) {
     density: wa(r)
   };
 }
-const $a = 0.5;
+const ka = 0.5;
 function mt(t, e) {
   const a = e.start.getTime(), i = e.end.getTime(), n = Math.max(1, i - a), s = Math.max(t.start.getTime(), a), r = Math.min(t.end.getTime(), i), c = Math.min(Math.max(s, a), i), o = Math.min(Math.max(r, a), i), l = Math.max(0, o - c), d = Le((c - a) / n * 100), u = Le(l / n * 100);
   return {
     leftPct: d,
     widthPct: u,
-    minVisible: t.active && l > 0 && u < $a
+    minVisible: t.active && l > 0 && u < ka
   };
 }
 function Le(t) {
   return Number.isFinite(t) ? Math.min(100, Math.max(0, t)) : 0;
 }
-const ka = 6e4;
+const $a = 6e4;
 function Aa(t, e) {
   const a = t.map((r) => {
-    const c = r.rows.filter(ja).sort(
+    const c = r.rows.filter(Ua).sort(
       (o, l) => l.totalActiveMs - o.totalActiveMs || l.eventCount - o.eventCount || o.entity.name.localeCompare(l.entity.name, "he")
     );
     return {
@@ -1153,7 +1153,7 @@ function Ne(t, e, a, i, n = {}) {
     c,
     a,
     n.groupBy
-  ), l = Ra(
+  ), l = Ca(
     t,
     s.groups,
     o,
@@ -1163,14 +1163,14 @@ function Ne(t, e, a, i, n = {}) {
     i?.hiddenRows ?? 0,
     s.hiddenRowCount,
     d - s.visibleRowCount
-  ), p = rt(r, e, a), _ = r.reduce(
-    (m, $) => m + $.totalActiveMs,
+  ), p = rt(r, e, a), g = r.reduce(
+    (m, k) => m + k.totalActiveMs,
     0
   ), f = r.reduce(
-    (m, $) => m + $.eventCount,
+    (m, k) => m + k.eventCount,
     0
   ), x = l.reduce(
-    (m, $) => m + $.inventoryItemCount,
+    (m, k) => m + k.inventoryItemCount,
     0
   ), w = n.selectedAreas?.length === 1 || l.length === 1 && n.groupBy !== "domain";
   return {
@@ -1179,7 +1179,7 @@ function Ne(t, e, a, i, n = {}) {
     visibleRowsCount: s.visibleRowCount,
     hiddenRowsCount: u,
     hiddenReasonSummary: B(i),
-    totalVisibleActiveMs: _,
+    totalVisibleActiveMs: g,
     visibleEventCount: f,
     activeNowCount: r.filter(I).length,
     totalInventoryItemCount: x,
@@ -1189,7 +1189,7 @@ function Ne(t, e, a, i, n = {}) {
     insights: Ia(l, p)
   };
 }
-function Ca(t) {
+function za(t) {
   const e = t.groups.map((a) => ({
     id: a.id,
     title: a.title,
@@ -1223,7 +1223,7 @@ function Ca(t) {
   }));
   return L(e);
 }
-function Ra(t, e, a, i) {
+function Ca(t, e, a, i) {
   const n = new Map(t.map((o) => [o.id, o])), s = new Map(e.map((o) => [o.id, o])), r = new Map(
     a.map((o) => [o.id, o])
   );
@@ -1241,7 +1241,7 @@ function Ra(t, e, a, i) {
   }).filter((o) => o.activityCount > 0 || o.inventoryCount > 0).sort(
     (o, l) => l.totalActiveMs - o.totalActiveMs || l.activityCount - o.activityCount || l.inventoryCount - o.inventoryCount || o.title.localeCompare(l.title, "he")
   ).map((o) => o.id).map(
-    (o) => za(
+    (o) => Ra(
       s.get(o),
       n.get(o),
       r.get(o),
@@ -1249,7 +1249,7 @@ function Ra(t, e, a, i) {
     )
   );
 }
-function za(t, e, a, i) {
+function Ra(t, e, a, i) {
   const n = t ?? e, s = (t?.rows ?? []).map(
     (d) => Ma(d, i)
   ), r = (a?.rows ?? []).map(Ea).sort(Ha), c = s.reduce((d, u) => d + u.eventCount, 0), o = s.filter((d) => d.activeNow).length, l = e?.rows.length ?? s.length;
@@ -1279,12 +1279,12 @@ function za(t, e, a, i) {
 }
 function Ma(t, e) {
   const a = t.segments.map((i, n) => ({ segment: i, sourceIndex: n })).filter((i) => i.segment.active).map(
-    ({ segment: i, sourceIndex: n }) => vt(
+    ({ segment: i, sourceIndex: n }) => bt(
       i,
       e,
-      `${t.entity.name} · ${C[i.category]} · ${b(
+      `${t.entity.name} · ${z[i.category]} · ${v(
         i.start
-      )} עד ${b(i.end)} · ${y(i.durationMs)}`,
+      )} עד ${v(i.end)} · ${y(i.durationMs)}`,
       n
     )
   ).filter(
@@ -1306,7 +1306,7 @@ function Ma(t, e) {
 function Sa(t, e, a = "area") {
   const i = Oa(
     e.area_inventory_domains?.length ? e.area_inventory_domains : e.domains
-  ), n = e.area_inventory_include_inactive ?? v.area_inventory_include_inactive, s = /* @__PURE__ */ new Map();
+  ), n = e.area_inventory_include_inactive ?? b.area_inventory_include_inactive, s = /* @__PURE__ */ new Map();
   for (const r of t) {
     if (i.length && !i.includes(r.entity.domain) || !n && r.totalActiveMs <= 0 && !I(r) || !ct(r.entity, e).visible) continue;
     const o = Da(r.entity, a), l = s.get(o) ?? {
@@ -1349,7 +1349,7 @@ function Ta(t, e, a) {
   const i = t.flatMap((s) => s.segments.filter((r) => r.active)).sort((s, r) => s.start.getTime() - r.start.getTime()), n = [];
   for (const s of i) {
     const r = n.at(-1);
-    if (r && s.start.getTime() <= r.end.getTime() + ka) {
+    if (r && s.start.getTime() <= r.end.getTime() + $a) {
       r.end = new Date(
         Math.max(r.end.getTime(), s.end.getTime())
       ), r.durationMs = Math.max(
@@ -1361,18 +1361,18 @@ function Ta(t, e, a) {
     n.push({ ...s });
   }
   return n.map(
-    (s) => vt(
+    (s) => bt(
       s,
       e,
-      `${a} · פעילות מצטברת · ${b(
+      `${a} · פעילות מצטברת · ${v(
         s.start
-      )} עד ${b(s.end)} · ${y(s.durationMs)}`
+      )} עד ${v(s.end)} · ${y(s.durationMs)}`
     )
   ).filter(
     (s) => !!(s && s.widthPct > 0)
   );
 }
-function vt(t, e, a, i) {
+function bt(t, e, a, i) {
   const n = mt(t, e);
   if (!(n.widthPct <= 0))
     return {
@@ -1415,7 +1415,7 @@ function Ia(t, e) {
       rowCount: r.activityRows.length,
       inventoryCount: r.inventoryItemCount
     } : void 0,
-    peakBucketLabel: c && c.totalActiveMs > 0 ? `${b(c.start)} - ${b(c.end)}` : void 0,
+    peakBucketLabel: c && c.totalActiveMs > 0 ? `${v(c.start)} - ${v(c.end)}` : void 0,
     shortUsePattern: a.length ? `${a.length} רכיבי פעילות · ${t.length} אזורים` : void 0,
     inventoryPattern: i ? `${i} אביזרים במלאי · ${n} פעילים עכשיו` : void 0
   };
@@ -1430,10 +1430,10 @@ function Pa(t, e) {
   return e === "domain" ? pe(t.domain) : e === "none" || e === "entity" ? "כל הרכיבים" : t.area || "ללא אזור";
 }
 function La(t, e) {
-  if (e === "domain") return Ua(t.domain);
+  if (e === "domain") return ja(t.domain);
 }
 function Na(t) {
-  return t.currentCategory ? C[t.currentCategory] : t.currentState ? t.currentState : t.totalActiveMs > 0 ? "היתה פעילות" : "לא פעיל";
+  return t.currentCategory ? z[t.currentCategory] : t.currentState ? t.currentState : t.totalActiveMs > 0 ? "היתה פעילות" : "לא פעיל";
 }
 function Ba(t) {
   return Fa(t) ? "unavailable" : I(t) ? "active" : t.totalActiveMs > 0 ? "had_activity" : "inactive";
@@ -1447,10 +1447,10 @@ function pe(t) {
 function Oa(t) {
   return (t ?? []).map((e) => e.trim()).filter(Boolean).map((e) => e.toLowerCase());
 }
-function Ua(t) {
+function ja(t) {
   return t === "light" ? "mdi:lightbulb-outline" : t === "climate" ? "mdi:thermostat" : t === "media_player" ? "mdi:music" : t === "cover" ? "mdi:window-shutter" : t === "fan" ? "mdi:fan" : "mdi:toggle-switch-outline";
 }
-function ja(t) {
+function Ua(t) {
   return t.segments.some((e) => e.active);
 }
 function I(t) {
@@ -1471,9 +1471,9 @@ function Ga(t, e, a = !1) {
     ["רכיב", t.entity.name],
     ["אזור", t.entity.area ?? "ללא אזור"],
     ["סוג", M[t.entity.domain] ?? t.entity.domain],
-    ["מצב", C[e.category] ?? e.state],
-    ["התחלה", b(e.start)],
-    ["סיום", b(e.end)],
+    ["מצב", z[e.category] ?? e.state],
+    ["התחלה", v(e.start)],
+    ["סיום", v(e.end)],
     ["משך", y(e.durationMs)]
   ];
   return a && i.push(["entity_id", t.entity.entity_id]), i;
@@ -1500,17 +1500,17 @@ function Va(t, e, a) {
   if (a.entities.length) {
     const c = Oe(a.areas, "area_id"), o = Oe(a.devices, "id");
     for (const l of a.entities) {
-      if (l.disabled_by || l.hidden_by || !e.states[l.entity_id] || !bt(l, t, !1)) continue;
-      const d = j(l.entity_id);
+      if (l.disabled_by || l.hidden_by || !e.states[l.entity_id] || !vt(l, t, !1)) continue;
+      const d = U(l.entity_id);
       if (n.has(A(d)) || i.length && !i.includes(d) || !_e(l.entity_id, t)) continue;
       const u = l.device_id ? o.get(l.device_id) : void 0;
       if (u?.disabled_by) continue;
       const p = l.area_id || u?.area_id || void 0;
       if (!p) continue;
-      const _ = c.get(p), f = _?.name ?? p;
+      const g = c.get(p), f = g?.name ?? p;
       if (s.size && !s.has(A(p)) && !s.has(A(f)))
         continue;
-      const x = yt(l.labels, u?.labels, _?.labels);
+      const x = yt(l.labels, u?.labels, g?.labels);
       ft(x, t, a.labels) && r.push({
         entity: l.entity_id,
         area: f,
@@ -1520,9 +1520,9 @@ function Va(t, e, a) {
     return { entities: r, fallbackUsed: !1 };
   }
   for (const [c, o] of Object.entries(e.states)) {
-    const l = j(c);
+    const l = U(c);
     if (n.has(A(l)) || i.length && !i.includes(l) || !_e(c, t)) continue;
-    const d = k(o.attributes.area) ?? k(o.attributes.area_id);
+    const d = $(o.attributes.area) ?? $(o.attributes.area_id);
     d && (s.size && !s.has(A(d)) || r.push({ entity: c, area: d, domain: l }));
   }
   return { entities: r, fallbackUsed: !0 };
@@ -1531,21 +1531,21 @@ function Ka(t, e, a, i) {
   const n = a?.states[t.entity], s = i.entities.find(
     (G) => G.entity_id === t.entity
   ), r = ti(t.entity, e);
-  if (s?.disabled_by || s?.hidden_by || s && !bt(s, e, r))
+  if (s?.disabled_by || s?.hidden_by || s && !vt(s, e, r))
     return;
   const c = s?.device_id ? i.devices.find((G) => G.id === s.device_id) : void 0;
   if (c?.disabled_by) return;
-  const o = t.area ? void 0 : s?.area_id || c?.area_id || void 0, l = t.area ?? Za(o, i) ?? k(n?.attributes?.area) ?? k(n?.attributes?.area_id);
+  const o = t.area ? void 0 : s?.area_id || c?.area_id || void 0, l = t.area ?? Za(o, i) ?? $(n?.attributes?.area) ?? $(n?.attributes?.area_id);
   if (e.areas?.length && (!l || !Qa(l, o, e.areas)))
     return;
-  const d = t.domain ?? j(t.entity);
+  const d = t.domain ?? U(t.entity);
   if (!Wa(t.entity, d, e)) return;
   const u = yt(
     s?.labels,
     c?.labels,
     o ? i.areas.find((G) => G.area_id === o)?.labels : void 0
-  ), p = n ? a?.formatEntityName?.(n) : void 0, _ = n?.attributes?.friendly_name, f = k(t.name), x = k(s?.name) ?? k(s?.original_name), w = k(c?.name_by_user) ?? k(c?.name), m = k(p), $ = k(_), ne = gt(t.entity), St = f ?? ai(
-    m ?? $ ?? x ?? ne,
+  ), p = n ? a?.formatEntityName?.(n) : void 0, g = n?.attributes?.friendly_name, f = $(t.name), x = $(s?.name) ?? $(s?.original_name), w = $(c?.name_by_user) ?? $(c?.name), m = $(p), k = $(g), ne = gt(t.entity), St = f ?? ai(
+    m ?? k ?? x ?? ne,
     w,
     t.entity,
     d
@@ -1556,15 +1556,15 @@ function Ka(t, e, a, i) {
     area: l,
     area_id: o,
     domain: d,
-    icon: t.icon ?? k(n?.attributes?.icon),
+    icon: t.icon ?? $(n?.attributes?.icon),
     labels: u,
-    entity_category: k(s?.entity_category),
-    device_id: k(s?.device_id),
+    entity_category: $(s?.entity_category),
+    device_id: $(s?.device_id),
     device_name: w,
-    device_manufacturer: k(c?.manufacturer),
-    device_model: k(c?.model),
-    hidden_by: k(s?.hidden_by),
-    disabled_by: k(s?.disabled_by),
+    device_manufacturer: $(c?.manufacturer),
+    device_model: $(c?.model),
+    hidden_by: $(s?.hidden_by),
+    disabled_by: $(s?.disabled_by),
     config: t
   };
 }
@@ -1578,7 +1578,7 @@ function _e(t, e) {
   ];
   return !(a.length && !a.some((n) => Fe(n).test(t)) || i.length && i.some((n) => Fe(n).test(t)));
 }
-function bt(t, e, a) {
+function vt(t, e, a) {
   return a ? !0 : t.entity_category === "config" ? e.show_config_entities === !0 : t.entity_category === "diagnostic" ? e.show_diagnostic_entities === !0 : !0;
 }
 function ft(t, e, a) {
@@ -1683,7 +1683,7 @@ function ti(t, e) {
 function A(t) {
   return t.trim().toLowerCase();
 }
-function k(t) {
+function $(t) {
   return typeof t == "string" && t.trim() ? t.trim() : void 0;
 }
 function ai(t, e, a, i) {
@@ -1715,7 +1715,7 @@ function ni(t) {
     "דולק"
   ])).has(A(t));
 }
-function Ue(t, e) {
+function je(t, e) {
   const a = e.search.trim().toLowerCase();
   return t.filter((i) => {
     const { entity: n } = i;
@@ -1736,7 +1736,7 @@ function Ue(t, e) {
     return !0;
   });
 }
-function je(t, e) {
+function Ue(t, e) {
   if (e === "none" || e === "entity")
     return [Ge("all", "כל הרכיבים", t)];
   const a = /* @__PURE__ */ new Map();
@@ -1837,9 +1837,9 @@ function Ke(t, e) {
   let a = e;
   return t.map((i) => {
     if (!i || typeof i != "object") return;
-    const n = i, s = z(n.entity_id) ?? a;
+    const n = i, s = R(n.entity_id) ?? a;
     s && (a = s);
-    const r = z(n.last_changed) ?? z(n.lc) ?? z(n.last_updated) ?? z(n.lu), c = z(n.state) ?? z(n.s);
+    const r = R(n.last_changed) ?? R(n.lc) ?? R(n.last_updated) ?? R(n.lu), c = R(n.state) ?? R(n.s);
     if (!s || !c || !r) return;
     const o = We(n.attributes) ?? We(n.a), l = {
       entity_id: s,
@@ -1847,11 +1847,11 @@ function Ke(t, e) {
       last_changed: r
     };
     o && (l.attributes = o);
-    const d = z(n.last_updated) ?? z(n.lu);
+    const d = R(n.last_updated) ?? R(n.lu);
     return d && (l.last_updated = d), l;
   }).filter((i) => i !== void 0);
 }
-function z(t) {
+function R(t) {
   return typeof t == "string" ? t : void 0;
 }
 function We(t) {
@@ -1902,7 +1902,7 @@ function li(t, e, a, i) {
 function di(t, e, a) {
   if (e === "unknown" || e === "unavailable")
     return { category: "unknown", active: !1 };
-  const i = t.domain || j(t.entity_id), s = t.config?.active_states ?? Qt[i] ?? ["on"], r = t.config?.active_attributes ?? ea[i] ?? {};
+  const i = t.domain || U(t.entity_id), s = t.config?.active_states ?? Qt[i] ?? ["on"], r = t.config?.active_attributes ?? ea[i] ?? {};
   if (i === "climate" && !t.config?.active_states) {
     const o = a?.hvac_action;
     if (typeof o == "string" && o.trim()) {
@@ -1927,19 +1927,19 @@ function hi(t, e, a, i) {
   for (let o = 0; o < t.length; o += 1) {
     const l = t[o];
     if (!l) continue;
-    const d = t[o + 1], u = new Date(l.last_changed).getTime(), p = d ? new Date(d.last_changed).getTime() : r, _ = Math.max(u, s), f = Math.min(p, r);
-    if (f <= _) continue;
+    const d = t[o + 1], u = new Date(l.last_changed).getTime(), p = d ? new Date(d.last_changed).getTime() : r, g = Math.max(u, s), f = Math.min(p, r);
+    if (f <= g) continue;
     const x = di(
       e,
       l.state,
       l.attributes
-    ), w = f - _;
+    ), w = f - g;
     n.push({
       entity_id: e.entity_id,
       state: l.state,
       category: x.category,
       active: x.active,
-      start: new Date(_),
+      start: new Date(g),
       end: new Date(f),
       durationMs: w,
       attributes: l.attributes
@@ -2180,7 +2180,7 @@ function gi(t, e) {
   return a;
 }
 function wt(t) {
-  return t === "large_noisy_home" ? [...ge, ...bi()] : t === "area_inventory" ? mi() : t === "clean_activity_dashboard" ? vi() : ge;
+  return t === "large_noisy_home" ? [...ge, ...vi()] : t === "area_inventory" ? mi() : t === "clean_activity_dashboard" ? bi() : ge;
 }
 function mi() {
   return [
@@ -2224,10 +2224,45 @@ function mi() {
       domain: "cover",
       icon: "mdi:awning",
       pattern: [{ startHour: -7.1, endHour: -7, state: "opening" }]
+    },
+    {
+      entity_id: "light.pool_ambient",
+      name: "תאורת בריכה",
+      area: "בריכה",
+      domain: "light",
+      icon: "mdi:pool",
+      pattern: [
+        { startHour: -20, endHour: -18.5, state: "on" },
+        { startHour: -4.5, endHour: -1.2, state: "on" }
+      ]
+    },
+    {
+      entity_id: "switch.pool_pump",
+      name: "משאבת בריכה",
+      area: "בריכה",
+      domain: "switch",
+      icon: "mdi:pump",
+      pattern: [{ startHour: -8, endHour: -3.5, state: "on" }]
+    },
+    {
+      entity_id: "fan.pool_airflow",
+      name: "מאוורר אזור בריכה",
+      area: "בריכה",
+      domain: "fan",
+      icon: "mdi:fan",
+      pattern: []
+    },
+    {
+      entity_id: "cover.pool_cover",
+      name: "כיסוי בריכה",
+      area: "בריכה",
+      domain: "cover",
+      icon: "mdi:pool",
+      pattern: [{ startHour: -6.2, endHour: -6, state: "closing" }]
     }
   ];
 }
-function vi() {
+function bi() {
   return [
     {
       entity_id: "light.kitchen_counter_clean",
@@ -2298,7 +2333,7 @@ function vi() {
     }
   ];
 }
-function bi() {
+function vi() {
   const t = [
     "Power",
     "Extra dry",
@@ -2358,13 +2393,13 @@ function fi(t, e, a = 320, i = 220) {
 function Je(t, e, a) {
   return a < e ? e : Math.min(a, Math.max(e, t));
 }
-function $t(t) {
+function kt(t) {
   return !Number.isFinite(t) || !t ? 300 : Math.max(30, Math.floor(t));
 }
 function yi(t) {
   if (!t.hasFetchedOnce) return !0;
   if (!t.live) return !1;
-  const e = $t(t.refreshIntervalSeconds) * 1e3;
+  const e = kt(t.refreshIntervalSeconds) * 1e3;
   return t.now - t.lastHistoryFetchAt >= e;
 }
 function xi() {
@@ -2383,7 +2418,7 @@ function wi() {
     </div>
   </div>`;
 }
-function $i() {
+function ki() {
   return h`<div class="ahc-state-card">
     <div>
       <h3 class="ahc-state-card__title">Heatmap</h3>
@@ -2391,10 +2426,15 @@ function $i() {
     </div>
   </div>`;
 }
-function ki(t) {
-  const { model: e, config: a } = t, i = Ii(e.range);
-  return !e.visibleRowsCount && !e.totalInventoryItemCount ? Si() : h`
-    <section class="ahc-dashboard" dir="rtl" aria-label="ציר זמן פעילות">
+function $i(t) {
+  const { model: e, config: a } = t, i = Hi(e.range);
+  return !e.visibleRowsCount && !e.totalInventoryItemCount ? Ei() : h`
+    <section
+      class="ahc-dashboard"
+      dir="rtl"
+      aria-label="ציר זמן פעילות"
+      style=${a.timeline_height ? `--ahc-dashboard-height:${a.timeline_height}` : ""}
+    >
       <header class="ahc-dashboard__header">
         <div class="ahc-dashboard__title-block">
           <h3>ציר זמן פעילות</h3>
@@ -2402,16 +2442,20 @@ function ki(t) {
             ${e.visibleRowsCount} רכיבי פעילות מתוך
             ${e.totalInventoryItemCount || e.totalRowsBeforeCuration}
             אביזרים
-            ${e.hiddenRowsCount ? h` · הוסתרו ${e.hiddenRowsCount} שורות רעש` : g}
+            ${e.hiddenRowsCount ? h` · הוסתרו ${e.hiddenRowsCount} שורות רעש` : _}
           </p>
         </div>
         <div class="ahc-dashboard__range-pill">
-          ${Hi(e.range)}
+          ${Di(e.range)}
         </div>
       </header>
 
-      <section class="ahc-dashboard__overview" aria-label="צפיפות פעילות">
-        ${a.show_activity_density === !1 ? g : Mi(e.densityBuckets)}
+      ${a.show_activity_density === !1 ? _ : Mi(e.densityBuckets)}
+
+      <section
+        class="ahc-dashboard__timeline"
+        aria-label="פעילות לפי אזור ורכיב"
+      >
         <div class="ahc-dashboard__axis" dir="ltr" aria-hidden="true">
           ${i.map(
     (n) => h`<span
@@ -2421,29 +2465,29 @@ function ki(t) {
               >`
   )}
         </div>
-      </section>
-
-      <section class="ahc-dashboard__groups">
-        ${e.groups.map((n) => Ai(n, t))}
+        <div class="ahc-dashboard__scroll">
+          ${e.groups.map((n) => Ai(n, t))}
+        </div>
       </section>
 
       ${e.hiddenRowsCount ? h`<p class="ahc-dashboard__hidden-note">
             התצוגה שומרת על ציר פעילות נקי. רכיבים ללא פעילות עדיין מופיעים
             במלאי האביזרים של האזור.
-          </p>` : g}
+          </p>` : _}
     </section>
   `;
 }
 function Ai(t, e) {
-  const a = e.config.show_area_inventory !== !1 && e.config.area_inventory_mode !== "off", i = e.config.area_inventory_mode === "expanded" || e.model.singleAreaFocused || e.showAllInventory === !0, n = e.collapsedInventoryGroups?.has(t.id) === !0 ? !1 : i || e.expandedInventoryGroups?.has(t.id) === !0;
+  const a = e.config.show_area_inventory !== !1 && e.config.area_inventory_mode !== "off", i = e.config.area_inventory_mode === "expanded" || e.model.singleAreaFocused || e.showAllInventory === !0, n = e.collapsedInventoryGroups?.has(t.id) === !0 ? !1 : i || e.expandedInventoryGroups?.has(t.id) === !0, s = Math.max(0, t.hiddenRowsCount);
   return h`
-    <article
+    <section
       class="ahc-area-card ahc-dashboard-group"
       data-has-activity=${t.activityRows.length ? "true" : "false"}
+      data-inventory-expanded=${n ? "true" : "false"}
     >
       <header class="ahc-area-card__header ahc-dashboard-group__header">
         <div class="ahc-area-card__title ahc-dashboard-group__title">
-          ${$e(t.icon, "mdi:home-outline")}
+          ${ke(t.icon, "mdi:home-outline")}
           <div class="ahc-area-card__title-copy">
             <strong>${t.title}</strong>
             <span>
@@ -2462,8 +2506,8 @@ function Ai(t, e) {
                 aria-expanded=${n ? "true" : "false"}
                 @click=${() => e.onInventoryToggle?.(t.id)}
               >
-                ${n ? "צמצם אביזרים" : "כל האביזרים"}
-              </button>` : g}
+                ${n ? "סגור מלאי" : `אביזרים ${t.inventoryItemCount}`}
+              </button>` : _}
         </div>
       </header>
 
@@ -2473,31 +2517,34 @@ function Ai(t, e) {
         aria-label=${`פעילות מצטברת עבור ${t.title}`}
       >
         ${t.aggregateSegments.map(
-    (s) => kt(s, "aggregate")
+    (r) => $t(r, "aggregate")
   )}
       </div>
 
-      <div class="ahc-area-card__content">
+      <div class="ahc-area-card__content ahc-dashboard-group__body">
         <section class="ahc-area-card__activity" aria-label="פעילות באזור">
           ${t.activityRows.length ? h`<div class="ahc-dashboard-group__rows">
-                ${t.activityRows.map((s) => Ci(s, e))}
+                ${t.activityRows.map((r) => zi(r, e))}
+                ${s > 0 ? h`<p class="ahc-dashboard-group__more">
+                      +${s} פעילויות נוספות
+                    </p>` : _}
               </div>` : h`<div class="ahc-area-card__quiet">
                 אין פעילות משמעותית בטווח הנוכחי
               </div>`}
         </section>
-        ${a && t.inventoryItems.length ? Ri(t, e, n) : g}
+        ${a && t.inventoryItems.length && n ? Ci(t, e, n) : _}
       </div>
-    </article>
+    </section>
   `;
 }
-function Ci(t, e) {
+function zi(t, e) {
   return h`
     <div class="ahc-dashboard-row">
       <div class="ahc-dashboard-row__label" dir="rtl">
-        ${$e(t.icon, At(t.domain))}
+        ${ke(t.icon, At(t.domain))}
         <div>
           <strong title=${t.name}>${t.name}</strong>
-          ${t.secondary ? h`<span title=${t.secondary}>${t.secondary}</span>` : g}
+          ${t.secondary ? h`<span title=${t.secondary}>${t.secondary}</span>` : _}
           <span class="ahc-dashboard-row__inline-meta">
             <strong>${y(t.totalActiveMs)}</strong>
             <span>${t.eventCount} אירועים</span>
@@ -2512,7 +2559,7 @@ function Ci(t, e) {
         aria-label=${`פעילות עבור ${t.name}`}
       >
         ${t.segments.map(
-    (a, i) => kt(
+    (a, i) => $t(
       a,
       "row",
       (n) => e.onSegmentClick?.(
@@ -2531,8 +2578,8 @@ function Ci(t, e) {
     </div>
   `;
 }
-function Ri(t, e, a) {
-  const i = Ti(e.config), n = a ? t.inventoryItems : t.inventoryItems.slice(0, i), s = Math.max(0, t.inventoryItems.length - n.length), r = e.config.area_inventory_group_by_domain === !1 ? [{ title: "", items: n }] : Ei(n);
+function Ci(t, e, a) {
+  const i = Ii(e.config), n = a ? t.inventoryItems : t.inventoryItems.slice(0, i), s = Math.max(0, t.inventoryItems.length - n.length), r = e.config.area_inventory_group_by_domain === !1 ? [{ title: "", items: n }] : Ti(n);
   return h`
     <section
       class="ahc-area-inventory"
@@ -2551,10 +2598,10 @@ function Ri(t, e, a) {
             <div class="ahc-area-inventory__domain">
               ${c.title ? h`<span class="ahc-area-inventory__domain-title"
                     >${c.title}</span
-                  >` : g}
+                  >` : _}
               <div class="ahc-area-inventory__chips">
                 ${c.items.map(
-      (o) => zi(o, e.config, e)
+      (o) => Ri(o, e.config, e)
     )}
               </div>
             </div>
@@ -2567,12 +2614,12 @@ function Ri(t, e, a) {
             @click=${() => e.onInventoryToggle?.(t.id)}
           >
             עוד ${s} אביזרים
-          </button>` : g}
+          </button>` : _}
     </section>
   `;
 }
-function zi(t, e, a) {
-  const i = e.area_inventory_show_state ?? v.area_inventory_show_state, n = e.area_inventory_show_last_activity ?? v.area_inventory_show_last_activity, s = t.stateTone ?? (t.activeNow ? "active" : t.hadActivityInRange ? "had_activity" : "inactive"), r = `${t.name} · ${me(t.domain)}${t.currentStateLabel ? ` · ${t.currentStateLabel}` : ""}`;
+function Ri(t, e, a) {
+  const i = e.area_inventory_show_state ?? b.area_inventory_show_state, n = e.area_inventory_show_last_activity ?? b.area_inventory_show_last_activity, s = t.stateTone ?? (t.activeNow ? "active" : t.hadActivityInRange ? "had_activity" : "inactive"), r = `${t.name} · ${me(t.domain)}${t.currentStateLabel ? ` · ${t.currentStateLabel}` : ""}`;
   return h`
     <button
       class="ahc-inventory-chip"
@@ -2585,19 +2632,19 @@ function zi(t, e, a) {
       aria-label=${r}
       @click=${(c) => a.onInventoryItemClick?.(c, t.entityId)}
     >
-      ${$e(t.icon, At(t.domain))}
+      ${ke(t.icon, At(t.domain))}
       <span class="ahc-inventory-chip__copy">
         <span class="ahc-inventory-chip__status" aria-hidden="true"></span>
         <strong>${t.name}</strong>
         <small>
           ${i && t.currentStateLabel ? t.currentStateLabel : me(t.domain)}
-          ${n && t.hadActivityInRange && t.totalActiveMs ? h` · ${y(t.totalActiveMs)}` : g}
+          ${n && t.hadActivityInRange && t.totalActiveMs ? h` · ${y(t.totalActiveMs)}` : _}
         </small>
       </span>
     </button>
   `;
 }
-function kt(t, e, a) {
+function $t(t, e, a) {
   const i = [
     "ahc-dashboard-segment",
     `ahc-dashboard-segment--${e}`,
@@ -2613,7 +2660,7 @@ function kt(t, e, a) {
       aria-label=${t.label}
       @click=${a}
     >
-      <span>${C[t.category]}</span>
+      <span>${z[t.category]}</span>
     </button>
   ` : h`<span
       class=${i}
@@ -2623,29 +2670,47 @@ function kt(t, e, a) {
     ></span>`;
 }
 function Mi(t) {
+  const e = Si(t);
   return h`
-    <div class="ahc-dashboard__density" dir="ltr">
-      ${t.map((e) => {
-    const a = e.totalActiveMs > 0, i = `${b(e.start)} - ${b(
-      e.end
-    )}: ${y(e.totalActiveMs)} · ${e.activeEntityCount} רכיבים`;
+    <section
+      class="ahc-dashboard__density"
+      dir="ltr"
+      aria-label="צפיפות פעילות"
+    >
+      <div class="ahc-dashboard__density-bars">
+        ${t.map((a) => {
+    const i = a.totalActiveMs > 0, n = `${v(a.start)} - ${v(
+      a.end
+    )}: ${y(a.totalActiveMs)} · ${a.activeEntityCount} רכיבים`;
     return h`
-          <span
-            class="ahc-dashboard-density-bucket"
-            data-active=${a ? "true" : "false"}
-            title=${i}
-          >
-            <i
-              class="ahc-dashboard-density-fill"
-              style=${`--intensity:${e.intensity}`}
-            ></i>
-          </span>
-        `;
+            <span
+              class="ahc-dashboard-density-bucket"
+              data-active=${i ? "true" : "false"}
+              title=${n}
+            >
+              <i
+                class="ahc-dashboard-density-fill"
+                style=${`--intensity:${a.intensity}`}
+              ></i>
+            </span>
+          `;
   })}
-    </div>
+      </div>
+      <div class="ahc-dashboard__density-labels" aria-hidden="true">
+        ${e.map((a) => h`<span>${a}</span>`)}
+      </div>
+    </section>
   `;
 }
-function Si() {
+function Si(t) {
+  if (!t.length) return [];
+  const e = Math.min(6, Math.max(4, Math.ceil(t.length / 6))), a = t.length - 1;
+  return Array.from({ length: e }, (i, n) => {
+    const s = t[Math.round(n / (e - 1) * a)];
+    return s ? v(s.start) : "";
+  }).filter(Boolean);
+}
+function Ei() {
   return h`
     <section class="ahc-dashboard ahc-dashboard-empty" dir="rtl">
       <h3>לא נמצאה פעילות משמעותית בטווח הזה</h3>
@@ -2655,12 +2720,12 @@ function Si() {
     </section>
   `;
 }
-function $e(t, e) {
+function ke(t, e) {
   return h`<span class="ahc-dashboard-icon" aria-hidden="true"
     ><ha-icon icon=${t ?? e}></ha-icon
   ></span>`;
 }
-function Ei(t) {
+function Ti(t) {
   const e = /* @__PURE__ */ new Map();
   for (const a of t) {
     const i = me(a.domain);
@@ -2671,9 +2736,9 @@ function Ei(t) {
     items: i
   }));
 }
-function Ti(t) {
+function Ii(t) {
   const e = t.area_inventory_max_items;
-  return typeof e == "number" && Number.isFinite(e) ? Math.max(1, Math.floor(e)) : v.area_inventory_max_items;
+  return typeof e == "number" && Number.isFinite(e) ? Math.max(1, Math.floor(e)) : b.area_inventory_max_items;
 }
 function me(t) {
   return M[t] ?? t;
@@ -2681,25 +2746,25 @@ function me(t) {
 function At(t) {
   return t === "light" ? "mdi:lightbulb-outline" : t === "climate" ? "mdi:thermostat" : t === "media_player" ? "mdi:music" : t === "cover" ? "mdi:window-shutter" : t === "fan" ? "mdi:fan" : "mdi:toggle-switch-outline";
 }
-function Ii(t) {
+function Hi(t) {
   const e = Math.max(
     1,
     (t.end.getTime() - t.start.getTime()) / 36e5
   ), a = e <= 24 ? 3 : e <= 72 ? 6 : 24, i = [], n = new Date(t.start);
   for (n.setMinutes(0, 0, 0); n < t.end; )
     n >= t.start && i.push({
-      label: b(n),
+      label: v(n),
       percent: F(n, t)
     }), n.setHours(n.getHours() + a);
-  return i.push({ label: b(t.end), percent: 100 }), i;
+  return i.push({ label: v(t.end), percent: 100 }), i;
 }
-function Hi(t) {
+function Di(t) {
   const e = Math.round(
     (t.end.getTime() - t.start.getTime()) / 36e5
   );
   return e >= 24 * 7 ? "7 ימים" : e >= 24 ? `${Math.round(e / 24)} ימים` : `${e} שעות`;
 }
-const Ct = {
+const zt = {
   light: "mdi:lightbulb",
   switch: "mdi:toggle-switch",
   climate: "mdi:air-conditioner",
@@ -2710,7 +2775,7 @@ const Ct = {
   vacuum: "mdi:robot-vacuum",
   lock: "mdi:lock",
   binary_sensor: "mdi:motion-sensor"
-}, Di = [
+}, Pi = [
   [/סלון|living/i, "mdi:sofa"],
   [/מטבח|kitchen/i, "mdi:countertop"],
   [/שינה|הורים|bed/i, "mdi:bed"],
@@ -2718,31 +2783,31 @@ const Ct = {
   [/מרפסת|גינה|garden|balcony/i, "mdi:flower"],
   [/כניסה|entry|door/i, "mdi:door"]
 ];
-function Pi(t) {
-  if (t.icon?.startsWith("mdi:") || t.icon && !t.icon.includes(":")) return t.icon;
-  const e = t.domain || j(t.entity_id);
-  return Ct[e] ?? "mdi:circle-medium";
-}
 function Li(t) {
   if (t.icon?.startsWith("mdi:") || t.icon && !t.icon.includes(":")) return t.icon;
-  const e = Ct[t.id];
-  return e || (Di.find(([i]) => i.test(t.title))?.[1] ?? "mdi:home-outline");
-}
-function Rt(t, e) {
-  return t.startsWith("mdi:") ? h`<ha-icon class=${e} icon=${t}></ha-icon>` : h`<span class=${e} aria-hidden="true">${t}</span>`;
-}
-function zt(t, e = "ahc-entity-icon") {
-  return Rt(Pi(t), e);
-}
-function Mt(t, e = "ahc-group-icon") {
-  return Rt(Li(t), e);
+  const e = t.domain || U(t.entity_id);
+  return zt[e] ?? "mdi:circle-medium";
 }
 function Ni(t) {
-  const e = Bi(
+  if (t.icon?.startsWith("mdi:") || t.icon && !t.icon.includes(":")) return t.icon;
+  const e = zt[t.id];
+  return e || (Pi.find(([i]) => i.test(t.title))?.[1] ?? "mdi:home-outline");
+}
+function Ct(t, e) {
+  return t.startsWith("mdi:") ? h`<ha-icon class=${e} icon=${t}></ha-icon>` : h`<span class=${e} aria-hidden="true">${t}</span>`;
+}
+function Rt(t, e = "ahc-entity-icon") {
+  return Ct(Li(t), e);
+}
+function Mt(t, e = "ahc-group-icon") {
+  return Ct(Ni(t), e);
+}
+function Bi(t) {
+  const e = Fi(
     t.groups,
     t.range,
     t.config
-  ), a = qi(t.range), i = B(t.curation), n = Vi(t.range);
+  ), a = Vi(t.range), i = B(t.curation), n = Ki(t.range);
   return e.visibleRowCount ? h`
     <section class="ahc-activity" aria-label="ציר זמן פעילות">
       <header class="ahc-activity__header">
@@ -2770,7 +2835,7 @@ function Ni(t) {
 
       <div class="ahc-activity__groups">
         ${e.groups.map(
-    (s) => Fi(s, t.range, t)
+    (s) => Oi(s, t.range, t)
   )}
       </div>
 
@@ -2779,11 +2844,11 @@ function Ni(t) {
             הכל” למצב legacy/debug.
           </p>` : null}
     </section>
-  ` : ji();
+  ` : Gi();
 }
-function Bi(t, e, a) {
+function Fi(t, e, a) {
   const i = t.map((c) => {
-    const o = c.rows.filter(Gi), l = o.reduce(
+    const o = c.rows.filter(qi), l = o.reduce(
       (d, u) => d + u.totalActiveMs,
       0
     );
@@ -2807,7 +2872,7 @@ function Bi(t, e, a) {
     hiddenRowCount: Math.max(0, n.totalRowCount - r.length)
   };
 }
-function Fi(t, e, a) {
+function Oi(t, e, a) {
   return h`
     <article class="ahc-activity-group" aria-label=${t.title}>
       <header class="ahc-activity-group__header">
@@ -2819,16 +2884,16 @@ function Fi(t, e, a) {
         </span>
       </header>
       <div class="ahc-activity-group__rows">
-        ${t.rows.map((i) => Oi(i, e, a))}
+        ${t.rows.map((i) => ji(i, e, a))}
       </div>
     </article>
   `;
 }
-function Oi(t, e, a) {
+function ji(t, e, a) {
   return h`
     <div class="ahc-activity-row">
       <div class="ahc-activity-row__label" dir="rtl">
-        ${zt(t.entity)}
+        ${Rt(t.entity)}
         <span class="ahc-activity-row__name" title=${t.entity.name}>
           ${t.entity.name}
         </span>
@@ -2843,7 +2908,7 @@ function Oi(t, e, a) {
     if (!i.active) return null;
     const s = mt(i, e);
     if (s.widthPct <= 0) return null;
-    const r = `${t.entity.name}, ${C[i.category]}, ${b(i.start)} עד ${b(i.end)}, ${y(
+    const r = `${t.entity.name}, ${z[i.category]}, ${v(i.start)} עד ${v(i.end)}, ${y(
       i.durationMs
     )}`;
     return h`
@@ -2856,7 +2921,7 @@ function Oi(t, e, a) {
               aria-label=${r}
               @click=${(c) => a.onSegmentClick?.(c, t.entity.entity_id, n)}
             >
-              <span>${C[i.category]}</span>
+              <span>${z[i.category]}</span>
             </button>
           `;
   })}
@@ -2876,7 +2941,7 @@ function Ui(t) {
           <span
             class="ahc-activity__density-bar"
             style=${`--intensity:${e.intensity}`}
-            title=${`${b(e.start)} - ${b(
+            title=${`${v(e.start)} - ${v(
       e.end
     )}: ${y(e.totalActiveMs)}`}
           ></span>
@@ -2885,7 +2950,7 @@ function Ui(t) {
     </div>
   `;
 }
-function ji() {
+function Gi() {
   return h`
     <section class="ahc-activity ahc-activity-empty">
       <h3>לא נמצאה פעילות משמעותית בטווח הזה</h3>
@@ -2893,32 +2958,32 @@ function ji() {
     </section>
   `;
 }
-function Gi(t) {
+function qi(t) {
   return t.segments.some((e) => e.active);
 }
-function qi(t) {
+function Vi(t) {
   const e = Math.max(
     1,
     (t.end.getTime() - t.start.getTime()) / 36e5
   ), a = e <= 24 ? 3 : e <= 72 ? 6 : 24, i = [], n = new Date(t.start);
   for (n.setMinutes(0, 0, 0); n < t.end; )
     n >= t.start && i.push({
-      label: b(n),
+      label: v(n),
       percent: F(n, t)
     }), n.setHours(n.getHours() + a);
-  return i.push({ label: b(t.end), percent: 100 }), i;
+  return i.push({ label: v(t.end), percent: 100 }), i;
 }
-function Vi(t) {
+function Ki(t) {
   const e = Math.round(
     (t.end.getTime() - t.start.getTime()) / 36e5
   );
   return e >= 24 * 7 ? "7 ימים" : e >= 24 ? `${Math.round(e / 24)} ימים` : `${e} שעות`;
 }
-function Ki(t) {
+function Wi(t) {
   const e = we(
     t.groups,
     t.config.max_visible_rows
-  ), a = Ji(t.range), i = B(t.curation), n = /* @__PURE__ */ new Date(), s = F(n, t.range), r = t.config.show_inactive_baselines === !0, c = t.config.show_now_line !== !1 && n.getTime() >= t.range.start.getTime() && n.getTime() <= t.range.end.getTime() + 9e4;
+  ), a = Zi(t.range), i = B(t.curation), n = /* @__PURE__ */ new Date(), s = F(n, t.range), r = t.config.show_inactive_baselines === !0, c = t.config.show_now_line !== !1 && n.getTime() >= t.range.start.getTime() && n.getTime() <= t.range.end.getTime() + 9e4;
   return h`
     <section
       class=${`ahc-timeline-card ahc-timeline-card--${e.density}${r ? " ahc-timeline-card--baselines" : ""}`}
@@ -2928,7 +2993,7 @@ function Ki(t) {
       <div class="ahc-timeline-toolbar">
         <h3 class="ahc-timeline-title">ציר זמן פעילות</h3>
         <span class="ahc__metric-subtitle">
-          ${b(t.range.start)} – ${b(t.range.end)}
+          ${v(t.range.start)} – ${v(t.range.end)}
           ${e.hiddenRowCount ? ` · מציג ${e.visibleRowCount} מתוך ${e.totalRowCount}` : ""}
         </span>
         ${i ? h`<span class="ahc-curation-note">${i}</span>` : null}
@@ -2949,7 +3014,7 @@ function Ki(t) {
           </div>
           <div class="ahc-timeline__groups">
             ${e.groups.map((o) => {
-    const l = Wi(
+    const l = Yi(
       o,
       t.config
     );
@@ -2989,25 +3054,25 @@ function Ki(t) {
                                   y2="16"
                                 ></line>` : null}
                             ${d.segments.map((u, p) => {
-        const _ = F(
+        const g = F(
           u.start,
           t.range
         ), f = F(
           u.end,
           t.range
-        ), x = Math.max(0.65, f - _);
-        if (!Yi(
+        ), x = Math.max(0.65, f - g);
+        if (!Xi(
           u,
           t.config
         ))
           return null;
-        const w = `${d.entity.name}, ${C[u.category]}, ${b(u.start)} עד ${b(u.end)}, ${y(u.durationMs)}`;
+        const w = `${d.entity.name}, ${z[u.category]}, ${v(u.start)} עד ${v(u.end)}, ${y(u.durationMs)}`;
         return h`
                                 <rect
                                   class=${u.active ? "ahc-segment-svg" : "ahc-segment-svg ahc-segment-svg--inactive"}
                                   data-category=${u.category}
                                   data-active=${u.active ? "true" : "false"}
-                                  x=${_}
+                                  x=${g}
                                   y=${u.active ? "12" : "15"}
                                   width=${x}
                                   height=${u.active ? "8" : "2"}
@@ -3035,7 +3100,7 @@ function Ki(t) {
                           </svg>
                         </div>
                         <div class="ahc-row__label" dir="rtl">
-                          ${zt(d.entity)}
+                          ${Rt(d.entity)}
                           <span
                             class="ahc-row__name"
                             title=${t.config.debug ? d.entity.entity_id : d.entity.name}
@@ -3044,7 +3109,7 @@ function Ki(t) {
                           ${d.currentCategory ? h`<span
                                 class="ahc-row__state-chip"
                                 data-state=${d.currentCategory}
-                                >${C[d.currentCategory]}</span
+                                >${z[d.currentCategory]}</span
                               >` : null}
                         </div>
                       </div>
@@ -3062,18 +3127,18 @@ function Ki(t) {
               </div>` : null}
         </div>
       </div>
-      ${t.config.show_legend === !1 ? null : Xi()}
+      ${t.config.show_legend === !1 ? null : Ji()}
     </section>
   `;
 }
-function Wi(t, e) {
+function Yi(t, e) {
   const a = new Set(e.default_collapsed_groups ?? []);
   return a.has(t.id) || a.has(t.title) ? !0 : !!(e.collapse_groups && t.totalActiveMs <= 0);
 }
-function Yi(t, e) {
+function Xi(t, e) {
   return t.active || e.show_inactive_baselines === !0;
 }
-function Xi() {
+function Ji() {
   return h`<div class="ahc-legend" aria-label="מקרא">
     ${[
     ["on", "var(--ahc-on)"],
@@ -3087,24 +3152,24 @@ function Xi() {
   ].map(
     ([e, a]) => h`<span class="ahc-legend__item"
           ><span class="ahc-legend__swatch" style="--swatch:${a}"></span
-          >${C[e]}</span
+          >${z[e]}</span
         >`
   )}
   </div>`;
 }
-function Ji(t) {
+function Zi(t) {
   const e = Math.max(
     1,
     (t.end.getTime() - t.start.getTime()) / 36e5
   ), a = e <= 24 ? 3 : e <= 72 ? 6 : 24, i = [], n = new Date(t.start);
   for (n.setMinutes(0, 0, 0); n < t.end; )
     n >= t.start && i.push({
-      label: b(n),
+      label: v(n),
       percent: F(n, t)
     }), n.setHours(n.getHours() + a);
-  return i.push({ label: b(t.end), percent: 100 }), i;
+  return i.push({ label: v(t.end), percent: 100 }), i;
 }
-const Zi = et`
+const Qi = et`
   /*
   Activity History Card design baseline
   Target: Home Assistant Lovelace custom card, RTL-first, mobile-first capable.
@@ -3201,10 +3266,11 @@ const Zi = et`
     --ahc-activity-segment-height: 9px;
     --ahc-activity-segment-min-width: 4px;
     --ahc-activity-group-gap: 12px;
-    --ahc-dashboard-row-height: 36px;
+    --ahc-dashboard-row-height: 34px;
     --ahc-dashboard-label-width: 230px;
-    --ahc-dashboard-segment-height: 12px;
+    --ahc-dashboard-segment-height: 10px;
     --ahc-dashboard-segment-min-width: 5px;
+    --ahc-dashboard-group-header-height: 42px;
     --ahc-dashboard-group-gap: 10px;
     --ahc-insights-width: 340px;
 
@@ -3291,6 +3357,48 @@ const Zi = et`
       max(var(--ahc-gap-lg), env(safe-area-inset-bottom))
       max(var(--ahc-gap-lg), env(safe-area-inset-left));
     background: linear-gradient(145deg, #020617, #0f172a 45%, #0b1221);
+  }
+
+  .ahc--panel,
+  .ahc--fullscreen {
+    grid-template-rows:
+      minmax(72px, max-content)
+      minmax(0, 58px)
+      minmax(0, 88px)
+      minmax(0, 1fr);
+    block-size: min(100svh, 980px);
+    min-block-size: min(100svh, 760px);
+  }
+
+  .ahc__hero,
+  .ahc__toolbar,
+  .ahc__summary-strip,
+  .ahc__body,
+  .ahc__main {
+    min-inline-size: 0;
+  }
+
+  .ahc__hero {
+    max-block-size: 96px;
+    overflow: hidden;
+  }
+
+  .ahc__hero-actions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--ahc-gap-sm);
+    min-inline-size: min(420px, 100%);
+  }
+
+  .ahc__toolbar {
+    max-block-size: 58px;
+  }
+
+  .ahc__summary-strip {
+    max-block-size: 88px;
   }
 
   /* Top bar */
@@ -3384,7 +3492,7 @@ const Zi = et`
     font-weight: 850;
   }
 
-  .ahc__toolbar {
+  .ahc__hero-actions {
     display: flex;
     flex: 0 0 auto;
     flex-wrap: nowrap;
@@ -3703,12 +3811,11 @@ const Zi = et`
   /* Layout body */
   .ahc__body {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(
-        320px,
-        var(--ahc-insights-width)
-      );
+    grid-template-columns: minmax(0, 1fr) var(--ahc-insights-width);
     gap: var(--ahc-gap-md);
-    align-items: start;
+    align-items: stretch;
+    direction: ltr;
+    min-block-size: 0;
     max-inline-size: 1920px;
   }
 
@@ -3719,6 +3826,7 @@ const Zi = et`
   .ahc__main,
   .ahc__timeline-panel {
     min-inline-size: 0;
+    min-block-size: 0;
     display: grid;
     gap: var(--ahc-gap-md);
   }
@@ -6290,6 +6398,585 @@ const Zi = et`
     }
   }
 
+  /* Mockup 05 compact dashboard shell */
+  .ahc__hero {
+    min-block-size: 72px;
+    max-block-size: 96px;
+  }
+
+  .ahc__hero.ahc__topbar {
+    align-items: center;
+    padding-block: 10px;
+    padding-inline: 14px;
+  }
+
+  .ahc__hero .ahc__title-block {
+    justify-items: start;
+  }
+
+  .ahc__hero-actions {
+    justify-content: flex-start;
+    min-inline-size: 0;
+  }
+
+  .ahc__hero-actions .ahc__button {
+    min-block-size: 38px;
+    padding-inline: 12px;
+  }
+
+  .ahc__toolbar.ahc__filters {
+    display: flex;
+    align-items: center;
+    max-block-size: 58px;
+    min-block-size: 58px;
+    padding: 8px 10px;
+  }
+
+  .ahc__toolbar .ahc__filter-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+  }
+
+  .ahc__toolbar .ahc__filter-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ahc__toolbar .ahc__filter-row > * {
+    flex: 0 0 auto;
+  }
+
+  .ahc__toolbar .ahc__search {
+    inline-size: min(320px, 25vw);
+  }
+
+  .ahc__toolbar .ahc-curation-note {
+    max-inline-size: min(320px, 24vw);
+  }
+
+  .ahc__toolbar .ahc__chip,
+  .ahc__toolbar .ahc__button,
+  .ahc__toolbar .ahc__segmented-button {
+    min-block-size: 40px;
+  }
+
+  .ahc__summary-strip {
+    min-block-size: 82px;
+    max-block-size: 88px;
+  }
+
+  .ahc__summary-strip .ahc__metric {
+    min-block-size: 82px;
+    padding-block: 10px;
+    padding-inline: 14px;
+  }
+
+  .ahc--panel .ahc__body,
+  .ahc--fullscreen .ahc__body {
+    min-block-size: 0;
+    block-size: 100%;
+  }
+
+  .ahc__main {
+    block-size: 100%;
+    direction: rtl;
+    overflow: hidden;
+  }
+
+  .ahc[dir="rtl"] .ahc__main {
+    grid-column: 1;
+  }
+
+  .ahc[dir="rtl"] .ahc__insights-panel {
+    grid-column: 2;
+  }
+
+  .ahc[dir="ltr"] .ahc__main {
+    grid-column: 1;
+  }
+
+  .ahc[dir="ltr"] .ahc__insights-panel {
+    grid-column: 2;
+  }
+
+  .ahc .ahc__body--no-insights .ahc__main {
+    grid-column: 1;
+  }
+
+  .ahc__insights-panel {
+    align-self: stretch;
+    direction: rtl;
+    max-inline-size: var(--ahc-insights-width);
+    min-block-size: 0;
+    overflow: hidden;
+  }
+
+  .ahc__insights-panel > .ahc__insights {
+    block-size: 100%;
+    max-block-size: 100%;
+    overflow: auto;
+  }
+
+  .ahc__insights-panel .ahc__insight-card {
+    min-block-size: 112px;
+  }
+
+  .ahc-dashboard {
+    grid-template-rows: auto auto minmax(0, 1fr);
+    block-size: var(--ahc-dashboard-height, 100%);
+    min-block-size: min(520px, 62svh);
+    max-block-size: 100%;
+    padding: 0;
+    gap: 0;
+    background:
+      linear-gradient(180deg, rgba(30, 41, 59, 0.44), rgba(2, 6, 23, 0.28)),
+      rgba(15, 23, 42, 0.5);
+  }
+
+  .ahc-dashboard__header {
+    min-block-size: 48px;
+    padding-block: 8px;
+    padding-inline: 14px;
+    border-block-end: 1px solid rgba(148, 163, 184, 0.14);
+  }
+
+  .ahc-dashboard__title-block h3 {
+    font-size: 0.98rem;
+  }
+
+  .ahc-dashboard__range-pill {
+    min-block-size: 32px;
+    border-radius: 8px;
+  }
+
+  .ahc-dashboard__density {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) 12px;
+    gap: 2px;
+    block-size: 42px;
+    min-block-size: 42px;
+    padding-block: 5px 3px;
+    padding-inline: 14px calc(var(--ahc-dashboard-label-width) + 14px);
+    border: 0;
+    border-block-end: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: 0;
+    background: rgba(2, 6, 23, 0.18);
+  }
+
+  .ahc-dashboard__density-bars {
+    direction: ltr;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(5px, 1fr));
+    align-items: end;
+    gap: 4px;
+    min-block-size: 0;
+  }
+
+  .ahc-dashboard-density-bucket {
+    display: flex;
+    align-items: end;
+    block-size: 24px;
+    min-inline-size: 0;
+    border-radius: 5px;
+    background: rgba(148, 163, 184, 0.026);
+  }
+
+  .ahc-dashboard-density-fill {
+    inline-size: 100%;
+    max-block-size: 22px;
+    border-radius: 6px 6px 2px 2px;
+    background: linear-gradient(180deg, #93c5fd 0%, #38bdf8 48%, #22c55e 100%);
+    opacity: 0.18;
+  }
+
+  .ahc-dashboard-density-bucket[data-active="true"]
+    .ahc-dashboard-density-fill {
+    block-size: max(4px, calc(var(--intensity, 0) * 22px));
+    opacity: max(0.44, calc(var(--intensity, 0) * 0.98));
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.18);
+  }
+
+  .ahc-dashboard__density-labels {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    color: color-mix(in srgb, var(--ahc-muted) 78%, transparent 22%);
+    font-size: 0.68rem;
+    line-height: 1;
+  }
+
+  .ahc-dashboard__timeline {
+    min-inline-size: 0;
+    min-block-size: 0;
+    display: grid;
+    grid-template-rows: 31px minmax(0, 1fr);
+    overflow: hidden;
+  }
+
+  .ahc-dashboard__axis {
+    margin-inline-start: 0;
+    margin-inline-end: calc(var(--ahc-dashboard-label-width) + 12px);
+    min-block-size: 31px;
+    border-block-end: 1px solid rgba(148, 163, 184, 0.12);
+    background: rgba(15, 23, 42, 0.5);
+  }
+
+  .ahc-dashboard__tick {
+    min-inline-size: 48px;
+    font-size: 0.72rem;
+  }
+
+  .ahc-dashboard__scroll {
+    min-inline-size: 0;
+    min-block-size: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-color: rgba(56, 189, 248, 0.48) rgba(15, 23, 42, 0.24);
+  }
+
+  .ahc-dashboard__groups {
+    display: contents;
+  }
+
+  .ahc-dashboard-group,
+  .ahc-area-card {
+    display: grid;
+    gap: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  .ahc-dashboard-group + .ahc-dashboard-group {
+    border-block-start: 1px solid rgba(148, 163, 184, 0.14);
+  }
+
+  .ahc-dashboard-group__header,
+  .ahc-area-card__header {
+    min-block-size: var(--ahc-dashboard-group-header-height);
+    padding-block: 0;
+    padding-inline: 14px;
+    background: linear-gradient(
+      90deg,
+      rgba(15, 23, 42, 0.84),
+      rgba(30, 41, 59, 0.46)
+    );
+  }
+
+  .ahc-dashboard-group__title,
+  .ahc-area-card__title {
+    min-inline-size: 0;
+  }
+
+  .ahc-area-card__title-copy strong {
+    font-size: 0.94rem;
+  }
+
+  .ahc-area-card__title-copy span {
+    font-size: 0.74rem;
+  }
+
+  .ahc-area-card__meta {
+    min-inline-size: max-content;
+    font-size: 0.72rem;
+  }
+
+  .ahc-area-card__inventory-button,
+  .ahc-area-inventory__more {
+    min-block-size: 32px;
+    border-radius: 8px;
+  }
+
+  .ahc-dashboard-group__aggregate,
+  .ahc-area-card__aggregate {
+    min-block-size: 18px;
+    margin-inline: 14px calc(var(--ahc-dashboard-label-width) + 12px);
+    border-radius: 0;
+    background-image: linear-gradient(
+      to right,
+      rgba(148, 163, 184, 0.055) 1px,
+      transparent 1px
+    );
+    background-color: transparent;
+    background-size: calc(100% / 8) 100%;
+  }
+
+  .ahc-dashboard-group__body,
+  .ahc-area-card__content {
+    display: grid;
+    gap: 0;
+    min-inline-size: 0;
+  }
+
+  .ahc-dashboard-group__rows {
+    display: grid;
+    gap: 0;
+  }
+
+  .ahc-dashboard-row {
+    direction: ltr;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--ahc-dashboard-label-width);
+    gap: 12px;
+    min-block-size: var(--ahc-dashboard-row-height);
+    padding-block: 0;
+    padding-inline: 14px;
+    border-radius: 0;
+    border-block-start: 1px solid rgba(148, 163, 184, 0.07);
+  }
+
+  .ahc-dashboard-row__plot {
+    grid-column: 1;
+    direction: ltr;
+    min-block-size: var(--ahc-dashboard-row-height);
+    border-radius: 0;
+    background-image: linear-gradient(
+      to right,
+      rgba(148, 163, 184, 0.055) 1px,
+      transparent 1px
+    );
+    background-color: transparent;
+    background-size: calc(100% / 8) 100%;
+  }
+
+  .ahc-dashboard-row__plot::before {
+    display: none;
+  }
+
+  .ahc-dashboard-row__label {
+    grid-column: 2;
+    direction: rtl;
+    align-self: stretch;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+    padding-inline: 0;
+    min-inline-size: 0;
+    border-inline-start: 1px solid rgba(148, 163, 184, 0.1);
+  }
+
+  .ahc-dashboard-row__label strong,
+  .ahc-dashboard-row__label span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ahc-dashboard-row__label strong {
+    font-size: 0.82rem;
+  }
+
+  .ahc-dashboard-row__inline-meta,
+  .ahc-dashboard-row__meta {
+    display: none;
+  }
+
+  .ahc-dashboard-segment {
+    block-size: var(--ahc-dashboard-segment-height);
+    min-inline-size: 0;
+    border: 0;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      0 4px 14px rgba(0, 0, 0, 0.2);
+  }
+
+  .ahc-dashboard-segment--min {
+    min-inline-size: var(--ahc-dashboard-segment-min-width);
+  }
+
+  .ahc-dashboard-segment--aggregate {
+    block-size: 8px;
+    opacity: 0.64;
+  }
+
+  .ahc-dashboard-group__more {
+    margin: 0;
+    padding-block: 5px 8px;
+    padding-inline: 14px calc(var(--ahc-dashboard-label-width) + 26px);
+    color: var(--ahc-muted);
+    font-size: 0.74rem;
+  }
+
+  .ahc-area-card__quiet {
+    min-block-size: 42px;
+    margin-inline: 14px;
+    border-radius: 8px;
+  }
+
+  .ahc-area-inventory {
+    max-block-size: 120px;
+    overflow: auto;
+    margin: 8px 14px 12px;
+    padding: 8px;
+    border-radius: 8px;
+    background: rgba(2, 6, 23, 0.28);
+  }
+
+  .ahc-area-inventory__header {
+    min-block-size: 22px;
+    font-size: 0.76rem;
+  }
+
+  .ahc-area-inventory__groups {
+    gap: 6px;
+  }
+
+  .ahc-area-inventory__chips {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 6px;
+  }
+
+  .ahc-inventory-chip {
+    min-block-size: 40px;
+    padding-block: 5px;
+    padding-inline: 7px;
+    border-radius: 8px;
+  }
+
+  .ahc-inventory-chip .ahc-dashboard-icon {
+    inline-size: 24px;
+    block-size: 24px;
+  }
+
+  .ahc-inventory-chip__copy strong {
+    font-size: 0.76rem;
+  }
+
+  .ahc-inventory-chip__copy small {
+    font-size: 0.68rem;
+  }
+
+  @media (max-width: 1100px) {
+    .ahc__insights-panel {
+      display: none;
+    }
+  }
+
+  @media (max-width: 760px) {
+    :host {
+      --ahc-dashboard-label-width: 156px;
+      --ahc-dashboard-row-height: 36px;
+    }
+
+    .ahc,
+    .ahc--panel,
+    .ahc--fullscreen {
+      grid-template-rows: auto auto auto minmax(0, 1fr);
+      block-size: auto;
+      min-block-size: 100svh;
+    }
+
+    .ahc__hero {
+      max-block-size: none;
+    }
+
+    .ahc__hero.ahc__topbar {
+      align-items: stretch;
+      gap: 10px;
+    }
+
+    .ahc__hero-actions {
+      justify-content: center;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+    }
+
+    .ahc__toolbar.ahc__filters {
+      max-block-size: none;
+      min-block-size: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
+
+    .ahc__toolbar .ahc__search {
+      inline-size: min(86vw, 420px);
+    }
+
+    .ahc__summary-strip {
+      display: flex;
+      max-block-size: none;
+    }
+
+    .ahc__body {
+      min-block-size: 0;
+    }
+
+    .ahc__main {
+      overflow: visible;
+    }
+
+    .ahc-dashboard {
+      min-block-size: 560px;
+      block-size: auto;
+    }
+
+    .ahc-dashboard__density {
+      padding-inline: 10px calc(var(--ahc-dashboard-label-width) + 10px);
+    }
+
+    .ahc-dashboard__axis {
+      margin-inline-end: calc(var(--ahc-dashboard-label-width) + 10px);
+    }
+
+    .ahc-dashboard__scroll {
+      max-block-size: min(66svh, 720px);
+    }
+
+    .ahc-dashboard-row {
+      grid-template-columns: minmax(360px, 1fr) var(--ahc-dashboard-label-width);
+      min-inline-size: calc(360px + var(--ahc-dashboard-label-width) + 32px);
+      padding-inline: 10px;
+    }
+
+    .ahc-dashboard-group__aggregate,
+    .ahc-area-card__aggregate {
+      min-inline-size: 360px;
+      margin-inline: 10px calc(var(--ahc-dashboard-label-width) + 10px);
+    }
+
+    .ahc-dashboard-row__label span {
+      display: block;
+    }
+
+    .ahc-area-inventory {
+      max-block-size: 150px;
+      margin-inline: 10px;
+    }
+
+    .ahc-area-inventory__chips {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .ahc-inventory-chip {
+      flex: 0 0 min(72vw, 230px);
+    }
+  }
+
+  @media (max-width: 420px) {
+    :host {
+      --ahc-dashboard-label-width: 142px;
+    }
+
+    .ahc-dashboard-row {
+      grid-template-columns: minmax(320px, 1fr) var(--ahc-dashboard-label-width);
+      min-inline-size: calc(320px + var(--ahc-dashboard-label-width) + 28px);
+    }
+
+    .ahc-dashboard-row__label span {
+      display: block;
+    }
+  }
+
   /* Motion & contrast */
   @media (prefers-reduced-motion: reduce) {
     .ahc *,
@@ -6369,11 +7056,11 @@ const Zi = et`
     font-size: 0.74rem;
   }
 `;
-function Qi(t, e = !1) {
-  const a = t.view_mode ?? t.default_view ?? v.view_mode;
+function en(t, e = !1) {
+  const a = t.view_mode ?? t.default_view ?? b.view_mode;
   return a === "activity_legacy" ? "activity_legacy" : a === "legacy_swimlane" || a === "swimlane" || t.timeline_style === "legacy" ? "legacy_swimlane" : a === "heatmap" ? "heatmap" : a === "detail" ? "detail" : a === "correlation" ? "correlation" : "activity";
 }
-class en extends N {
+class tn extends N {
   constructor() {
     super(...arguments), this._config = {
       type: "custom:activity-history-card"
@@ -6481,13 +7168,13 @@ class en extends N {
       ...e,
       type: "custom:activity-history-card",
       auto_discover: e.auto_discover ?? !0,
-      hours_to_show: e.hours_to_show ?? v.hours_to_show,
-      display_mode: e.display_mode ?? v.display_mode,
-      view_mode: e.view_mode ?? v.view_mode,
-      group_by: e.group_by ?? v.group_by,
-      show_area_inventory: e.show_area_inventory ?? v.show_area_inventory,
-      area_inventory_mode: e.area_inventory_mode ?? v.area_inventory_mode,
-      area_inventory_max_items: e.area_inventory_max_items ?? v.area_inventory_max_items
+      hours_to_show: e.hours_to_show ?? b.hours_to_show,
+      display_mode: e.display_mode ?? b.display_mode,
+      view_mode: e.view_mode ?? b.view_mode,
+      group_by: e.group_by ?? b.group_by,
+      show_area_inventory: e.show_area_inventory ?? b.show_area_inventory,
+      area_inventory_mode: e.area_inventory_mode ?? b.area_inventory_mode,
+      area_inventory_max_items: e.area_inventory_max_items ?? b.area_inventory_max_items
     }, this.requestUpdate();
   }
   set hass(e) {
@@ -6504,8 +7191,8 @@ class en extends N {
               כותרת
               <input
                 type="text"
-                .value=${e.title ?? v.title}
-                @input=${(i) => this._setValue("title", R(i))}
+                .value=${e.title ?? b.title}
+                @input=${(i) => this._setValue("title", C(i))}
               />
             </label>
             <label>
@@ -6515,7 +7202,7 @@ class en extends N {
                 min="1"
                 max="168"
                 .value=${String(e.hours_to_show ?? 24)}
-                @input=${(i) => this._setNumber("hours_to_show", R(i))}
+                @input=${(i) => this._setNumber("hours_to_show", C(i))}
               />
             </label>
           </div>
@@ -6526,7 +7213,7 @@ class en extends N {
                 .value=${e.display_mode ?? "panel"}
                 @change=${(i) => this._setValue(
       "display_mode",
-      R(i)
+      C(i)
     )}
               >
                 <option value="card">כרטיס רגיל</option>
@@ -6547,8 +7234,8 @@ class en extends N {
             <label>
               תצוגת ציר זמן
               <select
-                .value=${e.view_mode ?? v.view_mode}
-                @change=${(i) => this._setValue("view_mode", R(i))}
+                .value=${e.view_mode ?? b.view_mode}
+                @change=${(i) => this._setValue("view_mode", C(i))}
               >
                 <option value="activity">Activity dashboard</option>
                 <option value="activity_legacy">Activity legacy</option>
@@ -6603,10 +7290,10 @@ class en extends N {
             <label>
               מצב מלאי
               <select
-                .value=${e.area_inventory_mode ?? v.area_inventory_mode}
+                .value=${e.area_inventory_mode ?? b.area_inventory_mode}
                 @change=${(i) => this._setValue(
       "area_inventory_mode",
-      R(i)
+      C(i)
     )}
               >
                 <option value="compact">קומפקטי</option>
@@ -6623,11 +7310,11 @@ class en extends N {
                 min="1"
                 max="80"
                 .value=${String(
-      e.area_inventory_max_items ?? v.area_inventory_max_items
+      e.area_inventory_max_items ?? b.area_inventory_max_items
     )}
                 @input=${(i) => this._setNumber(
       "area_inventory_max_items",
-      R(i)
+      C(i)
     )}
               />
             </label>
@@ -6696,10 +7383,10 @@ class en extends N {
             <label>
               מצב פעילות
               <select
-                .value=${e.activity_mode ?? v.activity_mode}
+                .value=${e.activity_mode ?? b.activity_mode}
                 @change=${(i) => this._setValue(
       "activity_mode",
-      R(i)
+      C(i)
     )}
               >
                 <option value="meaningful">פעילות משמעותית</option>
@@ -6713,9 +7400,9 @@ class en extends N {
                 min="0"
                 max="3600"
                 .value=${String(
-      e.min_row_active_seconds ?? v.min_row_active_seconds
+      e.min_row_active_seconds ?? b.min_row_active_seconds
     )}
-                @input=${(i) => this._setNumber("min_row_active_seconds", R(i))}
+                @input=${(i) => this._setNumber("min_row_active_seconds", C(i))}
               />
             </label>
             <label>
@@ -6725,9 +7412,9 @@ class en extends N {
                 min="1"
                 max="60"
                 .value=${String(
-      e.max_rows_per_group ?? v.max_rows_per_group
+      e.max_rows_per_group ?? b.max_rows_per_group
     )}
-                @input=${(i) => this._setNumber("max_rows_per_group", R(i))}
+                @input=${(i) => this._setNumber("max_rows_per_group", C(i))}
               />
             </label>
             <label>
@@ -6737,9 +7424,9 @@ class en extends N {
                 min="1"
                 max="200"
                 .value=${String(
-      e.max_total_rows ?? v.max_total_rows
+      e.max_total_rows ?? b.max_total_rows
     )}
-                @input=${(i) => this._setNumber("max_total_rows", R(i))}
+                @input=${(i) => this._setNumber("max_total_rows", C(i))}
               />
             </label>
           </div>
@@ -6879,7 +7566,7 @@ class en extends N {
       this._safeRegistryCall("config/area_registry/list"),
       this._safeRegistryCall("config/label_registry/list")
     ]), i = [
-      ...new Set(Object.keys(this._hass.states).map(j))
+      ...new Set(Object.keys(this._hass.states).map(U))
     ].filter(Boolean).sort();
     this._areas = e.sort((n, s) => n.name.localeCompare(s.name, "he")), this._labels = a.sort((n, s) => n.name.localeCompare(s.name, "he")), this._domains = [
       .../* @__PURE__ */ new Set([...Q, ...i])
@@ -6923,14 +7610,14 @@ class en extends N {
     ), this.requestUpdate();
   }
 }
-function R(t) {
+function C(t) {
   return t.target.value;
 }
 customElements.get("activity-history-card-editor") || customElements.define(
   "activity-history-card-editor",
-  en
+  tn
 );
-class tn extends N {
+class an extends N {
   constructor() {
     super(...arguments), this._rows = [], this._visibleRows = [], this._groups = [], this._loading = !1, this._fullscreen = !1, this._filterSheetOpen = !1, this._usingMockData = !1, this._showAllRows = !1, this._debugLegacyView = !1, this._expandedInventoryGroups = /* @__PURE__ */ new Set(), this._collapsedInventoryGroups = /* @__PURE__ */ new Set(), this._fetchToken = 0, this._lastFetchKey = "", this._hasFetchedOnce = !1, this._initialLoad = !1, this._backgroundLoading = !1, this._lastResolvedEntityKey = "", this._lastHistoryFetchAt = 0, this._historyCache = /* @__PURE__ */ new Map(), this._filter = {
       search: "",
@@ -7024,7 +7711,7 @@ class tn extends N {
     };
   }
   static {
-    this.styles = Zi;
+    this.styles = Qi;
   }
   static getConfigElement() {
     return document.createElement("activity-history-card-editor");
@@ -7032,7 +7719,7 @@ class tn extends N {
   static getStubConfig() {
     return {
       type: "custom:activity-history-card",
-      title: v.title,
+      title: b.title,
       auto_discover: !0,
       display_mode: "panel",
       view_mode: "activity",
@@ -7047,10 +7734,10 @@ class tn extends N {
       );
     const a = this._initialTimePreset(e);
     this._config = {
-      ...v,
+      ...b,
       ...e,
-      view_mode: e.view_mode ?? e.default_view ?? v.view_mode,
-      group_by: e.group_by ?? v.group_by,
+      view_mode: e.view_mode ?? e.default_view ?? b.view_mode,
+      group_by: e.group_by ?? b.group_by,
       filters: {
         show: !0,
         show_search: !0,
@@ -7120,10 +7807,10 @@ class tn extends N {
       >
         ${this._renderHeader()} ${this._renderFilters()}
         ${this._renderSummary()}
-        ${this._config.debug ? this._renderDiagnostics() : g}
+        ${this._config.debug ? this._renderDiagnostics() : _}
         ${this._renderBody()}
-        ${this._segmentPopover ? this._renderSegmentPopover() : g}
-        ${this._filterSheetOpen ? this._renderFilterSheet() : g}
+        ${this._segmentPopover ? this._renderSegmentPopover() : _}
+        ${this._filterSheetOpen ? this._renderFilterSheet() : _}
       </ha-card>
     `;
   }
@@ -7136,28 +7823,28 @@ class tn extends N {
         <main class="ahc__main">${this._renderMainContent()}</main>
         ${e ? h`<aside class="ahc__insights-panel" aria-label="תובנות חכמות">
               ${this._renderInsights()}
-            </aside>` : g}
+            </aside>` : _}
       </section>
     `;
   }
   _renderHeader() {
     const e = `${this._timePresetLabel(this._filter.timePreset)} · ${this._usingMockData ? "נתוני דוגמה" : "נתוני Home Assistant"}`;
     return h`
-      <header class="ahc__topbar">
+      <header class="ahc__hero ahc__topbar">
         <div class="ahc__title-block">
           <div class="ahc__title-row">
             <span class="ahc__icon-badge" aria-hidden="true"
               ><ha-icon icon="mdi:chart-timeline-variant"></ha-icon
             ></span>
             <h2 class="ahc__title">
-              ${this._config.title ?? v.title}
+              ${this._config.title ?? b.title}
             </h2>
           </div>
           <p class="ahc__subtitle">${e}</p>
           ${this._renderLastEventPill()}
         </div>
-        <div class="ahc__toolbar">
-          ${this._config.show_fullscreen_button === !1 ? g : h`
+        <div class="ahc__hero-actions">
+          ${this._config.show_fullscreen_button === !1 ? _ : h`
                 <button
                   class="ahc__button ahc__button--ghost"
                   type="button"
@@ -7180,29 +7867,29 @@ class tn extends N {
           </button>
           ${this._backgroundLoading ? h`<span class="ahc__refresh-indicator" role="status"
                 >מעדכן...</span
-              >` : g}
+              >` : _}
         </div>
       </header>
     `;
   }
   _renderLastEventPill() {
     const e = this._summary, a = e?.lastEventRow, i = e?.lastEvent;
-    return !a || !i ? g : h`
+    return !a || !i ? _ : h`
       <div class="ahc-last-event">
         <span class="ahc-last-event__label">אירוע אחרון</span>
         <strong>${a.entity.name}</strong>
         <span
-          >${b(i.start)} · ${C[i.category]} ·
+          >${v(i.start)} · ${z[i.category]} ·
           ${le(a, this._config.debug === !0)}</span
         >
       </div>
     `;
   }
   _renderFilters() {
-    if (this._config.filters?.show === !1) return g;
+    if (this._config.filters?.show === !1) return _;
     const e = B(this._curation), i = this._currentRendererMode() === "activity", n = !!(i ? this._canToggleAreaInventory() : this._curation?.hiddenRows || this._showAllRows), s = i ? this._showAllRows ? "פעילות בלבד" : "כל האביזרים" : this._showAllRows ? "הצג רק פעילות" : "הצג הכל";
     return h`
-      <section class="ahc__filters" aria-label="מסננים">
+      <section class="ahc__toolbar ahc__filters" aria-label="מסננים">
         <div class="ahc__filter-row ahc__filter-row--primary">
           <span class="ahc__filter-label">טווח זמן</span>
           ${this._renderChip(
@@ -7272,7 +7959,7 @@ class tn extends N {
                 @click=${this._toggleShowAllRows}
               >
                 ${s}
-              </button>` : g}
+              </button>` : _}
           ${this._config.debug ? h`<button
                 class="ahc__button ahc__button--ghost ahc__button--debug"
                 type="button"
@@ -7280,8 +7967,8 @@ class tn extends N {
                 @click=${this._toggleDebugLegacyView}
               >
                 תצוגת legacy
-              </button>` : g}
-          ${e ? h`<span class="ahc-curation-note">${e}</span>` : g}
+              </button>` : _}
+          ${e ? h`<span class="ahc-curation-note">${e}</span>` : _}
         </div>
       </section>
     `;
@@ -7297,12 +7984,15 @@ class tn extends N {
     </button>`;
   }
   _renderSummary() {
-    if (this._config.show_summary === !1) return g;
+    if (this._config.show_summary === !1) return _;
     if (this._dashboardModel && this._config.summary_scope !== "all")
       return this._renderDashboardSummary(this._dashboardModel);
     const e = this._summary, i = this._dashboardModel?.visibleRowsCount || this._visibleRows.length || this._rows.length, n = this._config.summary_scope === "all" ? "לפי כל הרכיבים שנמצאו" : "לפי הרכיבים שמוצגים";
     return h`
-      <section class="ahc__summary-grid" aria-label="סיכום פעילות">
+      <section
+        class="ahc__summary-strip ahc__summary-grid"
+        aria-label="סיכום פעילות"
+      >
         <article class="ahc__metric">
           <div class="ahc__metric-copy">
             <span class="ahc__metric-label">פעילים עכשיו</span>
@@ -7348,7 +8038,10 @@ class tn extends N {
   }
   _renderDashboardSummary(e) {
     return h`
-      <section class="ahc__summary-grid" aria-label="סיכום פעילות">
+      <section
+        class="ahc__summary-strip ahc__summary-grid"
+        aria-label="סיכום פעילות"
+      >
         <article class="ahc__metric">
           <div class="ahc__metric-copy">
             <span class="ahc__metric-label">סה״כ שעות־רכיב</span>
@@ -7393,10 +8086,13 @@ class tn extends N {
     `;
   }
   _renderSummaryLegacy() {
-    if (this._config.show_summary === !1) return g;
+    if (this._config.show_summary === !1) return _;
     const e = this._summary, a = e?.lastEventRow, i = e?.lastEvent;
     return h`
-      <section class="ahc__summary-grid" aria-label="סיכום פעילות">
+      <section
+        class="ahc__summary-strip ahc__summary-grid"
+        aria-label="סיכום פעילות"
+      >
         <article class="ahc__metric">
           <div class="ahc__metric-copy">
             <span class="ahc__metric-label">אירוע אחרון</span>
@@ -7404,7 +8100,7 @@ class tn extends N {
               >${a?.entity.name ?? "אין"}</span
             >
             <span class="ahc__metric-subtitle">
-              ${i && a ? `${b(i.start)} · ${C[i.category]} · ${le(a, this._config.debug === !0)}` : "לא נמצאו אירועים בטווח"}
+              ${i && a ? `${v(i.start)} · ${z[i.category]} · ${le(a, this._config.debug === !0)}` : "לא נמצאו אירועים בטווח"}
             </span>
           </div>
           <span class="ahc__metric-icon" aria-hidden="true">♪</span>
@@ -7462,7 +8158,7 @@ class tn extends N {
     const a = this._resolveRange();
     switch (this._currentRendererMode()) {
       case "heatmap":
-        return $i();
+        return ki();
       case "detail":
         return wi();
       case "correlation":
@@ -7472,8 +8168,8 @@ class tn extends N {
           ${this._showAllRows && this._config.view_mode === "activity" ? h`<div class="ahc-legacy-warning">
                 מצב הצגת הכל מיועד לבדיקה. התצוגה מציגה שורות גולמיות יותר
                 ועלולה לכלול רכיבים רועשים.
-              </div>` : g}
-          ${Ki({
+              </div>` : _}
+          ${Wi({
           groups: this._groups,
           range: a,
           config: this._showAllRows && this._config.view_mode === "activity" ? {
@@ -7490,7 +8186,7 @@ class tn extends N {
         })}
         `;
       case "activity_legacy":
-        return Ni({
+        return Bi({
           groups: this._groups,
           range: a,
           config: this._config,
@@ -7500,14 +8196,14 @@ class tn extends N {
         });
       case "activity":
       default:
-        return ki({
+        return $i({
           model: this._dashboardModel ?? Ne(
             this._groups,
             a,
             this._config,
             this._curation,
             {
-              inventoryRows: Ue(this._rows, this._filter),
+              inventoryRows: je(this._rows, this._filter),
               selectedAreas: this._filter.areas,
               groupBy: this._filter.groupBy
             }
@@ -7637,10 +8333,10 @@ show_inactive_baselines: true`
           ${n ? h`<p>
                 אזהרת discovery: ${n}. אם האזורים לא זמינים, נסה
                 להגדיר entities ידנית או להפעיל debug.
-              </p>` : g}
+              </p>` : _}
           ${e === "no_meaningful_activity" && this._config.debug ? h`<p class="ahc-debug__meta">
                 ${B(this._curation)}
-              </p>` : g}
+              </p>` : _}
           <pre
             class="ahc-state-card__yaml"
             dir="ltr"
@@ -7667,7 +8363,7 @@ show_inactive_baselines: true`
                 >
                   פתח סינון
                 </button>
-              </div>` : g}
+              </div>` : _}
         </div>
       </div>
     `;
@@ -7759,11 +8455,11 @@ show_inactive_baselines: true`
         </p>
         ${e.curation ? h`<p class="ahc-debug__meta" dir="ltr">
               curation: ${JSON.stringify(e.curation.hiddenByReason)}
-            </p>` : g}
+            </p>` : _}
         ${e.discovery?.unavailableReasons.length ? h`<p class="ahc-debug__meta">
               Registry warnings:
               ${e.discovery.unavailableReasons.join(", ")}
-            </p>` : g}
+            </p>` : _}
       </details>
     ` : h`<details class="ahc-debug" aria-label="אבחון">
         <summary>Debug · ממתין לטעינת נתונים...</summary>
@@ -8065,7 +8761,7 @@ show_inactive_baselines: true`
     )}
             ${i.length > 32 ? h`<span class="ahc-entity-list__more"
                   >ועוד ${i.length - 32} רכיבים</span
-                >` : g}
+                >` : _}
           </div>
         </div>
 
@@ -8109,7 +8805,7 @@ show_inactive_baselines: true`
       diagnostics: void 0
     } : await qa(this._config, this._hass);
     if (s !== this._fetchToken) return;
-    const o = c.entities, l = an(o), d = this._resolveRange(), u = xt(o), p = ri({
+    const o = c.entities, l = nn(o), d = this._resolveRange(), u = xt(o), p = ri({
       mock: n,
       start: d.start.toISOString(),
       end: d.end.toISOString(),
@@ -8124,9 +8820,9 @@ show_inactive_baselines: true`
       excludeLabels: this._config.exclude_labels ?? [],
       significant: this._config.significant_changes_only,
       minimal: this._config.minimal_response
-    }), _ = a && ["manual", "timer", "interval", "config"].includes(e), x = !!(this._lastResolvedEntityKey && this._lastResolvedEntityKey !== l) && e === "interval" ? "entities" : e, w = (m, $, ne = c.diagnostics) => {
+    }), g = a && ["manual", "timer", "interval", "config"].includes(e), x = !!(this._lastResolvedEntityKey && this._lastResolvedEntityKey !== l) && e === "interval" ? "entities" : e, w = (m, k, ne = c.diagnostics) => {
       this._lastResolvedEntityKey = l, this._lastHistoryFetchAt = Date.now(), this._hasFetchedOnce = !0, this._setPostLoadState(
-        $,
+        k,
         d,
         u,
         m,
@@ -8164,36 +8860,36 @@ show_inactive_baselines: true`
       }), this._hasFetchedOnce = !0, this._lastResolvedEntityKey = l, this._lastHistoryFetchAt = Date.now(), this._initialLoad = !1, this._loading = !1, this._backgroundLoading = !1, this._error = void 0, this._syncRefreshTimer(), this.requestUpdate();
       return;
     }
-    if (!_ && p === this._lastFetchKey) {
+    if (!g && p === this._lastFetchKey) {
       const m = this._historyCache.get(p);
       if (m) {
-        const $ = Ze(m);
+        const k = Ze(m);
         this._rows = Ye(
           m,
           o,
           d,
           this._config,
           this._hass?.states ?? {}
-        ), w(!0, $), this._initialLoad = !1, this._loading = !1, this._backgroundLoading = !1, this._error = void 0, this._rebuildGroups();
+        ), w(!0, k), this._initialLoad = !1, this._loading = !1, this._backgroundLoading = !1, this._error = void 0, this._rebuildGroups();
         return;
       }
     }
     try {
-      let m = _ ? void 0 : this._historyCache.get(p);
+      let m = g ? void 0 : this._historyCache.get(p);
       if (m || (m = n ? gi(d, this._config.mock_profile) : await oi(
         this._hass,
         o,
         d,
         this._config
       ), this._historyCache.set(p, m)), s !== this._fetchToken) return;
-      const $ = Ze(m);
+      const k = Ze(m);
       this._rows = Ye(
         m,
         o,
         d,
         this._config,
         this._hass?.states ?? {}
-      ), w(!1, $), this._lastFetchKey = p, this._rebuildGroups();
+      ), w(!1, k), this._lastFetchKey = p, this._rebuildGroups();
     } catch (m) {
       this._error = m instanceof Error ? m.message : String(m), this._rows.length || (this._visibleRows = [], this._groups = [], this._dashboardModel = void 0, this._summary = L([]), this._curation = re([], this._config).diagnostics, this._emptyReason = void 0);
     } finally {
@@ -8201,11 +8897,11 @@ show_inactive_baselines: true`
     }
   }
   _rebuildGroups() {
-    const e = Ue(this._rows, this._filter), a = this._currentRendererMode(), i = a !== "activity" && this._showAllRows, n = re(e, this._config, {
+    const e = je(this._rows, this._filter), a = this._currentRendererMode(), i = a !== "activity" && this._showAllRows, n = re(e, this._config, {
       showAll: i,
       groupBy: this._filter.groupBy
     });
-    this._visibleRows = n.rows, this._curation = n.diagnostics, this._groups = je(n.rows, this._filter.groupBy).filter(
+    this._visibleRows = n.rows, this._curation = n.diagnostics, this._groups = Ue(n.rows, this._filter.groupBy).filter(
       (s) => this._config.hide_empty_groups === !1 || s.rows.length > 0
     ), this._dashboardModel = a === "activity" ? Ne(
       this._groups,
@@ -8217,8 +8913,8 @@ show_inactive_baselines: true`
         selectedAreas: this._filter.areas,
         groupBy: this._filter.groupBy
       }
-    ) : void 0, this._summary = a === "activity" && this._dashboardModel && this._config.summary_scope !== "all" ? Ca(this._dashboardModel) : L(
-      this._config.summary_scope === "all" ? je(e, this._filter.groupBy) : this._groups
+    ) : void 0, this._summary = a === "activity" && this._dashboardModel && this._config.summary_scope !== "all" ? za(this._dashboardModel) : L(
+      this._config.summary_scope === "all" ? Ue(e, this._filter.groupBy) : this._groups
     ), this._rows.length && !e.length ? this._emptyReason = "all_entities_filtered" : e.length && !n.rows.length ? this._emptyReason = "no_meaningful_activity" : (this._emptyReason === "all_entities_filtered" || this._emptyReason === "no_meaningful_activity") && (this._emptyReason = void 0), this._diagnostics && this._setDiagnostics({
       ...this._diagnostics,
       filteredRowCount: e.length,
@@ -8272,7 +8968,7 @@ show_inactive_baselines: true`
     }, e * 1e3);
   }
   _refreshIntervalSeconds() {
-    return $t(
+    return kt(
       this._config?.refresh_interval_seconds
     );
   }
@@ -8334,7 +9030,7 @@ show_inactive_baselines: true`
     this._filter.timePreset !== e && (this._filter = { ...this._filter, timePreset: e }, this._lastFetchKey = "", this._requestHistoryRefresh("range", { force: !0 }));
   }
   _currentRendererMode() {
-    return this._config.debug && this._debugLegacyView ? "legacy_swimlane" : Qi(this._config, this._showAllRows);
+    return this._config.debug && this._debugLegacyView ? "legacy_swimlane" : en(this._config, this._showAllRows);
   }
   _resetInventoryExpansion() {
     this._showAllRows = !1, this._expandedInventoryGroups.clear(), this._collapsedInventoryGroups.clear();
@@ -8358,10 +9054,10 @@ function Ze(t) {
     0
   );
 }
-function an(t) {
+function nn(t) {
   return t.map((e) => "entity" in e ? e.entity.entity_id : e.entity_id).sort().join("|");
 }
-customElements.get("activity-history-card") || customElements.define("activity-history-card", tn);
+customElements.get("activity-history-card") || customElements.define("activity-history-card", an);
 window.customCards = window.customCards || [];
 window.customCards.some((t) => t.type === "activity-history-card") || window.customCards.push({
   type: "activity-history-card",
@@ -8371,6 +9067,6 @@ window.customCards.some((t) => t.type === "activity-history-card") || window.cus
   documentationURL: "https://github.com/jonioliel/activity-history-card"
 });
 export {
-  tn as ActivityHistoryCard
+  an as ActivityHistoryCard
 };
 //# sourceMappingURL=activity-history-card.js.map

@@ -50,7 +50,7 @@ area_inventory_show_last_activity: true
 max_visible_rows: 18
 collapse_groups: false
 default_collapsed_groups: []
-timeline_height: min(62svh, 680px)
+timeline_height: calc(100svh - 320px)
 
 domains:
   - light

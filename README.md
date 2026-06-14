@@ -56,7 +56,7 @@ area_inventory_max_items: 12
 area_inventory_group_by_domain: true
 area_inventory_show_state: true
 area_inventory_show_last_activity: true
-timeline_height: min(62svh, 680px)
+timeline_height: calc(100svh - 320px)
 collapse_groups: false
 exclude_labels:
   - לא להצגה
@@ -102,7 +102,7 @@ area_inventory_group_by_domain: true
 area_inventory_show_state: true
 area_inventory_show_last_activity: true
 debug: false
-timeline_height: min(62svh, 680px)
+timeline_height: calc(100svh - 320px)
 filters:
   show: true
   show_search: true
@@ -166,6 +166,7 @@ domains:
 type: custom:activity-history-card
 mock_data: false
 auto_discover: true
+display_mode: panel
 view_mode: activity
 areas:
   - סלון
@@ -173,6 +174,7 @@ show_area_inventory: true
 area_inventory_mode: compact
 area_inventory_include_inactive: true
 area_inventory_max_items: 12
+timeline_height: calc(100svh - 320px)
 ```
 
 אם לא מגדירים `domains`, הכרטיס משתמש בדומיינים שימושיים כברירת מחדל כדי להימנע מרעש של חיישנים כלליים.
@@ -231,7 +233,7 @@ include_labels:
 
 ## מלאי אביזרים לפי אזור
 
-בתצוגת `activity` ציר הזמן נשאר נקי ומציג רק שורות עם פעילות משמעותית. מתחת לכל כרטיס אזור מופיע מלאי קומפקטי של האביזרים הרגילים באותו אזור, כולל אביזרים שלא פעלו בטווח הזמן. כך אפשר לראות שמות של מפסקים, תאורות ומזגנים בלי להעמיס את הגרף.
+בתצוגת `activity` ציר הזמן נשאר נקי ומציג רק שורות עם פעילות משמעותית. בתצוגת כל הבית מלאי האביזרים מקופל כברירת מחדל ונפתח מכפתור האזור; בבחירת אזור יחיד הוא נפתח אוטומטית. כך אפשר לראות שמות של מפסקים, תאורות ומזגנים בלי להעמיס את הגרף.
 
 ```yaml
 type: custom:activity-history-card
@@ -360,7 +362,7 @@ debug: true
 | `show_diagnostic_entities`          | `false`                 | מאפשר להציג ישויות registry מסוג `diagnostic`                                     |
 | `summary_scope`                     | `visible`               | מחשב סיכום לפי השורות המוצגות או לפי כל השורות המסוננות                           |
 | `max_visible_rows`                  | `18`                    | מגביל את מספר השורות הגלויות כדי לשמור על ביצועים וקריאות                         |
-| `timeline_height`                   | `min(62svh, 680px)`     | גובה פנימי של אזור הטיימליין לפני גלילה                                           |
+| `timeline_height`                   | `calc(100svh - 320px)`  | גובה פנימי של אזור הטיימליין לפני גלילה                                           |
 | `collapse_groups`                   | `false`                 | מאפשר קיפול קבוצות; קבוצות ללא פעילות יכולות להתחיל סגורות                        |
 | `default_collapsed_groups`          | `[]`                    | רשימת שמות/IDs של קבוצות שייפתחו סגורות                                           |
 | `group_by`                          | `area`                  | `area`, `domain`, `entity`, `none`                                                |
@@ -379,7 +381,7 @@ npm run test
 npm run build
 ```
 
-`npm run demo` פותח דמו מקומי עם נתוני mock ומציג את ברירת המחדל החדשה, דוגמה קטנה, ותצוגת legacy להשוואה.
+`npm run demo` פותח דמו מקומי עם נתוני mock ומציג בית עמוס בתצוגת panel, אזור יחיד עם מלאי פתוח, ותצוגת legacy להשוואה.
 
 הקובץ ש-HACS מתקין הוא:
 

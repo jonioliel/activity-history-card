@@ -291,7 +291,7 @@ export class ActivityHistoryCard extends LitElement {
   private _renderHeader(): TemplateResult {
     const subtitle = `${this._timePresetLabel(this._filter.timePreset)} · ${this._usingMockData ? "נתוני דוגמה" : "נתוני Home Assistant"}`;
     return html`
-      <header class="ahc__topbar">
+      <header class="ahc__hero ahc__topbar">
         <div class="ahc__title-block">
           <div class="ahc__title-row">
             <span class="ahc__icon-badge" aria-hidden="true"
@@ -304,7 +304,7 @@ export class ActivityHistoryCard extends LitElement {
           <p class="ahc__subtitle">${subtitle}</p>
           ${this._renderLastEventPill()}
         </div>
-        <div class="ahc__toolbar">
+        <div class="ahc__hero-actions">
           ${this._config.show_fullscreen_button === false
             ? nothing
             : html`
@@ -374,7 +374,7 @@ export class ActivityHistoryCard extends LitElement {
         : "הצג הכל";
 
     return html`
-      <section class="ahc__filters" aria-label="מסננים">
+      <section class="ahc__toolbar ahc__filters" aria-label="מסננים">
         <div class="ahc__filter-row ahc__filter-row--primary">
           <span class="ahc__filter-label">טווח זמן</span>
           ${this._renderChip("24 שעות", this._filter.timePreset === "24h", () =>
@@ -492,7 +492,10 @@ export class ActivityHistoryCard extends LitElement {
         ? "לפי כל הרכיבים שנמצאו"
         : "לפי הרכיבים שמוצגים";
     return html`
-      <section class="ahc__summary-grid" aria-label="סיכום פעילות">
+      <section
+        class="ahc__summary-strip ahc__summary-grid"
+        aria-label="סיכום פעילות"
+      >
         <article class="ahc__metric">
           <div class="ahc__metric-copy">
             <span class="ahc__metric-label">פעילים עכשיו</span>
@@ -541,7 +544,10 @@ export class ActivityHistoryCard extends LitElement {
     dashboard: ActivityDashboardModel,
   ): TemplateResult {
     return html`
-      <section class="ahc__summary-grid" aria-label="סיכום פעילות">
+      <section
+        class="ahc__summary-strip ahc__summary-grid"
+        aria-label="סיכום פעילות"
+      >
         <article class="ahc__metric">
           <div class="ahc__metric-copy">
             <span class="ahc__metric-label">סה״כ שעות־רכיב</span>
@@ -593,7 +599,10 @@ export class ActivityHistoryCard extends LitElement {
     const lastEventRow = summary?.lastEventRow;
     const lastEvent = summary?.lastEvent;
     return html`
-      <section class="ahc__summary-grid" aria-label="סיכום פעילות">
+      <section
+        class="ahc__summary-strip ahc__summary-grid"
+        aria-label="סיכום פעילות"
+      >
         <article class="ahc__metric">
           <div class="ahc__metric-copy">
             <span class="ahc__metric-label">אירוע אחרון</span>

@@ -41,7 +41,14 @@ export function renderActivityDashboard(
   }
 
   return html`
-    <section class="ahc-dashboard" dir="rtl" aria-label="ציר זמן פעילות">
+    <section
+      class="ahc-dashboard"
+      dir="rtl"
+      aria-label="ציר זמן פעילות"
+      style=${config.timeline_height
+        ? `--ahc-dashboard-height:${config.timeline_height}`
+        : ""}
+    >
       <header class="ahc-dashboard__header">
         <div class="ahc-dashboard__title-block">
           <h3>ציר זמן פעילות</h3>
@@ -59,10 +66,14 @@ export function renderActivityDashboard(
         </div>
       </header>
 
-      <section class="ahc-dashboard__overview" aria-label="צפיפות פעילות">
-        ${config.show_activity_density === false
-          ? nothing
-          : renderDensity(model.densityBuckets)}
+      ${config.show_activity_density === false
+        ? nothing
+        : renderDensity(model.densityBuckets)}
+
+      <section
+        class="ahc-dashboard__timeline"
+        aria-label="פעילות לפי אזור ורכיב"
+      >
         <div class="ahc-dashboard__axis" dir="ltr" aria-hidden="true">
           ${ticks.map(
             (tick) =>
@@ -73,10 +84,9 @@ export function renderActivityDashboard(
               >`,
           )}
         </div>
-      </section>
-
-      <section class="ahc-dashboard__groups">
-        ${model.groups.map((group) => renderGroup(group, options))}
+        <div class="ahc-dashboard__scroll">
+          ${model.groups.map((group) => renderGroup(group, options))}
+        </div>
       </section>
 
       ${model.hiddenRowsCount
@@ -106,10 +116,13 @@ function renderGroup(
       : defaultExpanded ||
         options.expandedInventoryGroups?.has(group.id) === true;
 
+  const extraActivityCount = Math.max(0, group.hiddenRowsCount);
+
   return html`
-    <article
+    <section
       class="ahc-area-card ahc-dashboard-group"
       data-has-activity=${group.activityRows.length ? "true" : "false"}
+      data-inventory-expanded=${inventoryExpanded ? "true" : "false"}
     >
       <header class="ahc-area-card__header ahc-dashboard-group__header">
         <div class="ahc-area-card__title ahc-dashboard-group__title">
@@ -133,7 +146,9 @@ function renderGroup(
                 aria-expanded=${inventoryExpanded ? "true" : "false"}
                 @click=${() => options.onInventoryToggle?.(group.id)}
               >
-                ${inventoryExpanded ? "צמצם אביזרים" : "כל האביזרים"}
+                ${inventoryExpanded
+                  ? "סגור מלאי"
+                  : `אביזרים ${group.inventoryItemCount}`}
               </button>`
             : nothing}
         </div>
@@ -149,21 +164,26 @@ function renderGroup(
         )}
       </div>
 
-      <div class="ahc-area-card__content">
+      <div class="ahc-area-card__content ahc-dashboard-group__body">
         <section class="ahc-area-card__activity" aria-label="פעילות באזור">
           ${group.activityRows.length
             ? html`<div class="ahc-dashboard-group__rows">
                 ${group.activityRows.map((row) => renderRow(row, options))}
+                ${extraActivityCount > 0
+                  ? html`<p class="ahc-dashboard-group__more">
+                      +${extraActivityCount} פעילויות נוספות
+                    </p>`
+                  : nothing}
               </div>`
             : html`<div class="ahc-area-card__quiet">
                 אין פעילות משמעותית בטווח הנוכחי
               </div>`}
         </section>
-        ${inventoryEnabled && group.inventoryItems.length
+        ${inventoryEnabled && group.inventoryItems.length && inventoryExpanded
           ? renderInventory(group, options, inventoryExpanded)
           : nothing}
       </div>
-    </article>
+    </section>
   `;
 }
 
@@ -361,30 +381,50 @@ function renderSegment(
 }
 
 function renderDensity(buckets: ActivityDensityBucket[]): TemplateResult {
+  const labels = densityLabels(buckets);
   return html`
-    <div class="ahc-dashboard__density" dir="ltr">
-      ${buckets.map((bucket) => {
-        const active = bucket.totalActiveMs > 0;
-        const title = `${formatTime(bucket.start)} - ${formatTime(
-          bucket.end,
-        )}: ${formatDuration(bucket.totalActiveMs)} · ${
-          bucket.activeEntityCount
-        } רכיבים`;
-        return html`
-          <span
-            class="ahc-dashboard-density-bucket"
-            data-active=${active ? "true" : "false"}
-            title=${title}
-          >
-            <i
-              class="ahc-dashboard-density-fill"
-              style=${`--intensity:${bucket.intensity}`}
-            ></i>
-          </span>
-        `;
-      })}
-    </div>
+    <section
+      class="ahc-dashboard__density"
+      dir="ltr"
+      aria-label="צפיפות פעילות"
+    >
+      <div class="ahc-dashboard__density-bars">
+        ${buckets.map((bucket) => {
+          const active = bucket.totalActiveMs > 0;
+          const title = `${formatTime(bucket.start)} - ${formatTime(
+            bucket.end,
+          )}: ${formatDuration(bucket.totalActiveMs)} · ${
+            bucket.activeEntityCount
+          } רכיבים`;
+          return html`
+            <span
+              class="ahc-dashboard-density-bucket"
+              data-active=${active ? "true" : "false"}
+              title=${title}
+            >
+              <i
+                class="ahc-dashboard-density-fill"
+                style=${`--intensity:${bucket.intensity}`}
+              ></i>
+            </span>
+          `;
+        })}
+      </div>
+      <div class="ahc-dashboard__density-labels" aria-hidden="true">
+        ${labels.map((label) => html`<span>${label}</span>`)}
+      </div>
+    </section>
   `;
+}
+
+function densityLabels(buckets: ActivityDensityBucket[]): string[] {
+  if (!buckets.length) return [];
+  const labelCount = Math.min(6, Math.max(4, Math.ceil(buckets.length / 6)));
+  const lastIndex = buckets.length - 1;
+  return Array.from({ length: labelCount }, (_, index) => {
+    const bucket = buckets[Math.round((index / (labelCount - 1)) * lastIndex)];
+    return bucket ? formatTime(bucket.start) : "";
+  }).filter(Boolean);
 }
 
 function renderDashboardEmpty(): TemplateResult {

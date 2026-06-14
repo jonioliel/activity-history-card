@@ -44,6 +44,7 @@ describe("mock profiles", () => {
     );
     expect(inventoryNames).toContain("מדיח כלים");
     expect(inventoryNames).toContain("שקע שירות");
+    expect(model.groups.some((group) => group.title === "בריכה")).toBe(true);
   });
 
   it("clean_activity_dashboard provides visible activity and density", () => {

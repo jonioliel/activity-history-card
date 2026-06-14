@@ -11,5 +11,20 @@ describe("sample-config.yaml", () => {
     expect(sample).toContain("area_inventory_max_items: 12");
     expect(sample).toContain("max_total_rows: 18");
     expect(sample).toContain("max_rows_per_group: 4");
+    expect(sample).toContain("timeline_height: calc(100svh - 320px)");
+  });
+
+  it("uses a simple valid YAML shape", () => {
+    const lines = sample
+      .split(/\r?\n/)
+      .map((line) => line.replace(/\s+#.*$/, ""))
+      .filter((line) => line.trim().length > 0);
+
+    expect(sample).not.toContain("\t");
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith("- ")) continue;
+      expect(trimmed).toMatch(/^[\w_]+:/);
+    }
   });
 });
