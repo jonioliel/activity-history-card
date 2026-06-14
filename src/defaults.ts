@@ -84,6 +84,8 @@ export const DEFAULT_CONFIG: Required<
     | "area_inventory_show_state"
     | "area_inventory_show_last_activity"
     | "timeline_height"
+    | "timeline_axis_density"
+    | "debug_timeline_geometry"
     | "mobile_breakpoint"
   >
 > = {
@@ -129,7 +131,9 @@ export const DEFAULT_CONFIG: Required<
   area_inventory_group_by_domain: true,
   area_inventory_show_state: true,
   area_inventory_show_last_activity: true,
-  timeline_height: "min(62svh, 680px)",
+  timeline_height: "calc(100svh - 320px)",
+  timeline_axis_density: "comfortable",
+  debug_timeline_geometry: false,
   mobile_breakpoint: 760,
 };
 

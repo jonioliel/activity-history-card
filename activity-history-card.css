@@ -1270,11 +1270,14 @@
 /* Activity dashboard visual baseline */
 :host {
   --ahc-insights-width: 340px;
-  --ahc-dashboard-label-width: 230px;
-  --ahc-dashboard-row-height: 34px;
-  --ahc-dashboard-segment-height: 10px;
-  --ahc-dashboard-segment-min-width: 5px;
+  --ahc-dashboard-label-width: 250px;
+  --ahc-dashboard-row-height: 38px;
+  --ahc-dashboard-segment-height: 12px;
+  --ahc-dashboard-aggregate-height: 14px;
+  --ahc-dashboard-segment-min-width: 6px;
   --ahc-dashboard-group-header-height: 42px;
+  --ahc-axis-label-color: rgba(235, 242, 255, 0.82);
+  --ahc-axis-grid-color: rgba(148, 163, 184, 0.18);
 }
 
 .ahc__hero,
@@ -1307,10 +1310,13 @@
 }
 
 .ahc-dashboard {
-  display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
-  block-size: var(--ahc-dashboard-height, 100%);
-  min-block-size: min(520px, 62svh);
+  display: flex;
+  flex-direction: column;
+  block-size: var(
+    --ahc-dashboard-height,
+    var(--ahc-timeline-height, calc(100svh - 320px))
+  );
+  min-block-size: 0;
   overflow: hidden;
 }
 
@@ -1322,14 +1328,58 @@
 }
 
 .ahc-dashboard__timeline {
-  display: grid;
-  grid-template-rows: 31px minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
   min-block-size: 0;
   overflow: hidden;
 }
 
 .ahc-dashboard__scroll {
+  flex: 1 1 auto;
+  min-block-size: 0;
   overflow: auto;
+}
+
+.ahc-timegrid {
+  direction: ltr;
+  position: relative;
+  min-inline-size: 0;
+  block-size: 100%;
+  overflow: visible;
+}
+
+.ahc-timegrid--density {
+  block-size: 28px;
+}
+
+.ahc-timegrid--row {
+  block-size: var(--ahc-dashboard-row-height);
+}
+
+.ahc-timegrid__grid,
+.ahc-timegrid__segments {
+  position: absolute;
+  inset: 0;
+}
+
+.ahc-timegrid__line {
+  position: absolute;
+  inset-block: 0;
+  inline-size: 1px;
+  background: var(--ahc-axis-grid-color);
+}
+
+.ahc-timegrid__line--minor {
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.ahc-timegrid__now {
+  position: absolute;
+  inset-block: 0;
+  z-index: 3;
+  inline-size: 2px;
+  background: rgba(125, 211, 252, 0.9);
 }
 
 .ahc-dashboard-group__header {
@@ -1340,6 +1390,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) var(--ahc-dashboard-label-width);
   min-block-size: var(--ahc-dashboard-row-height);
+  direction: rtl;
 }
 
 .ahc-dashboard-row__plot {
@@ -1354,6 +1405,10 @@
 
 .ahc-dashboard-segment {
   block-size: var(--ahc-dashboard-segment-height);
+}
+
+.ahc-dashboard-segment--aggregate {
+  block-size: var(--ahc-dashboard-aggregate-height);
 }
 
 .ahc-dashboard-segment--min {

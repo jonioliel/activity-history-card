@@ -57,6 +57,7 @@ area_inventory_group_by_domain: true
 area_inventory_show_state: true
 area_inventory_show_last_activity: true
 timeline_height: calc(100svh - 320px)
+timeline_axis_density: comfortable
 collapse_groups: false
 exclude_labels:
   - לא להצגה
@@ -103,6 +104,7 @@ area_inventory_show_state: true
 area_inventory_show_last_activity: true
 debug: false
 timeline_height: calc(100svh - 320px)
+timeline_axis_density: comfortable
 filters:
   show: true
   show_search: true
@@ -175,6 +177,7 @@ area_inventory_mode: compact
 area_inventory_include_inactive: true
 area_inventory_max_items: 12
 timeline_height: calc(100svh - 320px)
+timeline_axis_density: comfortable
 ```
 
 אם לא מגדירים `domains`, הכרטיס משתמש בדומיינים שימושיים כברירת מחדל כדי להימנע מרעש של חיישנים כלליים.
@@ -363,6 +366,8 @@ debug: true
 | `summary_scope`                     | `visible`               | מחשב סיכום לפי השורות המוצגות או לפי כל השורות המסוננות                           |
 | `max_visible_rows`                  | `18`                    | מגביל את מספר השורות הגלויות כדי לשמור על ביצועים וקריאות                         |
 | `timeline_height`                   | `calc(100svh - 320px)`  | גובה פנימי של אזור הטיימליין לפני גלילה                                           |
+| `timeline_axis_density`             | `comfortable`           | צפיפות תוויות הציר: `auto`, `compact`, `comfortable`                              |
+| `debug_timeline_geometry`           | `false`                 | מציג אחוזי tick/segment ורוחב plot בזמן debug                                     |
 | `collapse_groups`                   | `false`                 | מאפשר קיפול קבוצות; קבוצות ללא פעילות יכולות להתחיל סגורות                        |
 | `default_collapsed_groups`          | `[]`                    | רשימת שמות/IDs של קבוצות שייפתחו סגורות                                           |
 | `group_by`                          | `area`                  | `area`, `domain`, `entity`, `none`                                                |

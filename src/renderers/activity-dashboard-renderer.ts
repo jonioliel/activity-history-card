@@ -12,8 +12,13 @@ import {
   DEFAULT_CONFIG,
   DOMAIN_LABELS_HE,
 } from "../defaults";
-import { formatDuration, formatTime, timeToPercent } from "../format";
+import { formatDuration, formatTime } from "../format";
 import type { ActivityHistoryCardConfig, TimeRange } from "../types";
+import {
+  buildTimelineAxis,
+  type TimelineAxisModel,
+  type TimelineTick,
+} from "./timeline-axis";
 
 export interface ActivityDashboardRendererOptions {
   model: ActivityDashboardModel;
@@ -34,7 +39,12 @@ export function renderActivityDashboard(
   options: ActivityDashboardRendererOptions,
 ): TemplateResult {
   const { model, config } = options;
-  const ticks = buildTicks(model.range);
+  const axis = buildTimelineAxis(model.range, {
+    maxMajorTicks: axisMajorTickCount(config),
+  });
+  const timelineStyle = config.timeline_height
+    ? `--ahc-dashboard-height:${config.timeline_height};--ahc-timeline-height:${config.timeline_height}`
+    : "";
 
   if (!model.visibleRowsCount && !model.totalInventoryItemCount) {
     return renderDashboardEmpty();
@@ -45,9 +55,7 @@ export function renderActivityDashboard(
       class="ahc-dashboard"
       dir="rtl"
       aria-label="ציר זמן פעילות"
-      style=${config.timeline_height
-        ? `--ahc-dashboard-height:${config.timeline_height}`
-        : ""}
+      style=${timelineStyle}
     >
       <header class="ahc-dashboard__header">
         <div class="ahc-dashboard__title-block">
@@ -68,24 +76,15 @@ export function renderActivityDashboard(
 
       ${config.show_activity_density === false
         ? nothing
-        : renderDensity(model.densityBuckets)}
+        : renderDensity(model.densityBuckets, axis, config)}
 
       <section
         class="ahc-dashboard__timeline"
         aria-label="פעילות לפי אזור ורכיב"
       >
-        <div class="ahc-dashboard__axis" dir="ltr" aria-hidden="true">
-          ${ticks.map(
-            (tick) =>
-              html`<span
-                class="ahc-dashboard__tick"
-                style=${`left:${tick.percent}%`}
-                >${tick.label}</span
-              >`,
-          )}
-        </div>
+        ${renderAxis(axis, config)}
         <div class="ahc-dashboard__scroll">
-          ${model.groups.map((group) => renderGroup(group, options))}
+          ${model.groups.map((group) => renderGroup(group, options, axis))}
         </div>
       </section>
 
@@ -102,6 +101,7 @@ export function renderActivityDashboard(
 function renderGroup(
   group: ActivityDashboardGroup,
   options: ActivityDashboardRendererOptions,
+  axis: TimelineAxisModel,
 ): TemplateResult {
   const inventoryEnabled =
     options.config.show_area_inventory !== false &&
@@ -159,8 +159,13 @@ function renderGroup(
         dir="ltr"
         aria-label=${`פעילות מצטברת עבור ${group.title}`}
       >
-        ${group.aggregateSegments.map((segment) =>
-          renderSegment(segment, "aggregate"),
+        ${renderTimeGrid(
+          axis,
+          "aggregate",
+          options.config,
+          group.aggregateSegments.map((segment) =>
+            renderSegment(segment, "aggregate", options.config),
+          ),
         )}
       </div>
 
@@ -168,7 +173,9 @@ function renderGroup(
         <section class="ahc-area-card__activity" aria-label="פעילות באזור">
           ${group.activityRows.length
             ? html`<div class="ahc-dashboard-group__rows">
-                ${group.activityRows.map((row) => renderRow(row, options))}
+                ${group.activityRows.map((row) =>
+                  renderRow(row, options, axis),
+                )}
                 ${extraActivityCount > 0
                   ? html`<p class="ahc-dashboard-group__more">
                       +${extraActivityCount} פעילויות נוספות
@@ -190,9 +197,10 @@ function renderGroup(
 function renderRow(
   row: ActivityDashboardRow,
   options: ActivityDashboardRendererOptions,
+  axis: TimelineAxisModel,
 ): TemplateResult {
   return html`
-    <div class="ahc-dashboard-row">
+    <div class="ahc-dashboard-row" dir="rtl">
       <div class="ahc-dashboard-row__label" dir="rtl">
         ${renderIcon(row.icon, fallbackIcon(row.domain))}
         <div>
@@ -213,12 +221,17 @@ function renderRow(
         role="img"
         aria-label=${`פעילות עבור ${row.name}`}
       >
-        ${row.segments.map((segment, index) =>
-          renderSegment(segment, "row", (event) =>
-            options.onSegmentClick?.(
-              event,
-              row.entityId,
-              segment.sourceIndex ?? index,
+        ${renderTimeGrid(
+          axis,
+          "row",
+          options.config,
+          row.segments.map((segment, index) =>
+            renderSegment(segment, "row", options.config, (event) =>
+              options.onSegmentClick?.(
+                event,
+                row.entityId,
+                segment.sourceIndex ?? index,
+              ),
             ),
           ),
         )}
@@ -345,6 +358,7 @@ function renderInventoryItem(
 function renderSegment(
   segment: ActivityDashboardSegment,
   variant: "aggregate" | "row",
+  config: ActivityHistoryCardConfig,
   onClick?: (event: Event) => void,
 ): TemplateResult {
   const classes = [
@@ -355,13 +369,17 @@ function renderSegment(
     .filter(Boolean)
     .join(" ");
   const style = `left:${segment.leftPct}%;width:${segment.widthPct}%;--segment-color:${segment.colorVar}`;
+  const title =
+    config.debug_timeline_geometry === true
+      ? `${segment.label} · left ${segment.leftPct.toFixed(2)}% · width ${segment.widthPct.toFixed(2)}%`
+      : segment.label;
 
   if (!onClick) {
     return html`<span
       class=${classes}
       data-category=${segment.category}
       style=${style}
-      title=${segment.label}
+      title=${title}
     ></span>`;
   }
 
@@ -371,8 +389,8 @@ function renderSegment(
       type="button"
       data-category=${segment.category}
       style=${style}
-      title=${segment.label}
-      aria-label=${segment.label}
+      title=${title}
+      aria-label=${title}
       @click=${onClick}
     >
       <span>${CATEGORY_LABELS_HE[segment.category]}</span>
@@ -380,51 +398,141 @@ function renderSegment(
   `;
 }
 
-function renderDensity(buckets: ActivityDensityBucket[]): TemplateResult {
-  const labels = densityLabels(buckets);
+function renderTimeGrid(
+  axis: TimelineAxisModel,
+  variant: "aggregate" | "row" | "density",
+  config: ActivityHistoryCardConfig,
+  children: TemplateResult | TemplateResult[],
+): TemplateResult {
+  return html`
+    <div class=${`ahc-timegrid ahc-timegrid--${variant}`} dir="ltr">
+      ${renderGridLines(axis, config)}
+      ${config.show_now_line === false ? nothing : renderNowMarker(axis)}
+      <div class="ahc-timegrid__segments">${children}</div>
+    </div>
+  `;
+}
+
+function renderGridLines(
+  axis: TimelineAxisModel,
+  config: ActivityHistoryCardConfig,
+): TemplateResult {
+  return html`
+    <div class="ahc-timegrid__grid" aria-hidden="true">
+      ${axis.ticks.map((tick) => renderGridLine(tick, config))}
+    </div>
+  `;
+}
+
+function renderGridLine(
+  tick: TimelineTick,
+  config: ActivityHistoryCardConfig,
+): TemplateResult {
+  const title = config.debug_timeline_geometry
+    ? `${tick.major ? tick.label || "major" : "minor"} · ${tick.percent.toFixed(2)}%`
+    : tick.label;
+  return html`<span
+    class=${tick.major
+      ? "ahc-timegrid__line ahc-timegrid__line--major"
+      : "ahc-timegrid__line ahc-timegrid__line--minor"}
+    style=${`left:${tick.percent}%`}
+    title=${title}
+  ></span>`;
+}
+
+function renderAxis(
+  axis: TimelineAxisModel,
+  config: ActivityHistoryCardConfig,
+): TemplateResult {
+  return html`
+    <div class="ahc-dashboard__axis" dir="ltr" aria-hidden="true">
+      ${renderGridLines(axis, config)}
+      <div class="ahc-dashboard__axis-labels">
+        ${axis.ticks
+          .filter((tick) => tick.major)
+          .map(
+            (tick) =>
+              html`<span
+                class="ahc-dashboard__tick"
+                style=${`left:${tick.percent}%`}
+                title=${config.debug_timeline_geometry
+                  ? `${tick.label} · ${tick.percent.toFixed(2)}%`
+                  : tick.label}
+                >${tick.label}</span
+              >`,
+          )}
+        ${config.show_now_line === false
+          ? nothing
+          : renderNowMarker(axis, "label")}
+      </div>
+    </div>
+  `;
+}
+
+function renderNowMarker(
+  axis: TimelineAxisModel,
+  labelMode: "line" | "label" = "line",
+): TemplateResult | typeof nothing {
+  if (axis.nowPercent === undefined) return nothing;
+  return html`<span
+    class=${labelMode === "label"
+      ? "ahc-timegrid__now ahc-timegrid__now--label"
+      : "ahc-timegrid__now"}
+    style=${`left:${axis.nowPercent}%`}
+    title="עכשיו"
+    >${labelMode === "label"
+      ? html`<span class="ahc-timegrid__now-label">עכשיו</span>`
+      : nothing}</span
+  >`;
+}
+
+function renderDensity(
+  buckets: ActivityDensityBucket[],
+  axis: TimelineAxisModel,
+  config: ActivityHistoryCardConfig,
+): TemplateResult {
+  const labels = axis.ticks.filter((tick) => tick.major);
   return html`
     <section
       class="ahc-dashboard__density"
       dir="ltr"
       aria-label="צפיפות פעילות"
     >
-      <div class="ahc-dashboard__density-bars">
-        ${buckets.map((bucket) => {
-          const active = bucket.totalActiveMs > 0;
-          const title = `${formatTime(bucket.start)} - ${formatTime(
-            bucket.end,
-          )}: ${formatDuration(bucket.totalActiveMs)} · ${
-            bucket.activeEntityCount
-          } רכיבים`;
-          return html`
-            <span
-              class="ahc-dashboard-density-bucket"
-              data-active=${active ? "true" : "false"}
-              title=${title}
-            >
-              <i
-                class="ahc-dashboard-density-fill"
-                style=${`--intensity:${bucket.intensity}`}
-              ></i>
-            </span>
-          `;
-        })}
-      </div>
+      ${renderTimeGrid(
+        axis,
+        "density",
+        { ...config, show_now_line: false },
+        html`<div class="ahc-dashboard__density-bars">
+          ${buckets.map((bucket) => {
+            const active = bucket.totalActiveMs > 0;
+            const title = `${formatTime(bucket.start)} - ${formatTime(
+              bucket.end,
+            )}: ${formatDuration(bucket.totalActiveMs)} · ${
+              bucket.activeEntityCount
+            } רכיבים`;
+            return html`
+              <span
+                class="ahc-dashboard-density-bucket"
+                data-active=${active ? "true" : "false"}
+                title=${title}
+              >
+                <i
+                  class="ahc-dashboard-density-fill"
+                  style=${`--intensity:${bucket.intensity}`}
+                ></i>
+              </span>
+            `;
+          })}
+        </div>`,
+      )}
       <div class="ahc-dashboard__density-labels" aria-hidden="true">
-        ${labels.map((label) => html`<span>${label}</span>`)}
+        ${labels.map(
+          (tick) =>
+            html`<span style=${`left:${tick.percent}%`}>${tick.label}</span>`,
+        )}
       </div>
     </section>
   `;
-}
-
-function densityLabels(buckets: ActivityDensityBucket[]): string[] {
-  if (!buckets.length) return [];
-  const labelCount = Math.min(6, Math.max(4, Math.ceil(buckets.length / 6)));
-  const lastIndex = buckets.length - 1;
-  return Array.from({ length: labelCount }, (_, index) => {
-    const bucket = buckets[Math.round((index / (labelCount - 1)) * lastIndex)];
-    return bucket ? formatTime(bucket.start) : "";
-  }).filter(Boolean);
 }
 
 function renderDashboardEmpty(): TemplateResult {
@@ -482,30 +590,10 @@ function fallbackIcon(domain: string): string {
   return "mdi:toggle-switch-outline";
 }
 
-function buildTicks(
-  range: TimeRange,
-): Array<{ label: string; percent: number }> {
-  const totalHours = Math.max(
-    1,
-    (range.end.getTime() - range.start.getTime()) / 3600000,
-  );
-  const stepHours = totalHours <= 24 ? 3 : totalHours <= 72 ? 6 : 24;
-  const ticks: Array<{ label: string; percent: number }> = [];
-  const start = new Date(range.start);
-  start.setMinutes(0, 0, 0);
-
-  while (start < range.end) {
-    if (start >= range.start) {
-      ticks.push({
-        label: formatTime(start),
-        percent: timeToPercent(start, range),
-      });
-    }
-    start.setHours(start.getHours() + stepHours);
-  }
-
-  ticks.push({ label: formatTime(range.end), percent: 100 });
-  return ticks;
+function axisMajorTickCount(config: ActivityHistoryCardConfig): number {
+  if (config.timeline_axis_density === "compact") return 6;
+  if (config.timeline_axis_density === "auto") return 7;
+  return 8;
 }
 
 function rangeLabelFor(range: TimeRange): string {

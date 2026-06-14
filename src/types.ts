@@ -15,6 +15,7 @@ export type TimePreset = "24h" | "7d" | "custom";
 export type SummaryScope = "visible" | "all";
 export type ActivityMode = "meaningful" | "all";
 export type AreaInventoryMode = "compact" | "expanded" | "off";
+export type TimelineAxisDensity = "auto" | "compact" | "comfortable";
 
 export interface HassEntity {
   entity_id: string;
@@ -125,6 +126,8 @@ export interface ActivityHistoryCardConfig {
   area_inventory_domains?: string[];
   default_collapsed_groups?: string[];
   timeline_height?: string;
+  timeline_axis_density?: TimelineAxisDensity;
+  debug_timeline_geometry?: boolean;
   mobile_breakpoint?: number;
   filters?: FilterConfig;
   entities?: Array<string | EntityConfig>;

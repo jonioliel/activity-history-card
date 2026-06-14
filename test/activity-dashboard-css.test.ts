@@ -5,10 +5,13 @@ describe("activity dashboard CSS", () => {
   it("styles the area dashboard structure emitted by the renderer", () => {
     [
       "--ahc-insights-width: 340px",
-      "--ahc-dashboard-label-width: 230px",
-      "--ahc-dashboard-row-height: 34px",
-      "--ahc-dashboard-segment-height: 10px",
-      "--ahc-dashboard-segment-min-width: 5px",
+      "--ahc-dashboard-label-width: 250px",
+      "--ahc-dashboard-row-height: 38px",
+      "--ahc-dashboard-segment-height: 12px",
+      "--ahc-dashboard-aggregate-height: 14px",
+      "--ahc-dashboard-segment-min-width: 6px",
+      "--ahc-axis-label-color: rgba(235, 242, 255, 0.82)",
+      "--ahc-axis-grid-color: rgba(148, 163, 184, 0.18)",
       "--ahc-dashboard-group-header-height: 42px",
       ".ahc__hero",
       ".ahc__toolbar",
@@ -22,6 +25,12 @@ describe("activity dashboard CSS", () => {
       ".ahc-dashboard__axis",
       ".ahc-dashboard__timeline",
       ".ahc-dashboard__scroll",
+      ".ahc-timegrid",
+      ".ahc-timegrid__grid",
+      ".ahc-timegrid__segments",
+      ".ahc-timegrid__line--major",
+      ".ahc-timegrid__line--minor",
+      ".ahc-timegrid__now-label",
       ".ahc-dashboard-group",
       ".ahc-dashboard-group__header",
       ".ahc-dashboard-group__aggregate",
@@ -41,6 +50,8 @@ describe("activity dashboard CSS", () => {
       ".ahc-inventory-chip__status",
       '[data-state-tone="active"]',
       '[data-state-tone="unavailable"]',
+      "block-size: 42px",
+      "block-size: max(5px, calc(var(--intensity, 0) * 28px))",
     ].forEach((selector) => {
       expect(styles).toContain(selector);
     });

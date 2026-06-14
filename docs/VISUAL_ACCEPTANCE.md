@@ -23,12 +23,26 @@ or correlation.
 
 - The dashboard uses `ahc-dashboard__density`, `ahc-dashboard__timeline`,
   `ahc-dashboard__axis`, and `ahc-dashboard__scroll`.
+- Density, aggregate bands, and row plots use the shared `.ahc-timegrid`
+  structure and the same axis model.
+- The time axis itself is `dir="ltr"` and remains chronological left to right,
+  while labels, group names, controls, and cards remain RTL-friendly.
+- A 24-hour range shows a readable number of major labels, roughly 6-8 in
+  comfortable mode, without overlapping.
+- A seven-day range uses readable day/date labels and avoids dense hourly
+  labels.
+- Major grid lines align across the density strip, aggregate bands, and every
+  activity row; minor grid lines stay subtle.
+- The current-time marker appears only when "now" is inside the active range and
+  uses the label `עכשיו`.
 - Activity rows use a right-side label column and a left-to-right plot column:
   time math remains chronological left to right.
 - Inactive default rails are not visible as thick grey bars; the chart shows
   active segments and subtle grid lines.
-- Segment height is compact and short events remain visible through minimum
-  width styling.
+- Row segments are visually readable at about 12px high; aggregate segments are
+  slightly stronger at about 14px high.
+- Short active events remain visible through minimum width styling and should
+  read as small dots or pills instead of disappearing.
 - Area group headers are compact, around 40-44px high.
 - All-areas inventory is collapsed by default.
 - Single-area inventory is expanded by default.

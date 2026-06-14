@@ -1034,6 +1034,12 @@ export class ActivityHistoryCard extends LitElement {
                   : "idle"}
             </dd>
           </div>
+          ${this._config.debug_timeline_geometry === true
+            ? html`<div>
+                <dt>plot width</dt>
+                <dd>${this._timelinePlotWidthLabel()}</dd>
+              </div>`
+            : nothing}
         </dl>
         <p class="ahc-debug__meta" dir="ltr">
           ${diagnostics.historyRange
@@ -1062,6 +1068,13 @@ export class ActivityHistoryCard extends LitElement {
           : nothing}
       </details>
     `;
+  }
+
+  private _timelinePlotWidthLabel(): string {
+    const plot = this.renderRoot?.querySelector(
+      ".ahc-dashboard-row__plot",
+    ) as HTMLElement | null;
+    return plot?.clientWidth ? `${plot.clientWidth}px` : "pending";
   }
 
   private _renderInsights(): TemplateResult {

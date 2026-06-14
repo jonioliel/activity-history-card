@@ -12,6 +12,8 @@ describe("sample-config.yaml", () => {
     expect(sample).toContain("max_total_rows: 18");
     expect(sample).toContain("max_rows_per_group: 4");
     expect(sample).toContain("timeline_height: calc(100svh - 320px)");
+    expect(sample).toContain("timeline_axis_density: comfortable");
+    expect(sample).toContain("debug_timeline_geometry: false");
   });
 
   it("uses a simple valid YAML shape", () => {

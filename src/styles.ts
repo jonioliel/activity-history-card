@@ -97,12 +97,15 @@ export const activityHistoryCardStyles = css`
     --ahc-activity-segment-height: 9px;
     --ahc-activity-segment-min-width: 4px;
     --ahc-activity-group-gap: 12px;
-    --ahc-dashboard-row-height: 34px;
-    --ahc-dashboard-label-width: 230px;
-    --ahc-dashboard-segment-height: 10px;
-    --ahc-dashboard-segment-min-width: 5px;
+    --ahc-dashboard-row-height: 38px;
+    --ahc-dashboard-label-width: 250px;
+    --ahc-dashboard-segment-height: 12px;
+    --ahc-dashboard-aggregate-height: 14px;
+    --ahc-dashboard-segment-min-width: 6px;
     --ahc-dashboard-group-header-height: 42px;
     --ahc-dashboard-group-gap: 10px;
+    --ahc-axis-label-color: rgba(235, 242, 255, 0.82);
+    --ahc-axis-grid-color: rgba(148, 163, 184, 0.18);
     --ahc-insights-width: 340px;
 
     --ahc-chip-height: 40px;
@@ -3354,10 +3357,14 @@ export const activityHistoryCardStyles = css`
   }
 
   .ahc-dashboard {
-    grid-template-rows: auto auto minmax(0, 1fr);
-    block-size: var(--ahc-dashboard-height, 100%);
-    min-block-size: min(520px, 62svh);
+    min-block-size: 0;
+    block-size: var(
+      --ahc-dashboard-height,
+      var(--ahc-timeline-height, calc(100svh - 320px))
+    );
     max-block-size: 100%;
+    display: flex;
+    flex-direction: column;
     padding: 0;
     gap: 0;
     background:
@@ -3396,9 +3403,12 @@ export const activityHistoryCardStyles = css`
   }
 
   .ahc-dashboard__density-bars {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
     direction: ltr;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(5px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(7px, 1fr));
     align-items: end;
     gap: 4px;
     min-block-size: 0;
@@ -3407,15 +3417,15 @@ export const activityHistoryCardStyles = css`
   .ahc-dashboard-density-bucket {
     display: flex;
     align-items: end;
-    block-size: 24px;
+    block-size: 28px;
     min-inline-size: 0;
     border-radius: 5px;
-    background: rgba(148, 163, 184, 0.026);
+    background: transparent;
   }
 
   .ahc-dashboard-density-fill {
     inline-size: 100%;
-    max-block-size: 22px;
+    max-block-size: 28px;
     border-radius: 6px 6px 2px 2px;
     background: linear-gradient(180deg, #93c5fd 0%, #38bdf8 48%, #22c55e 100%);
     opacity: 0.18;
@@ -3423,44 +3433,177 @@ export const activityHistoryCardStyles = css`
 
   .ahc-dashboard-density-bucket[data-active="true"]
     .ahc-dashboard-density-fill {
-    block-size: max(4px, calc(var(--intensity, 0) * 22px));
+    block-size: max(5px, calc(var(--intensity, 0) * 28px));
     opacity: max(0.44, calc(var(--intensity, 0) * 0.98));
     box-shadow: 0 0 14px rgba(56, 189, 248, 0.18);
   }
 
   .ahc-dashboard__density-labels {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-    color: color-mix(in srgb, var(--ahc-muted) 78%, transparent 22%);
+    position: relative;
+    direction: ltr;
+    color: var(--ahc-axis-label-color);
     font-size: 0.68rem;
     line-height: 1;
+  }
+
+  .ahc-dashboard__density-labels span {
+    position: absolute;
+    inset-block-start: 0;
+    transform: translateX(-50%);
+    min-inline-size: 40px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .ahc-timegrid {
+    direction: ltr;
+    position: relative;
+    min-inline-size: 0;
+    block-size: 100%;
+    overflow: visible;
+  }
+
+  .ahc-timegrid--density {
+    block-size: 28px;
+  }
+
+  .ahc-timegrid--aggregate {
+    block-size: 100%;
+  }
+
+  .ahc-timegrid--row {
+    block-size: var(--ahc-dashboard-row-height);
+  }
+
+  .ahc-timegrid--row::before,
+  .ahc-timegrid--aggregate::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 50%;
+    transform: translateY(-50%);
+    block-size: 1px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.1);
+  }
+
+  .ahc-timegrid__grid,
+  .ahc-timegrid__segments {
+    position: absolute;
+    inset: 0;
+  }
+
+  .ahc-timegrid__grid {
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .ahc-timegrid__segments {
+    z-index: 2;
+  }
+
+  .ahc-timegrid__line {
+    position: absolute;
+    inset-block: 0;
+    inline-size: 1px;
+    transform: translateX(-0.5px);
+    pointer-events: none;
+  }
+
+  .ahc-timegrid__line--major {
+    background: var(--ahc-axis-grid-color);
+  }
+
+  .ahc-timegrid__line--minor {
+    background: rgba(148, 163, 184, 0.08);
+  }
+
+  .ahc-timegrid__now {
+    position: absolute;
+    inset-block: 0;
+    z-index: 3;
+    inline-size: 2px;
+    transform: translateX(-1px);
+    border-radius: 999px;
+    background: rgba(125, 211, 252, 0.9);
+    box-shadow: 0 0 12px rgba(125, 211, 252, 0.3);
+    pointer-events: none;
+  }
+
+  .ahc-timegrid__now--label {
+    inset-block: 0;
+    block-size: auto;
+  }
+
+  .ahc-timegrid__now-label {
+    position: absolute;
+    inset-block-start: 5px;
+    transform: translateX(-50%);
+    padding-block: 2px;
+    padding-inline: 6px;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.72);
+    color: #eff6ff;
+    font-size: 0.66rem;
+    font-weight: 850;
+    line-height: 1;
+    white-space: nowrap;
   }
 
   .ahc-dashboard__timeline {
     min-inline-size: 0;
     min-block-size: 0;
-    display: grid;
-    grid-template-rows: 31px minmax(0, 1fr);
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
+    flex: 1 1 auto;
   }
 
   .ahc-dashboard__axis {
+    position: relative;
+    direction: ltr;
+    flex: 0 0 31px;
     margin-inline-start: 0;
     margin-inline-end: calc(var(--ahc-dashboard-label-width) + 12px);
+    block-size: 31px;
     min-block-size: 31px;
     border-block-end: 1px solid rgba(148, 163, 184, 0.12);
     background: rgba(15, 23, 42, 0.5);
+    overflow: visible;
+  }
+
+  .ahc-dashboard__axis .ahc-timegrid__grid {
+    inset-block: auto 0;
+    block-size: 100%;
+  }
+
+  .ahc-dashboard__axis-labels {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
   }
 
   .ahc-dashboard__tick {
+    position: absolute;
+    inset-block-start: 9px;
+    transform: translateX(-50%);
     min-inline-size: 48px;
+    color: var(--ahc-axis-label-color);
     font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .ahc-dashboard__tick::after {
+    display: none;
   }
 
   .ahc-dashboard__scroll {
     min-inline-size: 0;
     min-block-size: 0;
+    flex: 1 1 auto;
     overflow: auto;
     overscroll-behavior: contain;
     scrollbar-color: rgba(56, 189, 248, 0.48) rgba(15, 23, 42, 0.24);
@@ -3524,16 +3667,12 @@ export const activityHistoryCardStyles = css`
 
   .ahc-dashboard-group__aggregate,
   .ahc-area-card__aggregate {
-    min-block-size: 18px;
+    min-block-size: 24px;
+    block-size: 24px;
     margin-inline: 14px calc(var(--ahc-dashboard-label-width) + 12px);
     border-radius: 0;
-    background-image: linear-gradient(
-      to right,
-      rgba(148, 163, 184, 0.055) 1px,
-      transparent 1px
-    );
     background-color: transparent;
-    background-size: calc(100% / 8) 100%;
+    overflow: visible;
   }
 
   .ahc-dashboard-group__body,
@@ -3549,7 +3688,7 @@ export const activityHistoryCardStyles = css`
   }
 
   .ahc-dashboard-row {
-    direction: ltr;
+    direction: rtl;
     display: grid;
     grid-template-columns: minmax(0, 1fr) var(--ahc-dashboard-label-width);
     gap: 12px;
@@ -3563,15 +3702,12 @@ export const activityHistoryCardStyles = css`
   .ahc-dashboard-row__plot {
     grid-column: 1;
     direction: ltr;
+    position: relative;
     min-block-size: var(--ahc-dashboard-row-height);
     border-radius: 0;
-    background-image: linear-gradient(
-      to right,
-      rgba(148, 163, 184, 0.055) 1px,
-      transparent 1px
-    );
+    background-image: none;
     background-color: transparent;
-    background-size: calc(100% / 8) 100%;
+    overflow: visible;
   }
 
   .ahc-dashboard-row__plot::before {
@@ -3613,7 +3749,9 @@ export const activityHistoryCardStyles = css`
     border: 0;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.18),
-      0 4px 14px rgba(0, 0, 0, 0.2);
+      0 3px 12px rgba(0, 0, 0, 0.22),
+      0 0 14px
+        color-mix(in srgb, var(--segment-color, #38bdf8) 32%, transparent);
   }
 
   .ahc-dashboard-segment--min {
@@ -3621,8 +3759,8 @@ export const activityHistoryCardStyles = css`
   }
 
   .ahc-dashboard-segment--aggregate {
-    block-size: 8px;
-    opacity: 0.64;
+    block-size: var(--ahc-dashboard-aggregate-height);
+    opacity: 0.9;
   }
 
   .ahc-dashboard-group__more {

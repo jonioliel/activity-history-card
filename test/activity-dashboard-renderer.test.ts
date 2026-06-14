@@ -137,6 +137,10 @@ describe("renderActivityDashboard", () => {
     expect(html).toContain("ahc-dashboard__timeline");
     expect(html).toContain("ahc-dashboard__axis");
     expect(html).toContain("ahc-dashboard__scroll");
+    expect(html).toContain("ahc-timegrid");
+    expect(html).toContain("ahc-timegrid--density");
+    expect(html).toContain("ahc-timegrid--aggregate");
+    expect(html).toContain("ahc-timegrid--row");
     expect(html).toContain("ahc-area-card");
     expect(html).toContain("ahc-area-card__title");
     expect(html).toContain("ahc-area-card__aggregate");
@@ -145,7 +149,24 @@ describe("renderActivityDashboard", () => {
     expect(html).toContain("ahc-dashboard-group__aggregate");
     expect(html).toContain("ahc-dashboard-group__body");
     expect(html).toContain("ahc-dashboard-row__plot");
+    expect(html).toContain('dir="ltr"');
+    expect(html).toContain('dir="rtl"');
     expect(html).toContain("ahc-dashboard-segment--row");
+  });
+
+  it("adds geometry titles when timeline debug is enabled", () => {
+    const html = flattenTemplate(
+      renderActivityDashboard({
+        model: model(),
+        config: {
+          type: "custom:activity-history-card",
+          debug_timeline_geometry: true,
+        },
+      }),
+    );
+
+    expect(html).toContain("left 0.00%");
+    expect(html).toContain("width 4.20%");
   });
 
   it("collapses inventory by default for an all-areas dashboard", () => {
