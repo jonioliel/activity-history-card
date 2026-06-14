@@ -2,6 +2,33 @@ import { describe, expect, it } from "vitest";
 import { buildTimelineAxis } from "../src/renderers/timeline-axis";
 
 describe("buildTimelineAxis", () => {
+  it("uses comfortable density with no more than six major labels for 24h", () => {
+    const axis = buildTimelineAxis(
+      {
+        start: new Date("2026-01-01T00:00:00.000Z"),
+        end: new Date("2026-01-02T00:00:00.000Z"),
+      },
+      { maxMajorTicks: 6, now: new Date("2026-01-01T12:00:00.000Z") },
+    );
+    const majors = axis.ticks.filter((tick) => tick.major);
+
+    expect(majors.length).toBeLessThanOrEqual(6);
+    expect(majors.length).toBeGreaterThanOrEqual(4);
+  });
+
+  it("uses compact density with no more than eight major labels", () => {
+    const axis = buildTimelineAxis(
+      {
+        start: new Date("2026-01-01T00:00:00.000Z"),
+        end: new Date("2026-01-02T00:00:00.000Z"),
+      },
+      { maxMajorTicks: 8 },
+    );
+    const majors = axis.ticks.filter((tick) => tick.major);
+
+    expect(majors.length).toBeLessThanOrEqual(8);
+  });
+
   it("keeps a 24 hour axis readable with major and minor ticks", () => {
     const axis = buildTimelineAxis(
       {
@@ -20,6 +47,11 @@ describe("buildTimelineAxis", () => {
     expect(majors.map((tick) => tick.percent)).toEqual(
       [...majors].map((tick) => tick.percent).sort((a, b) => a - b),
     );
+    expect(axis.ticks.map((tick) => tick.percent)).toEqual(
+      [...axis.ticks].map((tick) => tick.percent).sort((a, b) => a - b),
+    );
+    expect(axis.ticks.every((tick) => tick.percent >= 0)).toBe(true);
+    expect(axis.ticks.every((tick) => tick.percent <= 100)).toBe(true);
   });
 
   it("uses a sparse readable axis for seven day ranges", () => {

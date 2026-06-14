@@ -89,7 +89,7 @@ export function renderActivityDashboard(
       </section>
 
       ${model.hiddenRowsCount
-        ? html`<p class="ahc-dashboard__hidden-note">
+        ? html`<p class="ahc-dashboard__hidden-note ahc-dashboard__notice">
             התצוגה שומרת על ציר פעילות נקי. רכיבים ללא פעילות עדיין מופיעים
             במלאי האביזרים של האזור.
           </p>`
@@ -453,7 +453,8 @@ function renderAxis(
           .map(
             (tick) =>
               html`<span
-                class="ahc-dashboard__tick"
+                class="ahc-dashboard__tick ahc-dashboard__axis-label"
+                data-edge=${tickEdge(tick)}
                 style=${`left:${tick.percent}%`}
                 title=${config.debug_timeline_geometry
                   ? `${tick.label} · ${tick.percent.toFixed(2)}%`
@@ -502,7 +503,10 @@ function renderDensity(
         axis,
         "density",
         { ...config, show_now_line: false },
-        html`<div class="ahc-dashboard__density-bars">
+        html`<div
+          class="ahc-dashboard__density-bars"
+          style=${`--bucket-count:${Math.max(1, buckets.length)}`}
+        >
           ${buckets.map((bucket) => {
             const active = bucket.totalActiveMs > 0;
             const title = `${formatTime(bucket.start)} - ${formatTime(
@@ -528,7 +532,11 @@ function renderDensity(
       <div class="ahc-dashboard__density-labels" aria-hidden="true">
         ${labels.map(
           (tick) =>
-            html`<span style=${`left:${tick.percent}%`}>${tick.label}</span>`,
+            html`<span
+              data-edge=${tickEdge(tick)}
+              style=${`left:${tick.percent}%`}
+              >${tick.label}</span
+            >`,
         )}
       </div>
     </section>
@@ -591,9 +599,15 @@ function fallbackIcon(domain: string): string {
 }
 
 function axisMajorTickCount(config: ActivityHistoryCardConfig): number {
-  if (config.timeline_axis_density === "compact") return 6;
+  if (config.timeline_axis_density === "compact") return 8;
   if (config.timeline_axis_density === "auto") return 7;
-  return 8;
+  return 6;
+}
+
+function tickEdge(tick: TimelineTick): "start" | "end" | "middle" {
+  if (tick.percent <= 0.5) return "start";
+  if (tick.percent >= 99.5) return "end";
+  return "middle";
 }
 
 function rangeLabelFor(range: TimeRange): string {

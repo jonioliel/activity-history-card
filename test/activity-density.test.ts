@@ -62,6 +62,7 @@ describe("calculateActivityDensity", () => {
     expect(buckets[0]?.activeEntityCount).toBe(2);
     expect(buckets[0]?.intensity).toBe(1);
     expect(buckets[1]?.activeEntityCount).toBe(1);
+    expect(buckets.some((bucket) => bucket.intensity > 0)).toBe(true);
   });
 
   it("uses a denser default for a seven day range", () => {

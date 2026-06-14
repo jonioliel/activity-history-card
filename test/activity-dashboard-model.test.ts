@@ -115,6 +115,11 @@ describe("buildActivityDashboardModel", () => {
 
     expect(model.totalVisibleActiveMs).toBeGreaterThan(0);
     expect(renderedSegments.length).toBeGreaterThan(0);
+    expect(
+      renderedSegments.every(
+        (segment) => segment.widthPct > 0 || segment.minVisible === true,
+      ),
+    ).toBe(true);
     expect(model.densityBuckets.some((bucket) => bucket.intensity > 0)).toBe(
       true,
     );

@@ -8,10 +8,10 @@ describe("activity dashboard CSS", () => {
       "--ahc-dashboard-label-width: 250px",
       "--ahc-dashboard-row-height: 38px",
       "--ahc-dashboard-segment-height: 12px",
-      "--ahc-dashboard-aggregate-height: 14px",
+      "--ahc-dashboard-aggregate-height: 15px",
       "--ahc-dashboard-segment-min-width: 6px",
-      "--ahc-axis-label-color: rgba(235, 242, 255, 0.82)",
-      "--ahc-axis-grid-color: rgba(148, 163, 184, 0.18)",
+      "--ahc-axis-label-color: rgba(235, 242, 255, 0.92)",
+      "--ahc-axis-grid-color: rgba(148, 163, 184, 0.22)",
       "--ahc-dashboard-group-header-height: 42px",
       ".ahc__hero",
       ".ahc__toolbar",
@@ -50,7 +50,7 @@ describe("activity dashboard CSS", () => {
       ".ahc-inventory-chip__status",
       '[data-state-tone="active"]',
       '[data-state-tone="unavailable"]',
-      "block-size: 42px",
+      "block-size: 54px",
       "block-size: max(5px, calc(var(--intensity, 0) * 28px))",
     ].forEach((selector) => {
       expect(styles).toContain(selector);

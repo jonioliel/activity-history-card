@@ -25,6 +25,8 @@ describe("sample-config.yaml", () => {
     expect(sample).not.toContain("\t");
     for (const line of lines) {
       const trimmed = line.trim();
+      expect(line.search(/\S/)).toBeGreaterThanOrEqual(0);
+      expect(line.search(/\S/) % 2).toBe(0);
       if (trimmed.startsWith("- ")) continue;
       expect(trimmed).toMatch(/^[\w_]+:/);
     }

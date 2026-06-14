@@ -58,6 +58,7 @@ area_inventory_show_state: true
 area_inventory_show_last_activity: true
 timeline_height: calc(100svh - 320px)
 timeline_axis_density: comfortable
+debug_timeline_geometry: false
 collapse_groups: false
 exclude_labels:
   - לא להצגה
@@ -105,6 +106,7 @@ area_inventory_show_last_activity: true
 debug: false
 timeline_height: calc(100svh - 320px)
 timeline_axis_density: comfortable
+debug_timeline_geometry: false
 filters:
   show: true
   show_search: true

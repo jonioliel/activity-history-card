@@ -61,6 +61,8 @@ const cards: ActivityHistoryCardConfig[] = [
     area_inventory_mode: "compact",
     area_inventory_include_inactive: true,
     area_inventory_max_items: 12,
+    timeline_height: "calc(100svh - 320px)",
+    timeline_axis_density: "comfortable",
     show_insights: true,
     debug: false,
   },
@@ -83,6 +85,8 @@ const cards: ActivityHistoryCardConfig[] = [
     area_inventory_mode: "expanded",
     area_inventory_include_inactive: true,
     area_inventory_max_items: 10,
+    timeline_height: "620px",
+    timeline_axis_density: "comfortable",
     show_insights: false,
   },
   {

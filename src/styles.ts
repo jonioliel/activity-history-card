@@ -100,12 +100,12 @@ export const activityHistoryCardStyles = css`
     --ahc-dashboard-row-height: 38px;
     --ahc-dashboard-label-width: 250px;
     --ahc-dashboard-segment-height: 12px;
-    --ahc-dashboard-aggregate-height: 14px;
+    --ahc-dashboard-aggregate-height: 15px;
     --ahc-dashboard-segment-min-width: 6px;
     --ahc-dashboard-group-header-height: 42px;
     --ahc-dashboard-group-gap: 10px;
-    --ahc-axis-label-color: rgba(235, 242, 255, 0.82);
-    --ahc-axis-grid-color: rgba(148, 163, 184, 0.18);
+    --ahc-axis-label-color: rgba(235, 242, 255, 0.92);
+    --ahc-axis-grid-color: rgba(148, 163, 184, 0.22);
     --ahc-insights-width: 340px;
 
     --ahc-chip-height: 40px;
@@ -3357,26 +3357,35 @@ export const activityHistoryCardStyles = css`
   }
 
   .ahc-dashboard {
-    min-block-size: 0;
+    position: relative;
+    inline-size: 100%;
+    min-inline-size: 0;
     block-size: var(
       --ahc-dashboard-height,
       var(--ahc-timeline-height, calc(100svh - 320px))
     );
-    max-block-size: 100%;
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    gap: 0;
+    min-block-size: 520px;
+    max-block-size: 760px;
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid rgba(125, 211, 252, 0.16);
+    border-radius: 18px;
     background:
-      linear-gradient(180deg, rgba(30, 41, 59, 0.44), rgba(2, 6, 23, 0.28)),
-      rgba(15, 23, 42, 0.5);
+      linear-gradient(180deg, rgba(20, 31, 54, 0.94), rgba(8, 13, 29, 0.96)),
+      rgba(15, 23, 42, 0.88);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.045),
+      0 18px 46px rgba(2, 6, 23, 0.22);
+    overflow: hidden;
   }
 
   .ahc-dashboard__header {
     min-block-size: 48px;
-    padding-block: 8px;
-    padding-inline: 14px;
-    border-block-end: 1px solid rgba(148, 163, 184, 0.14);
+    padding-block: 0;
+    padding-inline: 4px;
+    border-block-end: 1px solid rgba(148, 163, 184, 0.11);
   }
 
   .ahc-dashboard__title-block h3 {
@@ -3390,16 +3399,18 @@ export const activityHistoryCardStyles = css`
 
   .ahc-dashboard__density {
     display: grid;
-    grid-template-rows: minmax(0, 1fr) 12px;
-    gap: 2px;
-    block-size: 42px;
-    min-block-size: 42px;
-    padding-block: 5px 3px;
+    grid-template-rows: 32px 14px;
+    gap: 4px;
+    block-size: 54px;
+    min-block-size: 54px;
+    padding-block: 4px 3px;
     padding-inline: 14px calc(var(--ahc-dashboard-label-width) + 14px);
-    border: 0;
-    border-block-end: 1px solid rgba(148, 163, 184, 0.12);
-    border-radius: 0;
-    background: rgba(2, 6, 23, 0.18);
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    border-radius: 14px;
+    background:
+      linear-gradient(180deg, rgba(15, 23, 42, 0.7), rgba(2, 6, 23, 0.42)),
+      rgba(15, 23, 42, 0.34);
+    overflow: hidden;
   }
 
   .ahc-dashboard__density-bars {
@@ -3408,23 +3419,28 @@ export const activityHistoryCardStyles = css`
     z-index: 2;
     direction: ltr;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(7px, 1fr));
+    grid-template-columns: repeat(var(--bucket-count, 24), minmax(5px, 1fr));
     align-items: end;
-    gap: 4px;
+    gap: 3px;
     min-block-size: 0;
   }
 
   .ahc-dashboard-density-bucket {
-    display: flex;
-    align-items: end;
-    block-size: 28px;
+    position: relative;
+    display: block;
+    block-size: 32px;
     min-inline-size: 0;
     border-radius: 5px;
-    background: transparent;
+    background: rgba(148, 163, 184, 0.055);
+    overflow: hidden;
   }
 
   .ahc-dashboard-density-fill {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
     inline-size: 100%;
+    block-size: 4px;
     max-block-size: 28px;
     border-radius: 6px 6px 2px 2px;
     background: linear-gradient(180deg, #93c5fd 0%, #38bdf8 48%, #22c55e 100%);
@@ -3443,6 +3459,7 @@ export const activityHistoryCardStyles = css`
     direction: ltr;
     color: var(--ahc-axis-label-color);
     font-size: 0.68rem;
+    font-weight: 700;
     line-height: 1;
   }
 
@@ -3455,16 +3472,31 @@ export const activityHistoryCardStyles = css`
     white-space: nowrap;
   }
 
+  .ahc-dashboard__density-labels span[data-edge="start"],
+  .ahc-dashboard__axis-label[data-edge="start"] {
+    transform: none;
+    text-align: start;
+  }
+
+  .ahc-dashboard__density-labels span[data-edge="end"],
+  .ahc-dashboard__axis-label[data-edge="end"] {
+    transform: translateX(-100%);
+    text-align: end;
+  }
+
   .ahc-timegrid {
     direction: ltr;
     position: relative;
+    inline-size: 100%;
     min-inline-size: 0;
     block-size: 100%;
-    overflow: visible;
+    min-block-size: 30px;
+    overflow: hidden;
   }
 
   .ahc-timegrid--density {
-    block-size: 28px;
+    block-size: 32px;
+    min-block-size: 32px;
   }
 
   .ahc-timegrid--aggregate {
@@ -3484,7 +3516,7 @@ export const activityHistoryCardStyles = css`
     transform: translateY(-50%);
     block-size: 1px;
     border-radius: 999px;
-    background: rgba(148, 163, 184, 0.1);
+    background: rgba(148, 163, 184, 0.035);
   }
 
   .ahc-timegrid__grid,
@@ -3500,6 +3532,7 @@ export const activityHistoryCardStyles = css`
 
   .ahc-timegrid__segments {
     z-index: 2;
+    pointer-events: auto;
   }
 
   .ahc-timegrid__line {
@@ -3515,7 +3548,7 @@ export const activityHistoryCardStyles = css`
   }
 
   .ahc-timegrid__line--minor {
-    background: rgba(148, 163, 184, 0.08);
+    background: rgba(148, 163, 184, 0.055);
   }
 
   .ahc-timegrid__now {
@@ -3553,23 +3586,27 @@ export const activityHistoryCardStyles = css`
   .ahc-dashboard__timeline {
     min-inline-size: 0;
     min-block-size: 0;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 0;
     overflow: hidden;
-    flex: 1 1 auto;
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    border-radius: 16px;
+    background:
+      linear-gradient(180deg, rgba(15, 23, 42, 0.74), rgba(2, 6, 23, 0.38)),
+      rgba(15, 23, 42, 0.28);
   }
 
   .ahc-dashboard__axis {
     position: relative;
     direction: ltr;
-    flex: 0 0 31px;
     margin-inline-start: 0;
     margin-inline-end: calc(var(--ahc-dashboard-label-width) + 12px);
-    block-size: 31px;
-    min-block-size: 31px;
+    block-size: 34px;
+    min-block-size: 34px;
     border-block-end: 1px solid rgba(148, 163, 184, 0.12);
-    background: rgba(15, 23, 42, 0.5);
-    overflow: visible;
+    background: rgba(15, 23, 42, 0.34);
+    overflow: hidden;
   }
 
   .ahc-dashboard__axis .ahc-timegrid__grid {
@@ -3583,17 +3620,19 @@ export const activityHistoryCardStyles = css`
     z-index: 2;
   }
 
-  .ahc-dashboard__tick {
+  .ahc-dashboard__tick,
+  .ahc-dashboard__axis-label {
     position: absolute;
-    inset-block-start: 9px;
+    inset-block-start: 10px;
     transform: translateX(-50%);
     min-inline-size: 48px;
     color: var(--ahc-axis-label-color);
-    font-size: 0.72rem;
-    font-weight: 700;
+    font-size: 0.75rem;
+    font-weight: 800;
     line-height: 1;
     text-align: center;
     white-space: nowrap;
+    text-shadow: 0 1px 6px rgba(2, 6, 23, 0.55);
   }
 
   .ahc-dashboard__tick::after {
@@ -3603,8 +3642,9 @@ export const activityHistoryCardStyles = css`
   .ahc-dashboard__scroll {
     min-inline-size: 0;
     min-block-size: 0;
-    flex: 1 1 auto;
     overflow: auto;
+    padding-block: 10px 12px;
+    padding-inline: 6px;
     overscroll-behavior: contain;
     scrollbar-color: rgba(56, 189, 248, 0.48) rgba(15, 23, 42, 0.24);
   }
@@ -3616,33 +3656,35 @@ export const activityHistoryCardStyles = css`
   .ahc-dashboard-group,
   .ahc-area-card {
     display: grid;
-    gap: 0;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-    overflow: visible;
+    gap: 8px;
+    padding: 10px 12px 12px;
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    border-radius: 16px;
+    background:
+      linear-gradient(180deg, rgba(15, 23, 42, 0.64), rgba(2, 6, 23, 0.3)),
+      rgba(15, 23, 42, 0.28);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+    overflow: hidden;
   }
 
   .ahc-dashboard-group + .ahc-dashboard-group {
-    border-block-start: 1px solid rgba(148, 163, 184, 0.14);
+    margin-block-start: 10px;
   }
 
   .ahc-dashboard-group__header,
   .ahc-area-card__header {
     min-block-size: var(--ahc-dashboard-group-header-height);
     padding-block: 0;
-    padding-inline: 14px;
-    background: linear-gradient(
-      90deg,
-      rgba(15, 23, 42, 0.84),
-      rgba(30, 41, 59, 0.46)
-    );
+    padding-inline: 0;
+    background: transparent;
   }
 
   .ahc-dashboard-group__title,
   .ahc-area-card__title {
+    min-inline-size: 0;
+  }
+
+  .ahc-area-card__title-copy {
     min-inline-size: 0;
   }
 
@@ -3659,6 +3701,14 @@ export const activityHistoryCardStyles = css`
     font-size: 0.72rem;
   }
 
+  .ahc-area-card__actions {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 8px;
+    min-inline-size: 0;
+  }
+
   .ahc-area-card__inventory-button,
   .ahc-area-inventory__more {
     min-block-size: 32px;
@@ -3667,12 +3717,12 @@ export const activityHistoryCardStyles = css`
 
   .ahc-dashboard-group__aggregate,
   .ahc-area-card__aggregate {
-    min-block-size: 24px;
-    block-size: 24px;
-    margin-inline: 14px calc(var(--ahc-dashboard-label-width) + 12px);
+    min-block-size: 28px;
+    block-size: 28px;
+    margin-inline: 0 calc(var(--ahc-dashboard-label-width) + 12px);
     border-radius: 0;
     background-color: transparent;
-    overflow: visible;
+    overflow: hidden;
   }
 
   .ahc-dashboard-group__body,
@@ -3694,9 +3744,13 @@ export const activityHistoryCardStyles = css`
     gap: 12px;
     min-block-size: var(--ahc-dashboard-row-height);
     padding-block: 0;
-    padding-inline: 14px;
-    border-radius: 0;
+    padding-inline: 0;
+    border-radius: 8px;
     border-block-start: 1px solid rgba(148, 163, 184, 0.07);
+  }
+
+  .ahc-dashboard-row:hover {
+    background: rgba(56, 189, 248, 0.045);
   }
 
   .ahc-dashboard-row__plot {
@@ -3707,7 +3761,7 @@ export const activityHistoryCardStyles = css`
     border-radius: 0;
     background-image: none;
     background-color: transparent;
-    overflow: visible;
+    overflow: hidden;
   }
 
   .ahc-dashboard-row__plot::before {
@@ -3719,10 +3773,10 @@ export const activityHistoryCardStyles = css`
     direction: rtl;
     align-self: stretch;
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: 34px minmax(0, 1fr);
     align-items: center;
     gap: 8px;
-    padding-inline: 0;
+    padding-inline: 0 10px;
     min-inline-size: 0;
     border-inline-start: 1px solid rgba(148, 163, 184, 0.1);
   }
@@ -3744,14 +3798,24 @@ export const activityHistoryCardStyles = css`
   }
 
   .ahc-dashboard-segment {
+    position: absolute;
+    inset-block-start: 50%;
+    transform: translateY(-50%);
     block-size: var(--ahc-dashboard-segment-height);
     min-inline-size: 0;
     border: 0;
+    border-radius: 999px;
+    background: var(--segment-color, #38bdf8);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.24),
       0 3px 12px rgba(0, 0, 0, 0.22),
       0 0 14px
-        color-mix(in srgb, var(--segment-color, #38bdf8) 32%, transparent);
+        color-mix(in srgb, var(--segment-color, #38bdf8) 38%, transparent);
+    opacity: 0.96;
+  }
+
+  .ahc-dashboard-segment--row {
+    block-size: var(--ahc-dashboard-segment-height);
   }
 
   .ahc-dashboard-segment--min {
@@ -3760,7 +3824,11 @@ export const activityHistoryCardStyles = css`
 
   .ahc-dashboard-segment--aggregate {
     block-size: var(--ahc-dashboard-aggregate-height);
-    opacity: 0.9;
+    opacity: 0.92;
+  }
+
+  button.ahc-dashboard-segment span {
+    display: none;
   }
 
   .ahc-dashboard-group__more {
@@ -3773,17 +3841,24 @@ export const activityHistoryCardStyles = css`
 
   .ahc-area-card__quiet {
     min-block-size: 42px;
-    margin-inline: 14px;
-    border-radius: 8px;
+    margin-inline: 0;
+    border-radius: 10px;
   }
 
   .ahc-area-inventory {
     max-block-size: 120px;
     overflow: auto;
-    margin: 8px 14px 12px;
+    margin: 2px 0 0;
     padding: 8px;
-    border-radius: 8px;
-    background: rgba(2, 6, 23, 0.28);
+    border: 1px solid rgba(148, 163, 184, 0.09);
+    border-radius: 14px;
+    background:
+      linear-gradient(180deg, rgba(15, 23, 42, 0.62), rgba(2, 6, 23, 0.3)),
+      rgba(2, 6, 23, 0.22);
+  }
+
+  .ahc-area-card[data-inventory-expanded="true"] .ahc-area-inventory {
+    max-block-size: 260px;
   }
 
   .ahc-area-inventory__header {
@@ -3795,22 +3870,40 @@ export const activityHistoryCardStyles = css`
     gap: 6px;
   }
 
+  .ahc-area-inventory__domain {
+    display: grid;
+    gap: 5px;
+    min-inline-size: 0;
+  }
+
+  .ahc-area-inventory__domain-title {
+    color: rgba(226, 232, 240, 0.72);
+    font-size: 0.68rem;
+    font-weight: 800;
+  }
+
   .ahc-area-inventory__chips {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 6px;
   }
 
   .ahc-inventory-chip {
-    min-block-size: 40px;
-    padding-block: 5px;
+    min-block-size: 36px;
+    block-size: 36px;
+    grid-template-columns: 28px minmax(0, 1fr);
+    padding-block: 4px;
     padding-inline: 7px;
-    border-radius: 8px;
+    border-radius: 10px;
   }
 
   .ahc-inventory-chip .ahc-dashboard-icon {
     inline-size: 24px;
     block-size: 24px;
+  }
+
+  .ahc-inventory-chip__copy {
+    min-inline-size: 0;
   }
 
   .ahc-inventory-chip__copy strong {
@@ -3819,6 +3912,21 @@ export const activityHistoryCardStyles = css`
 
   .ahc-inventory-chip__copy small {
     font-size: 0.68rem;
+  }
+
+  .ahc-dashboard__notice {
+    position: absolute;
+    inset-inline: 18px;
+    inset-block-end: 10px;
+    margin: 0;
+    padding-block: 6px;
+    padding-inline: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: 10px;
+    background: rgba(2, 6, 23, 0.72);
+    color: rgba(226, 232, 240, 0.78);
+    font-size: 0.72rem;
+    text-align: center;
   }
 
   @media (max-width: 1100px) {
@@ -3883,19 +3991,36 @@ export const activityHistoryCardStyles = css`
 
     .ahc-dashboard {
       min-block-size: 560px;
+      max-block-size: none;
       block-size: auto;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 16px;
     }
 
     .ahc-dashboard__density {
+      grid-template-rows: 32px;
+      block-size: 42px;
+      min-block-size: 42px;
       padding-inline: 10px calc(var(--ahc-dashboard-label-width) + 10px);
+    }
+
+    .ahc-dashboard__density-labels {
+      display: none;
     }
 
     .ahc-dashboard__axis {
       margin-inline-end: calc(var(--ahc-dashboard-label-width) + 10px);
     }
 
+    .ahc-dashboard__axis-label {
+      min-inline-size: 40px;
+      font-size: 0.66rem;
+    }
+
     .ahc-dashboard__scroll {
       max-block-size: min(66svh, 720px);
+      padding-inline: 4px;
     }
 
     .ahc-dashboard-row {
@@ -3916,7 +4041,11 @@ export const activityHistoryCardStyles = css`
 
     .ahc-area-inventory {
       max-block-size: 150px;
-      margin-inline: 10px;
+      margin-inline: 0;
+    }
+
+    .ahc-area-card[data-inventory-expanded="true"] .ahc-area-inventory {
+      max-block-size: 260px;
     }
 
     .ahc-area-inventory__chips {
