@@ -27,13 +27,24 @@ import {
 import { renderCorrelationPlaceholder } from "./renderers/correlation-renderer";
 import { renderDetailPlaceholder } from "./renderers/detail-renderer";
 import { renderHeatmapPlaceholder } from "./renderers/heatmap-renderer";
-import { renderActivityDashboard } from "./renderers/activity-dashboard-renderer";
+import {
+  activityDashboardToMockup05Model,
+  renderActivityDashboard,
+} from "./renderers/activity-dashboard-renderer";
 import { renderActivityTimeline } from "./renderers/activity-timeline-renderer";
+import {
+  renderMockup05Dashboard,
+  renderMockup05Hero,
+  renderMockup05Insights,
+  renderMockup05Summary,
+  renderMockup05Toolbar,
+} from "./renderers/mockup05-layout";
 import { renderSwimlaneTimeline } from "./renderers/swimlane-renderer";
 import { curateRows, formatCurationSummary } from "./activity-curation";
 import { activityHistoryCardStyles } from "./styles";
 import { summarizeActivity } from "./summary";
 import { resolveRendererMode, type RendererMode } from "./view-mode";
+import { mockup05VisualModel } from "./mockup05/mockup05-model";
 import "./activity-history-card-editor";
 import type {
   ActivityHistoryCardConfig,
@@ -239,6 +250,8 @@ export class ActivityHistoryCard extends LitElement {
     );
     const classes = [
       "ahc",
+      this._currentRendererMode() === "activity" ? "ahc--mockup05-shell" : "",
+      this._isMockup05VisualPreview() ? "ahc--mockup05-preview" : "",
       this._config.display_mode === "panel" ? "ahc--panel" : "",
       this._fullscreen || this._config.display_mode === "fullscreen"
         ? "ahc--fullscreen"
@@ -272,6 +285,14 @@ export class ActivityHistoryCard extends LitElement {
     `;
   }
 
+  private _isMockup05VisualPreview(): boolean {
+    return (
+      this._config?.mock_data === true &&
+      this._config.mock_profile === "mockup05_visual" &&
+      this._currentRendererMode() === "activity"
+    );
+  }
+
   private _renderBody(): TemplateResult {
     const showInsights = this._config.show_insights !== false;
     return html`
@@ -289,19 +310,35 @@ export class ActivityHistoryCard extends LitElement {
   }
 
   private _renderHeader(): TemplateResult {
+    if (this._isMockup05VisualPreview()) {
+      return renderMockup05Hero(
+        {
+          ...mockup05VisualModel.hero,
+          title: this._config.title ?? mockup05VisualModel.hero.title,
+        },
+        {
+          onRefresh: this._manualRefresh,
+          onFullscreen:
+            this._config.show_fullscreen_button === false
+              ? undefined
+              : this._toggleFullscreen,
+        },
+      );
+    }
+
     const subtitle = `${this._timePresetLabel(this._filter.timePreset)} · ${this._usingMockData ? "נתוני דוגמה" : "נתוני Home Assistant"}`;
     return html`
-      <header class="ahc__hero ahc__topbar">
-        <div class="ahc__title-block">
+      <section class="ahc__hero ahc__topbar">
+        <div class="ahc__title-block ahc__hero-main">
           <div class="ahc__title-row">
-            <span class="ahc__icon-badge" aria-hidden="true"
+            <span class="ahc__icon-badge ahc__hero-icon" aria-hidden="true"
               ><ha-icon icon="mdi:chart-timeline-variant"></ha-icon
             ></span>
-            <h2 class="ahc__title">
+            <h2 class="ahc__title ahc__hero-title">
               ${this._config.title ?? DEFAULT_CONFIG.title}
             </h2>
           </div>
-          <p class="ahc__subtitle">${subtitle}</p>
+          <p class="ahc__subtitle ahc__hero-subtitle">${subtitle}</p>
           ${this._renderLastEventPill()}
         </div>
         <div class="ahc__hero-actions">
@@ -334,7 +371,7 @@ export class ActivityHistoryCard extends LitElement {
               >`
             : nothing}
         </div>
-      </header>
+      </section>
     `;
   }
 
@@ -357,6 +394,10 @@ export class ActivityHistoryCard extends LitElement {
 
   private _renderFilters(): TemplateResult | typeof nothing {
     if (this._config.filters?.show === false) return nothing;
+    if (this._isMockup05VisualPreview()) {
+      return renderMockup05Toolbar(mockup05VisualModel.toolbar);
+    }
+
     const curationSummary = formatCurationSummary(this._curation);
     const rendererMode = this._currentRendererMode();
     const activityDashboard = rendererMode === "activity";
@@ -375,7 +416,9 @@ export class ActivityHistoryCard extends LitElement {
 
     return html`
       <section class="ahc__toolbar ahc__filters" aria-label="מסננים">
-        <div class="ahc__filter-row ahc__filter-row--primary">
+        <div
+          class="ahc__filter-row ahc__filter-row--primary ahc__toolbar-group"
+        >
           <span class="ahc__filter-label">טווח זמן</span>
           ${this._renderChip("24 שעות", this._filter.timePreset === "24h", () =>
             this._setTimePreset("24h"),
@@ -466,8 +509,16 @@ export class ActivityHistoryCard extends LitElement {
     pressed: boolean,
     onClick: () => void,
   ): TemplateResult {
+    const classes = [
+      "ahc__chip",
+      "ahc__filter-chip",
+      pressed ? "ahc__filter-chip--active" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
     return html`<button
-      class="ahc__chip"
+      class=${classes}
       type="button"
       aria-pressed=${pressed ? "true" : "false"}
       @click=${onClick}
@@ -478,8 +529,17 @@ export class ActivityHistoryCard extends LitElement {
 
   private _renderSummary(): TemplateResult | typeof nothing {
     if (this._config.show_summary === false) return nothing;
+    if (this._isMockup05VisualPreview()) {
+      return renderMockup05Summary(mockup05VisualModel.summary);
+    }
     if (this._dashboardModel && this._config.summary_scope !== "all") {
-      return this._renderDashboardSummary(this._dashboardModel);
+      return renderMockup05Summary(
+        activityDashboardToMockup05Model(this._dashboardModel, this._config, {
+          expandedInventoryGroups: this._expandedInventoryGroups,
+          collapsedInventoryGroups: this._collapsedInventoryGroups,
+          showAllInventory: this._showAllRows,
+        }).summary,
+      );
     }
     const summary = this._summary;
     const dashboard = this._dashboardModel;
@@ -654,6 +714,14 @@ export class ActivityHistoryCard extends LitElement {
   }
 
   private _renderMainContent(): TemplateResult {
+    if (this._isMockup05VisualPreview()) {
+      return renderMockup05Dashboard(mockup05VisualModel, {
+        config: this._config,
+        onInventoryToggle: this._toggleInventoryGroup,
+        onInventoryItemClick: this._openInventoryMoreInfo,
+      });
+    }
+
     if (this._initialLoad && !this._rows.length) {
       return this._renderInitialLoading();
     }
@@ -1078,8 +1146,17 @@ export class ActivityHistoryCard extends LitElement {
   }
 
   private _renderInsights(): TemplateResult {
+    if (this._isMockup05VisualPreview()) {
+      return renderMockup05Insights(mockup05VisualModel.insights);
+    }
     if (this._dashboardModel && this._config.summary_scope !== "all") {
-      return this._renderDashboardInsights(this._dashboardModel);
+      return renderMockup05Insights(
+        activityDashboardToMockup05Model(this._dashboardModel, this._config, {
+          expandedInventoryGroups: this._expandedInventoryGroups,
+          collapsedInventoryGroups: this._collapsedInventoryGroups,
+          showAllInventory: this._showAllRows,
+        }).insights,
+      );
     }
     const summary = this._summary;
     const mostActive = summary?.mostActiveEntity;

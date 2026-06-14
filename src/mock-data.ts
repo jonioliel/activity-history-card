@@ -239,6 +239,9 @@ export function getMockHistory(
 }
 
 function mockSeedsForProfile(profile?: string): MockEntitySeed[] {
+  if (profile === "mockup05_visual") {
+    return [];
+  }
   if (profile === "large_noisy_home") {
     return [...MOCK_ENTITIES, ...buildLargeNoisyHome()];
   }

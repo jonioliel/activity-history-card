@@ -1,4 +1,4 @@
-import { html, nothing, type TemplateResult } from "lit";
+import { type TemplateResult } from "lit";
 import type {
   ActivityDashboardGroup,
   ActivityDashboardModel,
@@ -13,12 +13,24 @@ import {
   DOMAIN_LABELS_HE,
 } from "../defaults";
 import { formatDuration, formatTime } from "../format";
-import type { ActivityHistoryCardConfig, TimeRange } from "../types";
+import type { ActivityHistoryCardConfig, StateCategory } from "../types";
 import {
-  buildTimelineAxis,
-  type TimelineAxisModel,
-  type TimelineTick,
-} from "./timeline-axis";
+  mockup05VisualModel,
+  type Mockup05DensityBucket,
+  type Mockup05Group,
+  type Mockup05Insight,
+  type Mockup05InventoryItem,
+  type Mockup05Model,
+  type Mockup05Row,
+  type Mockup05Segment,
+  type Mockup05SegmentTone,
+  type Mockup05StateTone,
+  type Mockup05SummaryCard,
+} from "../mockup05/mockup05-model";
+import {
+  renderMockup05Dashboard,
+  type Mockup05RenderOptions,
+} from "./mockup05-layout";
 
 export interface ActivityDashboardRendererOptions {
   model: ActivityDashboardModel;
@@ -38,543 +50,326 @@ export interface ActivityDashboardRendererOptions {
 export function renderActivityDashboard(
   options: ActivityDashboardRendererOptions,
 ): TemplateResult {
-  const { model, config } = options;
-  const axis = buildTimelineAxis(model.range, {
-    maxMajorTicks: axisMajorTickCount(config),
-  });
-  const timelineStyle = config.timeline_height
-    ? `--ahc-dashboard-height:${config.timeline_height};--ahc-timeline-height:${config.timeline_height}`
-    : "";
-
-  if (!model.visibleRowsCount && !model.totalInventoryItemCount) {
-    return renderDashboardEmpty();
-  }
-
-  return html`
-    <section
-      class="ahc-dashboard"
-      dir="rtl"
-      aria-label="ציר זמן פעילות"
-      style=${timelineStyle}
-    >
-      <header class="ahc-dashboard__header">
-        <div class="ahc-dashboard__title-block">
-          <h3>ציר זמן פעילות</h3>
-          <p>
-            ${model.visibleRowsCount} רכיבי פעילות מתוך
-            ${model.totalInventoryItemCount || model.totalRowsBeforeCuration}
-            אביזרים
-            ${model.hiddenRowsCount
-              ? html` · הוסתרו ${model.hiddenRowsCount} שורות רעש`
-              : nothing}
-          </p>
-        </div>
-        <div class="ahc-dashboard__range-pill">
-          ${rangeLabelFor(model.range)}
-        </div>
-      </header>
-
-      ${config.show_activity_density === false
-        ? nothing
-        : renderDensity(model.densityBuckets, axis, config)}
-
-      <section
-        class="ahc-dashboard__timeline"
-        aria-label="פעילות לפי אזור ורכיב"
-      >
-        ${renderAxis(axis, config)}
-        <div class="ahc-dashboard__scroll">
-          ${model.groups.map((group) => renderGroup(group, options, axis))}
-        </div>
-      </section>
-
-      ${model.hiddenRowsCount
-        ? html`<p class="ahc-dashboard__hidden-note ahc-dashboard__notice">
-            התצוגה שומרת על ציר פעילות נקי. רכיבים ללא פעילות עדיין מופיעים
-            במלאי האביזרים של האזור.
-          </p>`
-        : nothing}
-    </section>
-  `;
+  return renderMockup05Dashboard(
+    activityDashboardToMockup05Model(options.model, options.config, options),
+    toMockupOptions(options),
+  );
 }
 
-function renderGroup(
-  group: ActivityDashboardGroup,
+export function activityDashboardToMockup05Model(
+  model: ActivityDashboardModel,
+  config: ActivityHistoryCardConfig,
+  options: Pick<
+    ActivityDashboardRendererOptions,
+    "expandedInventoryGroups" | "collapsedInventoryGroups" | "showAllInventory"
+  > = {},
+): Mockup05Model {
+  const axisLabels = buildSixAxisLabels(model.range);
+  const groups = model.groups
+    .map((group) => toVisualGroup(group, model, config, options))
+    .filter((group): group is Mockup05Group => Boolean(group));
+  const summary = toVisualSummary(model);
+
+  return {
+    hero: {
+      ...mockup05VisualModel.hero,
+      subtitle: `Home Assistant · ${rangeLabelFor(model.range)} · ${model.totalInventoryItemCount} רכיבים`,
+    },
+    toolbar: mockup05VisualModel.toolbar,
+    summary,
+    rangeLabel: rangeLabelFor(model.range),
+    axisLabels,
+    density: toVisualDensity(model.densityBuckets),
+    groups,
+    insights: toVisualInsights(model),
+  };
+}
+
+function toMockupOptions(
   options: ActivityDashboardRendererOptions,
-  axis: TimelineAxisModel,
-): TemplateResult {
+): Mockup05RenderOptions {
+  return {
+    config: options.config,
+    onSegmentClick: options.onSegmentClick,
+    onInventoryToggle: options.onInventoryToggle,
+    onInventoryItemClick: options.onInventoryItemClick,
+  };
+}
+
+function toVisualSummary(model: ActivityDashboardModel): Mockup05SummaryCard[] {
+  const latest = latestSegment(model.groups);
+  const latestCaption = latest
+    ? [
+        categoryLabel(latest.segment.category),
+        latest.row.area,
+        formatTime(latest.segment.end),
+      ]
+        .filter(Boolean)
+        .join(" · ")
+    : "לא נמצאו אירועים";
+
+  return [
+    {
+      id: "active-now",
+      label: "פעילים עכשיו",
+      value: String(model.activeNowCount),
+      caption: "רכיבים במצב פעיל",
+      icon: "mdi:circle-medium",
+      tone: model.activeNowCount ? "on" : "idle",
+    },
+    {
+      id: "active-components",
+      label: "רכיבים שפעלו",
+      value: String(model.visibleRowsCount),
+      caption: `מתוך ${model.totalInventoryItemCount || model.totalRowsBeforeCuration} רכיבים שנבחרו`,
+      icon: "mdi:toggle-switch-outline",
+      tone: "cooling",
+    },
+    {
+      id: "events",
+      label: "אירועים",
+      value: String(model.visibleEventCount),
+      caption: "שינויי מצב פעילים",
+      icon: "mdi:timeline-clock-outline",
+      tone: "playing",
+    },
+    {
+      id: "component-hours",
+      label: "סה״כ שעות־רכיב",
+      value: formatDuration(model.totalVisibleActiveMs),
+      caption: "סכום פעילות על פני כל הרכיבים",
+      icon: "mdi:clock-outline",
+      tone: "heating",
+    },
+    {
+      id: "last-event",
+      label: "אירוע אחרון",
+      value: latest?.row.name ?? "אין",
+      caption: latestCaption,
+      icon: "mdi:music-note-eighth",
+      tone: latest ? categoryToStateTone(latest.segment.category) : "idle",
+    },
+  ];
+}
+
+function toVisualDensity(
+  density: ActivityDensityBucket[],
+): Mockup05DensityBucket[] {
+  if (!density.length) {
+    return Array.from({ length: 24 }, (_, index) => ({
+      id: `density-${index}`,
+      label: `${index}:00`,
+      value: "אין פעילות",
+      intensity: 0,
+      active: false,
+    }));
+  }
+
+  return density.map((bucket, index) => ({
+    id: `density-${index}`,
+    label: formatTime(bucket.start),
+    value: `${formatDuration(bucket.totalActiveMs)} · ${bucket.activeEntityCount} רכיבים`,
+    intensity: bucket.intensity,
+    active: bucket.totalActiveMs > 0,
+  }));
+}
+
+function toVisualGroup(
+  group: ActivityDashboardGroup,
+  model: ActivityDashboardModel,
+  config: ActivityHistoryCardConfig,
+  options: Pick<
+    ActivityDashboardRendererOptions,
+    "expandedInventoryGroups" | "collapsedInventoryGroups" | "showAllInventory"
+  >,
+): Mockup05Group | undefined {
   const inventoryEnabled =
-    options.config.show_area_inventory !== false &&
-    options.config.area_inventory_mode !== "off";
+    config.show_area_inventory !== false &&
+    config.area_inventory_mode !== "off";
+  const hasActivity = group.activityRows.length > 0;
+  const hasInventory = inventoryEnabled && group.inventoryItems.length > 0;
+
+  if (!hasActivity && !hasInventory) return undefined;
+
   const defaultExpanded =
-    options.config.area_inventory_mode === "expanded" ||
-    options.model.singleAreaFocused ||
+    config.area_inventory_mode === "expanded" ||
+    model.singleAreaFocused ||
     options.showAllInventory === true;
-  const inventoryExpanded =
+  const expanded =
     options.collapsedInventoryGroups?.has(group.id) === true
       ? false
       : defaultExpanded ||
         options.expandedInventoryGroups?.has(group.id) === true;
+  const inventoryItems = hasInventory
+    ? group.inventoryItems.map(toVisualInventoryItem)
+    : [];
+  const previewLimit = inventoryLimit(config);
+  const visibleInventory = expanded
+    ? inventoryItems
+    : inventoryItems.slice(0, Math.min(4, previewLimit));
+  const hiddenInventoryCount = Math.max(
+    0,
+    group.inventoryItemCount - visibleInventory.length,
+  );
 
-  const extraActivityCount = Math.max(0, group.hiddenRowsCount);
-
-  return html`
-    <section
-      class="ahc-area-card ahc-dashboard-group"
-      data-has-activity=${group.activityRows.length ? "true" : "false"}
-      data-inventory-expanded=${inventoryExpanded ? "true" : "false"}
-    >
-      <header class="ahc-area-card__header ahc-dashboard-group__header">
-        <div class="ahc-area-card__title ahc-dashboard-group__title">
-          ${renderIcon(group.icon, "mdi:home-outline")}
-          <div class="ahc-area-card__title-copy">
-            <strong>${group.title}</strong>
-            <span>
-              ${group.visibleActivityRowCount} פעילים בטווח ·
-              ${group.inventoryItemCount} אביזרים
-            </span>
-          </div>
-        </div>
-        <div class="ahc-area-card__actions">
-          <div class="ahc-area-card__meta ahc-dashboard-group__meta">
-            ${formatDuration(group.totalActiveMs)} · ${group.eventCount} אירועים
-          </div>
-          ${inventoryEnabled && group.inventoryItemCount
-            ? html`<button
-                class="ahc-area-card__inventory-button"
-                type="button"
-                aria-expanded=${inventoryExpanded ? "true" : "false"}
-                @click=${() => options.onInventoryToggle?.(group.id)}
-              >
-                ${inventoryExpanded
-                  ? "סגור מלאי"
-                  : `אביזרים ${group.inventoryItemCount}`}
-              </button>`
-            : nothing}
-        </div>
-      </header>
-
-      <div
-        class="ahc-area-card__aggregate ahc-dashboard-group__aggregate"
-        dir="ltr"
-        aria-label=${`פעילות מצטברת עבור ${group.title}`}
-      >
-        ${renderTimeGrid(
-          axis,
-          "aggregate",
-          options.config,
-          group.aggregateSegments.map((segment) =>
-            renderSegment(segment, "aggregate", options.config),
-          ),
-        )}
-      </div>
-
-      <div class="ahc-area-card__content ahc-dashboard-group__body">
-        <section class="ahc-area-card__activity" aria-label="פעילות באזור">
-          ${group.activityRows.length
-            ? html`<div class="ahc-dashboard-group__rows">
-                ${group.activityRows.map((row) =>
-                  renderRow(row, options, axis),
-                )}
-                ${extraActivityCount > 0
-                  ? html`<p class="ahc-dashboard-group__more">
-                      +${extraActivityCount} פעילויות נוספות
-                    </p>`
-                  : nothing}
-              </div>`
-            : html`<div class="ahc-area-card__quiet">
-                אין פעילות משמעותית בטווח הנוכחי
-              </div>`}
-        </section>
-        ${inventoryEnabled && group.inventoryItems.length && inventoryExpanded
-          ? renderInventory(group, options, inventoryExpanded)
-          : nothing}
-      </div>
-    </section>
-  `;
+  return {
+    id: group.id,
+    title: group.title,
+    icon: group.icon ?? "mdi:home-outline",
+    meta: `${group.inventoryItemCount} רכיבים · ${formatDuration(group.totalActiveMs)}`,
+    activityLabel: hasActivity
+      ? `${group.visibleActivityRowCount} פעילים · ${group.eventCount} אירועים`
+      : "אין פעילות בטווח",
+    inventoryLabel: "כל האביזרים",
+    aggregateSegments: group.aggregateSegments.map(toVisualSegment),
+    rows: group.activityRows.map(toVisualRow),
+    inventoryItems: visibleInventory,
+    inventoryTotal: group.inventoryItemCount,
+    hiddenInventoryCount,
+    expandedInventory: expanded,
+  };
 }
 
-function renderRow(
+function toVisualRow(row: ActivityDashboardRow): Mockup05Row {
+  const latest = latestRowSegment(row);
+  const stateTone = latest
+    ? categoryToStateTone(latest.category)
+    : row.activeNow
+      ? "on"
+      : "idle";
+
+  return {
+    id: row.entityId,
+    entityId: row.entityId,
+    label: row.name,
+    secondary: row.secondary,
+    state: latest
+      ? categoryLabel(latest.category)
+      : row.activeNow
+        ? "פעיל"
+        : "לא פעיל",
+    stateTone,
+    icon: row.icon ?? fallbackIcon(row.domain),
+    totalLabel: formatDuration(row.totalActiveMs),
+    eventLabel: `${row.eventCount} אירועים`,
+    segments: row.segments.map(toVisualSegment),
+  };
+}
+
+function toVisualSegment(segment: ActivityDashboardSegment): Mockup05Segment {
+  return {
+    leftPct: segment.leftPct,
+    widthPct: segment.widthPct,
+    tone: categoryToSegmentTone(segment.category),
+    label: segment.label,
+    minVisible: segment.minVisible,
+    sourceIndex: segment.sourceIndex,
+  };
+}
+
+function toVisualInventoryItem(item: AreaInventoryItem): Mockup05InventoryItem {
+  return {
+    id: item.entityId,
+    entityId: item.entityId,
+    label: item.name,
+    secondary: domainLabel(item.domain),
+    state: item.currentStateLabel ?? domainLabel(item.domain),
+    stateTone: inventoryTone(item),
+    icon: item.icon ?? fallbackIcon(item.domain),
+    activeNow: item.activeNow,
+    hadActivity: item.hadActivityInRange,
+  };
+}
+
+function toVisualInsights(model: ActivityDashboardModel): Mockup05Insight[] {
+  const mostActiveEntity = model.insights.mostActiveEntity;
+  const mostActiveArea = model.insights.mostActiveArea;
+
+  return [
+    {
+      id: "most-active-entity",
+      title: "הרכיב הפעיל ביותר",
+      value: mostActiveEntity?.name ?? "אין נתונים",
+      caption: mostActiveEntity
+        ? `${mostActiveEntity.secondary ?? "רכיב"} · ${formatDuration(mostActiveEntity.totalActiveMs)} · ${mostActiveEntity.eventCount} אירועים`
+        : "לא נמצאה פעילות בטווח הנוכחי",
+      icon: "mdi:star-four-points",
+    },
+    {
+      id: "most-active-area",
+      title: "האזור הפעיל ביותר",
+      value: mostActiveArea?.title ?? "אין נתונים",
+      caption: mostActiveArea
+        ? `${mostActiveArea.rowCount} רכיבים · ${formatDuration(mostActiveArea.totalActiveMs)} · ${mostActiveArea.eventCount} אירועים`
+        : "לא נמצאו אזורים פעילים",
+      icon: "mdi:home-lightning-bolt-outline",
+    },
+    {
+      id: "peak-hours",
+      title: "שעות שיא",
+      value: model.insights.peakBucketLabel ?? "אין נתונים",
+      caption: "לפי משך פעילות",
+      icon: "mdi:chart-bar",
+    },
+    {
+      id: "short-pattern",
+      title: "דפוס שימוש קצר",
+      value: model.insights.shortUsePattern ?? "אין נתונים",
+      caption: model.insights.inventoryPattern ?? "לפי התצוגה הנוכחית",
+      icon: "mdi:lightning-bolt-outline",
+    },
+  ];
+}
+
+function latestSegment(
+  groups: ActivityDashboardGroup[],
+):
+  | { row: ActivityDashboardRow; segment: ActivityDashboardSegment }
+  | undefined {
+  return groups
+    .flatMap((group) =>
+      group.activityRows.flatMap((row) =>
+        row.segments.map((segment) => ({ row, segment })),
+      ),
+    )
+    .sort((a, b) => b.segment.end.getTime() - a.segment.end.getTime())[0];
+}
+
+function latestRowSegment(
   row: ActivityDashboardRow,
-  options: ActivityDashboardRendererOptions,
-  axis: TimelineAxisModel,
-): TemplateResult {
-  return html`
-    <div class="ahc-dashboard-row" dir="rtl">
-      <div class="ahc-dashboard-row__label" dir="rtl">
-        ${renderIcon(row.icon, fallbackIcon(row.domain))}
-        <div>
-          <strong title=${row.name}>${row.name}</strong>
-          ${row.secondary
-            ? html`<span title=${row.secondary}>${row.secondary}</span>`
-            : nothing}
-          <span class="ahc-dashboard-row__inline-meta">
-            <strong>${formatDuration(row.totalActiveMs)}</strong>
-            <span>${row.eventCount} אירועים</span>
-          </span>
-        </div>
-      </div>
-
-      <div
-        class="ahc-dashboard-row__plot"
-        dir="ltr"
-        role="img"
-        aria-label=${`פעילות עבור ${row.name}`}
-      >
-        ${renderTimeGrid(
-          axis,
-          "row",
-          options.config,
-          row.segments.map((segment, index) =>
-            renderSegment(segment, "row", options.config, (event) =>
-              options.onSegmentClick?.(
-                event,
-                row.entityId,
-                segment.sourceIndex ?? index,
-              ),
-            ),
-          ),
-        )}
-      </div>
-
-      <div class="ahc-dashboard-row__meta">
-        <strong>${formatDuration(row.totalActiveMs)}</strong>
-        <span>${row.eventCount} אירועים</span>
-      </div>
-    </div>
-  `;
+): ActivityDashboardSegment | undefined {
+  return [...row.segments].sort((a, b) => b.end.getTime() - a.end.getTime())[0];
 }
 
-function renderInventory(
-  group: ActivityDashboardGroup,
-  options: ActivityDashboardRendererOptions,
-  expanded: boolean,
-): TemplateResult {
-  const limit = inventoryLimit(options.config);
-  const items = expanded
-    ? group.inventoryItems
-    : group.inventoryItems.slice(0, limit);
-  const hiddenCount = Math.max(0, group.inventoryItems.length - items.length);
-  const groupedItems =
-    options.config.area_inventory_group_by_domain === false
-      ? [{ title: "", items }]
-      : groupInventoryItems(items);
-
-  return html`
-    <section
-      class="ahc-area-inventory"
-      aria-label=${`אביזרים באזור ${group.title}`}
-    >
-      <header class="ahc-area-inventory__header">
-        <span>אביזרים באזור</span>
-        <small>
-          ${group.inventoryItems.filter((item) => item.activeNow).length} פעילים
-          עכשיו
-        </small>
-      </header>
-      <div class="ahc-area-inventory__groups">
-        ${groupedItems.map(
-          (itemGroup) => html`
-            <div class="ahc-area-inventory__domain">
-              ${itemGroup.title
-                ? html`<span class="ahc-area-inventory__domain-title"
-                    >${itemGroup.title}</span
-                  >`
-                : nothing}
-              <div class="ahc-area-inventory__chips">
-                ${itemGroup.items.map((item) =>
-                  renderInventoryItem(item, options.config, options),
-                )}
-              </div>
-            </div>
-          `,
-        )}
-      </div>
-      ${hiddenCount
-        ? html`<button
-            class="ahc-area-inventory__more"
-            type="button"
-            @click=${() => options.onInventoryToggle?.(group.id)}
-          >
-            עוד ${hiddenCount} אביזרים
-          </button>`
-        : nothing}
-    </section>
-  `;
+function categoryToSegmentTone(category: StateCategory): Mockup05SegmentTone {
+  if (category === "cooling") return "cooling";
+  if (category === "heating") return "heating";
+  if (category === "playing") return "playing";
+  if (category === "fan" || category === "drying") return "fan";
+  if (category === "opening" || category === "closing") return "open";
+  return "on";
 }
 
-function renderInventoryItem(
-  item: AreaInventoryItem,
-  config: ActivityHistoryCardConfig,
-  options: ActivityDashboardRendererOptions,
-): TemplateResult {
-  const showState =
-    config.area_inventory_show_state ??
-    DEFAULT_CONFIG.area_inventory_show_state;
-  const showLastActivity =
-    config.area_inventory_show_last_activity ??
-    DEFAULT_CONFIG.area_inventory_show_last_activity;
-  const stateTone =
-    item.stateTone ??
-    (item.activeNow
-      ? "active"
-      : item.hadActivityInRange
-        ? "had_activity"
-        : "inactive");
-  const title = `${item.name} · ${domainLabel(item.domain)}${
-    item.currentStateLabel ? ` · ${item.currentStateLabel}` : ""
-  }`;
-
-  return html`
-    <button
-      class="ahc-inventory-chip"
-      type="button"
-      data-active-now=${item.activeNow ? "true" : "false"}
-      data-had-activity=${item.hadActivityInRange ? "true" : "false"}
-      data-state-tone=${stateTone}
-      data-state-category=${item.currentCategory ?? "none"}
-      title=${title}
-      aria-label=${title}
-      @click=${(event: Event) =>
-        options.onInventoryItemClick?.(event, item.entityId)}
-    >
-      ${renderIcon(item.icon, fallbackIcon(item.domain))}
-      <span class="ahc-inventory-chip__copy">
-        <span class="ahc-inventory-chip__status" aria-hidden="true"></span>
-        <strong>${item.name}</strong>
-        <small>
-          ${showState && item.currentStateLabel
-            ? item.currentStateLabel
-            : domainLabel(item.domain)}
-          ${showLastActivity && item.hadActivityInRange && item.totalActiveMs
-            ? html` · ${formatDuration(item.totalActiveMs)}`
-            : nothing}
-        </small>
-      </span>
-    </button>
-  `;
+function categoryToStateTone(category: StateCategory): Mockup05StateTone {
+  if (category === "off" || category === "idle") return "idle";
+  if (category === "unknown" || category === "unavailable")
+    return "unavailable";
+  return categoryToSegmentTone(category);
 }
 
-function renderSegment(
-  segment: ActivityDashboardSegment,
-  variant: "aggregate" | "row",
-  config: ActivityHistoryCardConfig,
-  onClick?: (event: Event) => void,
-): TemplateResult {
-  const classes = [
-    "ahc-dashboard-segment",
-    `ahc-dashboard-segment--${variant}`,
-    segment.minVisible ? "ahc-dashboard-segment--min" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-  const style = `left:${segment.leftPct}%;width:${segment.widthPct}%;--segment-color:${segment.colorVar}`;
-  const title =
-    config.debug_timeline_geometry === true
-      ? `${segment.label} · left ${segment.leftPct.toFixed(2)}% · width ${segment.widthPct.toFixed(2)}%`
-      : segment.label;
-
-  if (!onClick) {
-    return html`<span
-      class=${classes}
-      data-category=${segment.category}
-      style=${style}
-      title=${title}
-    ></span>`;
-  }
-
-  return html`
-    <button
-      class=${classes}
-      type="button"
-      data-category=${segment.category}
-      style=${style}
-      title=${title}
-      aria-label=${title}
-      @click=${onClick}
-    >
-      <span>${CATEGORY_LABELS_HE[segment.category]}</span>
-    </button>
-  `;
+function inventoryTone(item: AreaInventoryItem): Mockup05StateTone {
+  if (item.stateTone === "unavailable") return "unavailable";
+  if (item.currentCategory) return categoryToStateTone(item.currentCategory);
+  if (item.activeNow) return "on";
+  return item.hadActivityInRange ? "idle" : "idle";
 }
 
-function renderTimeGrid(
-  axis: TimelineAxisModel,
-  variant: "aggregate" | "row" | "density",
-  config: ActivityHistoryCardConfig,
-  children: TemplateResult | TemplateResult[],
-): TemplateResult {
-  return html`
-    <div class=${`ahc-timegrid ahc-timegrid--${variant}`} dir="ltr">
-      ${renderGridLines(axis, config)}
-      ${config.show_now_line === false ? nothing : renderNowMarker(axis)}
-      <div class="ahc-timegrid__segments">${children}</div>
-    </div>
-  `;
+function categoryLabel(category: StateCategory): string {
+  return CATEGORY_LABELS_HE[category] ?? category;
 }
 
-function renderGridLines(
-  axis: TimelineAxisModel,
-  config: ActivityHistoryCardConfig,
-): TemplateResult {
-  return html`
-    <div class="ahc-timegrid__grid" aria-hidden="true">
-      ${axis.ticks.map((tick) => renderGridLine(tick, config))}
-    </div>
-  `;
-}
-
-function renderGridLine(
-  tick: TimelineTick,
-  config: ActivityHistoryCardConfig,
-): TemplateResult {
-  const title = config.debug_timeline_geometry
-    ? `${tick.major ? tick.label || "major" : "minor"} · ${tick.percent.toFixed(2)}%`
-    : tick.label;
-  return html`<span
-    class=${tick.major
-      ? "ahc-timegrid__line ahc-timegrid__line--major"
-      : "ahc-timegrid__line ahc-timegrid__line--minor"}
-    style=${`left:${tick.percent}%`}
-    title=${title}
-  ></span>`;
-}
-
-function renderAxis(
-  axis: TimelineAxisModel,
-  config: ActivityHistoryCardConfig,
-): TemplateResult {
-  return html`
-    <div class="ahc-dashboard__axis" dir="ltr" aria-hidden="true">
-      ${renderGridLines(axis, config)}
-      <div class="ahc-dashboard__axis-labels">
-        ${axis.ticks
-          .filter((tick) => tick.major)
-          .map(
-            (tick) =>
-              html`<span
-                class="ahc-dashboard__tick ahc-dashboard__axis-label"
-                data-edge=${tickEdge(tick)}
-                style=${`left:${tick.percent}%`}
-                title=${config.debug_timeline_geometry
-                  ? `${tick.label} · ${tick.percent.toFixed(2)}%`
-                  : tick.label}
-                >${tick.label}</span
-              >`,
-          )}
-        ${config.show_now_line === false
-          ? nothing
-          : renderNowMarker(axis, "label")}
-      </div>
-    </div>
-  `;
-}
-
-function renderNowMarker(
-  axis: TimelineAxisModel,
-  labelMode: "line" | "label" = "line",
-): TemplateResult | typeof nothing {
-  if (axis.nowPercent === undefined) return nothing;
-  return html`<span
-    class=${labelMode === "label"
-      ? "ahc-timegrid__now ahc-timegrid__now--label"
-      : "ahc-timegrid__now"}
-    style=${`left:${axis.nowPercent}%`}
-    title="עכשיו"
-    >${labelMode === "label"
-      ? html`<span class="ahc-timegrid__now-label">עכשיו</span>`
-      : nothing}</span
-  >`;
-}
-
-function renderDensity(
-  buckets: ActivityDensityBucket[],
-  axis: TimelineAxisModel,
-  config: ActivityHistoryCardConfig,
-): TemplateResult {
-  const labels = axis.ticks.filter((tick) => tick.major);
-  return html`
-    <section
-      class="ahc-dashboard__density"
-      dir="ltr"
-      aria-label="צפיפות פעילות"
-    >
-      ${renderTimeGrid(
-        axis,
-        "density",
-        { ...config, show_now_line: false },
-        html`<div
-          class="ahc-dashboard__density-bars"
-          style=${`--bucket-count:${Math.max(1, buckets.length)}`}
-        >
-          ${buckets.map((bucket) => {
-            const active = bucket.totalActiveMs > 0;
-            const title = `${formatTime(bucket.start)} - ${formatTime(
-              bucket.end,
-            )}: ${formatDuration(bucket.totalActiveMs)} · ${
-              bucket.activeEntityCount
-            } רכיבים`;
-            return html`
-              <span
-                class="ahc-dashboard-density-bucket"
-                data-active=${active ? "true" : "false"}
-                title=${title}
-              >
-                <i
-                  class="ahc-dashboard-density-fill"
-                  style=${`--intensity:${bucket.intensity}`}
-                ></i>
-              </span>
-            `;
-          })}
-        </div>`,
-      )}
-      <div class="ahc-dashboard__density-labels" aria-hidden="true">
-        ${labels.map(
-          (tick) =>
-            html`<span
-              data-edge=${tickEdge(tick)}
-              style=${`left:${tick.percent}%`}
-              >${tick.label}</span
-            >`,
-        )}
-      </div>
-    </section>
-  `;
-}
-
-function renderDashboardEmpty(): TemplateResult {
-  return html`
-    <section class="ahc-dashboard ahc-dashboard-empty" dir="rtl">
-      <h3>לא נמצאה פעילות משמעותית בטווח הזה</h3>
-      <p>
-        נסה להגדיל את טווח הזמן, להציג את כל האביזרים, או לפתוח סינון מתקדם.
-      </p>
-    </section>
-  `;
-}
-
-function renderIcon(
-  icon: string | undefined,
-  fallback: string,
-): TemplateResult {
-  return html`<span class="ahc-dashboard-icon" aria-hidden="true"
-    ><ha-icon icon=${icon ?? fallback}></ha-icon
-  ></span>`;
-}
-
-function groupInventoryItems(
-  items: AreaInventoryItem[],
-): Array<{ title: string; items: AreaInventoryItem[] }> {
-  const groups = new Map<string, AreaInventoryItem[]>();
-  for (const item of items) {
-    const title = domainLabel(item.domain);
-    groups.set(title, [...(groups.get(title) ?? []), item]);
-  }
-  return [...groups.entries()].map(([title, groupItems]) => ({
-    title,
-    items: groupItems,
-  }));
+function domainLabel(domain: string): string {
+  return DOMAIN_LABELS_HE[domain] ?? domain;
 }
 
 function inventoryLimit(config: ActivityHistoryCardConfig): number {
@@ -583,10 +378,6 @@ function inventoryLimit(config: ActivityHistoryCardConfig): number {
     return Math.max(1, Math.floor(configured));
   }
   return DEFAULT_CONFIG.area_inventory_max_items;
-}
-
-function domainLabel(domain: string): string {
-  return DOMAIN_LABELS_HE[domain] ?? domain;
 }
 
 function fallbackIcon(domain: string): string {
@@ -598,23 +389,33 @@ function fallbackIcon(domain: string): string {
   return "mdi:toggle-switch-outline";
 }
 
-function axisMajorTickCount(config: ActivityHistoryCardConfig): number {
-  if (config.timeline_axis_density === "compact") return 8;
-  if (config.timeline_axis_density === "auto") return 7;
-  return 6;
-}
-
-function tickEdge(tick: TimelineTick): "start" | "end" | "middle" {
-  if (tick.percent <= 0.5) return "start";
-  if (tick.percent >= 99.5) return "end";
-  return "middle";
-}
-
-function rangeLabelFor(range: TimeRange): string {
-  const hours = Math.round(
-    (range.end.getTime() - range.start.getTime()) / 3600000,
+function rangeLabelFor(range: { start: Date; end: Date }): string {
+  const durationHours = Math.max(
+    1,
+    Math.round((range.end.getTime() - range.start.getTime()) / 3600000),
   );
-  if (hours >= 24 * 7) return "7 ימים";
-  if (hours >= 24) return `${Math.round(hours / 24)} ימים`;
-  return `${hours} שעות`;
+  const duration =
+    durationHours >= 24
+      ? `${Math.round(durationHours / 24)} ימים`
+      : `${durationHours} שעות`;
+
+  return `${formatTime(range.start)} - ${formatTime(range.end)} · ${duration}`;
+}
+
+function buildSixAxisLabels(range: { start: Date; end: Date }): Array<{
+  label: string;
+  percent: number;
+}> {
+  const startMs = range.start.getTime();
+  const endMs = range.end.getTime();
+  const durationMs = Math.max(1, endMs - startMs);
+
+  return Array.from({ length: 6 }, (_, index) => {
+    const percent = index * 20;
+    const timestamp = startMs + durationMs * (percent / 100);
+    return {
+      label: formatTime(new Date(timestamp)),
+      percent,
+    };
+  });
 }

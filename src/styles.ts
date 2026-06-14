@@ -38,6 +38,15 @@ export const activityHistoryCardStyles = css`
       --ha-card-background,
       var(--card-background-color, #0f172a)
     );
+    --ahc-bg: #0b1020;
+    --ahc-surface: #11182b;
+    --ahc-surface-2: #17223a;
+    --ahc-blue: #6fb6ff;
+    --ahc-green: #b5eea2;
+    --ahc-purple: #b8a2ff;
+    --ahc-yellow: #f5d84f;
+    --ahc-orange: #ffa45c;
+    --ahc-teal: #7dd3fc;
     --ahc-page-bg: var(--lovelace-background, #020617);
     --ahc-surface-1: color-mix(in srgb, var(--ahc-card-bg) 88%, #1e3a5f 12%);
     --ahc-surface-2: color-mix(
@@ -97,10 +106,10 @@ export const activityHistoryCardStyles = css`
     --ahc-activity-segment-height: 9px;
     --ahc-activity-segment-min-width: 4px;
     --ahc-activity-group-gap: 12px;
-    --ahc-dashboard-row-height: 38px;
-    --ahc-dashboard-label-width: 250px;
-    --ahc-dashboard-segment-height: 12px;
-    --ahc-dashboard-aggregate-height: 15px;
+    --ahc-dashboard-row-height: 34px;
+    --ahc-dashboard-label-width: 230px;
+    --ahc-dashboard-segment-height: 11px;
+    --ahc-dashboard-aggregate-height: 13px;
     --ahc-dashboard-segment-min-width: 6px;
     --ahc-dashboard-group-header-height: 42px;
     --ahc-dashboard-group-gap: 10px;
@@ -3232,10 +3241,63 @@ export const activityHistoryCardStyles = css`
     }
   }
 
-  /* Mockup 05 compact dashboard shell */
+  /* Mockup 05 visual shell */
+  .ahc--mockup05-shell {
+    --ahc-bg: #0b1020;
+    --ahc-surface: rgba(17, 24, 43, 0.96);
+    --ahc-surface-2: rgba(23, 34, 58, 0.92);
+    --ahc-border: rgba(125, 211, 252, 0.16);
+    --ahc-text: #eff6ff;
+    --ahc-muted: rgba(226, 232, 240, 0.72);
+    --ahc-blue: #6fb6ff;
+    --ahc-green: #b5eea2;
+    --ahc-purple: #b8a2ff;
+    --ahc-yellow: #f5d84f;
+    --ahc-orange: #ffa45c;
+    --ahc-teal: #7dd3fc;
+    --ahc-insights-width: 340px;
+    --ahc-dashboard-label-width: 230px;
+    --ahc-dashboard-row-height: 34px;
+    --ahc-dashboard-segment-height: 11px;
+    --ahc-dashboard-aggregate-height: 13px;
+    --ahc-dashboard-segment-min-width: 6px;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 22px;
+    background:
+      linear-gradient(120deg, rgba(40, 31, 76, 0.78), transparent 26%),
+      linear-gradient(110deg, rgba(37, 99, 235, 0.2), transparent 54%),
+      var(--ahc-bg);
+  }
+
+  .ahc--mockup05-shell.ahc--panel,
+  .ahc--mockup05-shell.ahc--fullscreen {
+    grid-template-rows: minmax(0, 88px) minmax(0, 56px) minmax(0, 86px) minmax(
+        0,
+        1fr
+      );
+    block-size: min(100svh, 980px);
+  }
+
+  .ahc--mockup05-shell .ahc__hero,
   .ahc__hero {
     min-block-size: 72px;
-    max-block-size: 96px;
+    max-block-size: 88px;
+  }
+
+  .ahc--mockup05-shell .ahc__hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding-block: 10px;
+    padding-inline: 16px;
+    border: 1px solid rgba(125, 211, 252, 0.12);
+    border-radius: 16px;
+    background:
+      linear-gradient(90deg, rgba(39, 54, 86, 0.9), rgba(17, 24, 43, 0.9)),
+      rgba(15, 23, 42, 0.84);
+    overflow: hidden;
   }
 
   .ahc__hero.ahc__topbar {
@@ -3244,8 +3306,42 @@ export const activityHistoryCardStyles = css`
     padding-inline: 14px;
   }
 
+  .ahc__hero-main {
+    min-inline-size: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
   .ahc__hero .ahc__title-block {
     justify-items: start;
+  }
+
+  .ahc__hero-icon {
+    flex: 0 0 46px;
+    inline-size: 46px;
+    block-size: 46px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(125, 211, 252, 0.22);
+    border-radius: 13px;
+    color: var(--ahc-blue);
+    background: rgba(96, 165, 250, 0.14);
+  }
+
+  .ahc__hero-title {
+    margin: 0;
+    color: var(--ahc-text);
+    font-size: clamp(1.1rem, 1.25vw, 1.45rem);
+    font-weight: 900;
+    line-height: 1.1;
+  }
+
+  .ahc__hero-subtitle {
+    margin: 6px 0 0;
+    color: var(--ahc-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
   }
 
   .ahc__hero-actions {
@@ -3258,12 +3354,55 @@ export const activityHistoryCardStyles = css`
     padding-inline: 12px;
   }
 
+  .ahc__button--icon {
+    inline-size: 42px;
+    padding-inline: 0;
+  }
+
+  .ahc__status-pill {
+    min-block-size: 34px;
+    display: inline-flex;
+    align-items: center;
+    padding-inline: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: 999px;
+    color: var(--ahc-muted);
+    background: rgba(15, 23, 42, 0.52);
+    font-size: 0.72rem;
+    font-weight: 850;
+    white-space: nowrap;
+  }
+
+  .ahc--mockup05-shell .ahc__toolbar,
   .ahc__toolbar.ahc__filters {
     display: flex;
     align-items: center;
-    max-block-size: 58px;
-    min-block-size: 58px;
+    gap: 10px;
+    max-block-size: 56px;
+    min-block-size: 56px;
     padding: 8px 10px;
+  }
+
+  .ahc--mockup05-shell .ahc__toolbar {
+    border: 1px solid rgba(125, 211, 252, 0.1);
+    border-radius: 14px;
+    background: rgba(17, 24, 43, 0.76);
+    overflow: hidden;
+  }
+
+  .ahc__toolbar-group {
+    min-inline-size: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+  }
+
+  .ahc__toolbar-label {
+    color: var(--ahc-muted);
+    font-size: 0.72rem;
+    font-weight: 850;
+    white-space: nowrap;
   }
 
   .ahc__toolbar .ahc__filter-row {
@@ -3285,6 +3424,10 @@ export const activityHistoryCardStyles = css`
     inline-size: min(320px, 25vw);
   }
 
+  .ahc__search {
+    min-inline-size: min(320px, 30vw);
+  }
+
   .ahc__toolbar .ahc-curation-note {
     max-inline-size: min(320px, 24vw);
   }
@@ -3295,15 +3438,71 @@ export const activityHistoryCardStyles = css`
     min-block-size: 40px;
   }
 
-  .ahc__summary-strip {
-    min-block-size: 82px;
-    max-block-size: 88px;
+  .ahc__filter-chip {
+    min-block-size: 40px;
+    padding-inline: 14px;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    border-radius: 10px;
+    color: rgba(226, 232, 240, 0.86);
+    background: rgba(15, 23, 42, 0.68);
+    font-weight: 850;
+    white-space: nowrap;
   }
 
-  .ahc__summary-strip .ahc__metric {
+  .ahc__filter-chip--active,
+  .ahc__filter-chip[aria-pressed="true"] {
+    border-color: rgba(111, 182, 255, 0.5);
+    color: #eff6ff;
+    background: linear-gradient(
+      180deg,
+      rgba(96, 165, 250, 0.38),
+      rgba(37, 99, 235, 0.2)
+    );
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .ahc--mockup05-shell .ahc__summary-strip,
+  .ahc__summary-strip {
+    min-block-size: 82px;
+    max-block-size: 86px;
+  }
+
+  .ahc--mockup05-shell .ahc__summary-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+    gap: 10px;
+    overflow: hidden;
+  }
+
+  .ahc__summary-strip .ahc__metric,
+  .ahc__summary-card {
     min-block-size: 82px;
     padding-block: 10px;
     padding-inline: 14px;
+  }
+
+  .ahc__summary-card {
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: 14px;
+    background:
+      linear-gradient(180deg, rgba(19, 29, 50, 0.92), rgba(10, 16, 32, 0.94)),
+      rgba(15, 23, 42, 0.74);
+  }
+
+  .ahc__summary-card-icon {
+    color: var(--ahc-blue);
+  }
+
+  .ahc__summary-card[data-tone="on"] .ahc__summary-card-icon {
+    color: var(--ahc-green);
+  }
+
+  .ahc__summary-card[data-tone="heating"] .ahc__summary-card-icon {
+    color: var(--ahc-orange);
+  }
+
+  .ahc__summary-card[data-tone="playing"] .ahc__summary-card-icon {
+    color: var(--ahc-purple);
   }
 
   .ahc--panel .ahc__body,
@@ -3338,6 +3537,17 @@ export const activityHistoryCardStyles = css`
     grid-column: 1;
   }
 
+  .ahc--mockup05-shell .ahc__body {
+    grid-template-columns: minmax(0, 1fr) var(--ahc-insights-width, 340px);
+    gap: 16px;
+    min-block-size: 0;
+    overflow: hidden;
+  }
+
+  .ahc--mockup05-shell .ahc__body--no-insights {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .ahc__insights-panel {
     align-self: stretch;
     direction: rtl;
@@ -3362,10 +3572,10 @@ export const activityHistoryCardStyles = css`
     min-inline-size: 0;
     block-size: var(
       --ahc-dashboard-height,
-      var(--ahc-timeline-height, calc(100svh - 320px))
+      var(--ahc-timeline-height, calc(100svh - 310px))
     );
-    min-block-size: 520px;
-    max-block-size: 760px;
+    min-block-size: min(540px, calc(100svh - 260px));
+    max-block-size: none;
     display: grid;
     grid-template-rows: auto auto minmax(0, 1fr);
     gap: 12px;
@@ -3379,6 +3589,16 @@ export const activityHistoryCardStyles = css`
       inset 0 1px 0 rgba(255, 255, 255, 0.045),
       0 18px 46px rgba(2, 6, 23, 0.22);
     overflow: hidden;
+  }
+
+  .ahc--mockup05-shell .ahc-dashboard {
+    block-size: var(
+      --ahc-dashboard-height,
+      var(--ahc-timeline-height, calc(100svh - 310px))
+    );
+    min-block-size: min(540px, calc(100svh - 260px));
+    padding: 12px;
+    border-radius: 16px;
   }
 
   .ahc-dashboard__header {
@@ -3399,11 +3619,11 @@ export const activityHistoryCardStyles = css`
 
   .ahc-dashboard__density {
     display: grid;
-    grid-template-rows: 32px 14px;
+    grid-template-rows: 1fr;
     gap: 4px;
-    block-size: 54px;
-    min-block-size: 54px;
-    padding-block: 4px 3px;
+    block-size: 46px;
+    min-block-size: 46px;
+    padding-block: 7px;
     padding-inline: 14px calc(var(--ahc-dashboard-label-width) + 14px);
     border: 1px solid rgba(148, 163, 184, 0.1);
     border-radius: 14px;
@@ -3414,8 +3634,7 @@ export const activityHistoryCardStyles = css`
   }
 
   .ahc-dashboard__density-bars {
-    position: absolute;
-    inset: 0;
+    position: relative;
     z-index: 2;
     direction: ltr;
     display: grid;
@@ -3781,6 +4000,16 @@ export const activityHistoryCardStyles = css`
     border-inline-start: 1px solid rgba(148, 163, 184, 0.1);
   }
 
+  .ahc-dashboard-row__label-icon {
+    color: rgba(203, 213, 225, 0.92);
+  }
+
+  .ahc-dashboard-row__label-copy {
+    min-inline-size: 0;
+    display: grid;
+    gap: 2px;
+  }
+
   .ahc-dashboard-row__label strong,
   .ahc-dashboard-row__label span {
     overflow: hidden;
@@ -3790,6 +4019,28 @@ export const activityHistoryCardStyles = css`
 
   .ahc-dashboard-row__label strong {
     font-size: 0.82rem;
+  }
+
+  .ahc-dashboard-row__state {
+    color: var(--ahc-muted);
+    font-size: 0.66rem;
+    font-weight: 800;
+  }
+
+  .ahc-dashboard-row__state[data-state-tone="on"] {
+    color: var(--ahc-green);
+  }
+
+  .ahc-dashboard-row__state[data-state-tone="cooling"] {
+    color: var(--ahc-blue);
+  }
+
+  .ahc-dashboard-row__state[data-state-tone="heating"] {
+    color: var(--ahc-orange);
+  }
+
+  .ahc-dashboard-row__state[data-state-tone="playing"] {
+    color: var(--ahc-purple);
   }
 
   .ahc-dashboard-row__inline-meta,
@@ -3827,6 +4078,30 @@ export const activityHistoryCardStyles = css`
     opacity: 0.92;
   }
 
+  .ahc-dashboard-segment--on {
+    --segment-color: var(--ahc-green);
+  }
+
+  .ahc-dashboard-segment--cooling {
+    --segment-color: var(--ahc-blue);
+  }
+
+  .ahc-dashboard-segment--heating {
+    --segment-color: var(--ahc-orange);
+  }
+
+  .ahc-dashboard-segment--playing {
+    --segment-color: var(--ahc-purple);
+  }
+
+  .ahc-dashboard-segment--open {
+    --segment-color: var(--ahc-yellow);
+  }
+
+  .ahc-dashboard-segment--fan {
+    --segment-color: var(--ahc-teal);
+  }
+
   button.ahc-dashboard-segment span {
     display: none;
   }
@@ -3845,8 +4120,9 @@ export const activityHistoryCardStyles = css`
     border-radius: 10px;
   }
 
+  .ahc-area-card__inventory-preview,
   .ahc-area-inventory {
-    max-block-size: 120px;
+    max-block-size: 130px;
     overflow: auto;
     margin: 2px 0 0;
     padding: 8px;
@@ -3902,6 +4178,10 @@ export const activityHistoryCardStyles = css`
     block-size: 24px;
   }
 
+  .ahc-inventory-chip__icon {
+    color: rgba(203, 213, 225, 0.88);
+  }
+
   .ahc-inventory-chip__copy {
     min-inline-size: 0;
   }
@@ -3912,6 +4192,57 @@ export const activityHistoryCardStyles = css`
 
   .ahc-inventory-chip__copy small {
     font-size: 0.68rem;
+  }
+
+  .ahc-inventory-chip__state {
+    color: var(--ahc-muted);
+  }
+
+  .ahc-insight-card {
+    border: 1px solid rgba(148, 163, 184, 0.11);
+    border-radius: 14px;
+    background:
+      linear-gradient(180deg, rgba(19, 29, 50, 0.88), rgba(9, 14, 29, 0.94)),
+      rgba(15, 23, 42, 0.74);
+  }
+
+  .ahc__insights-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-block-end: 10px;
+    color: var(--ahc-text);
+  }
+
+  .ahc__insights-header h3 {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+
+  .ahc-insight-card__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ahc-muted);
+    font-size: 0.76rem;
+    font-weight: 850;
+  }
+
+  .ahc-insight-card__value {
+    display: block;
+    margin-block-start: 10px;
+    color: var(--ahc-text);
+    font-size: 1.08rem;
+    font-weight: 900;
+  }
+
+  .ahc-insight-card__caption {
+    display: block;
+    margin-block-start: 8px;
+    color: rgba(226, 232, 240, 0.72);
+    font-size: 0.74rem;
+    line-height: 1.45;
   }
 
   .ahc-dashboard__notice {
@@ -3930,8 +4261,30 @@ export const activityHistoryCardStyles = css`
   }
 
   @media (max-width: 1100px) {
-    .ahc__insights-panel {
+    .ahc:not(.ahc--mockup05-shell) .ahc__insights-panel {
       display: none;
+    }
+
+    .ahc--mockup05-shell .ahc__body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ahc--mockup05-shell .ahc__main,
+    .ahc--mockup05-shell .ahc__insights-panel {
+      grid-column: 1;
+    }
+
+    .ahc--mockup05-shell[dir="rtl"] .ahc__main,
+    .ahc--mockup05-shell[dir="rtl"] .ahc__insights-panel,
+    .ahc--mockup05-shell[dir="ltr"] .ahc__main,
+    .ahc--mockup05-shell[dir="ltr"] .ahc__insights-panel {
+      grid-column: 1;
+    }
+
+    .ahc--mockup05-shell .ahc__insights-panel {
+      display: block;
+      max-inline-size: none;
+      overflow: visible;
     }
   }
 
@@ -3951,6 +4304,35 @@ export const activityHistoryCardStyles = css`
 
     .ahc__hero {
       max-block-size: none;
+    }
+
+    .ahc--mockup05-shell {
+      inline-size: 100%;
+      max-inline-size: 100%;
+      overflow: hidden;
+    }
+
+    .ahc--mockup05-shell .ahc__hero {
+      flex-direction: column;
+      align-items: stretch;
+      max-block-size: none;
+    }
+
+    .ahc--mockup05-shell .ahc__hero-main {
+      justify-content: space-between;
+    }
+
+    .ahc--mockup05-shell .ahc__hero-actions {
+      justify-content: flex-start;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .ahc--mockup05-shell .ahc__toolbar {
+      max-block-size: none;
+      min-block-size: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
     }
 
     .ahc__hero.ahc__topbar {
@@ -3981,8 +4363,18 @@ export const activityHistoryCardStyles = css`
       max-block-size: none;
     }
 
+    .ahc--mockup05-shell .ahc__summary-strip {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      max-block-size: none;
+    }
+
     .ahc__body {
       min-block-size: 0;
+    }
+
+    .ahc--mockup05-shell .ahc__body {
+      overflow: visible;
     }
 
     .ahc__main {
@@ -3996,6 +4388,11 @@ export const activityHistoryCardStyles = css`
       gap: 10px;
       padding: 10px;
       border-radius: 16px;
+    }
+
+    .ahc--mockup05-shell .ahc-dashboard {
+      block-size: min(72svh, 720px);
+      min-block-size: 560px;
     }
 
     .ahc-dashboard__density {
@@ -4016,6 +4413,16 @@ export const activityHistoryCardStyles = css`
     .ahc-dashboard__axis-label {
       min-inline-size: 40px;
       font-size: 0.66rem;
+    }
+
+    .ahc--mockup05-shell .ahc-dashboard__axis-label {
+      display: none;
+    }
+
+    .ahc--mockup05-shell .ahc-dashboard__axis-label:nth-of-type(1),
+    .ahc--mockup05-shell .ahc-dashboard__axis-label:nth-of-type(3),
+    .ahc--mockup05-shell .ahc-dashboard__axis-label:nth-of-type(5) {
+      display: block;
     }
 
     .ahc-dashboard__scroll {

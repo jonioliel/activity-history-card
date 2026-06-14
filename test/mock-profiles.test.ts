@@ -19,6 +19,11 @@ const config: ActivityHistoryCardConfig = {
 };
 
 describe("mock profiles", () => {
+  it("mockup05_visual is static-layout only and does not generate mock entities", () => {
+    expect(getMockEntities("mockup05_visual")).toEqual([]);
+    expect(getMockHistory(range, "mockup05_visual")).toEqual({});
+  });
+
   it("area_inventory keeps normal accessories in inventory without activity", () => {
     const entities = getMockEntities("area_inventory");
     const rows = intervalizeHistory(

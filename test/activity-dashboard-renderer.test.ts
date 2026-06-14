@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { renderActivityDashboard } from "../src/renderers/activity-dashboard-renderer";
 import type { ActivityDashboardModel } from "../src/activity-dashboard-model";
+import { renderActivityDashboard } from "../src/renderers/activity-dashboard-renderer";
 
 interface InspectableTemplate {
   strings: readonly string[];
@@ -125,7 +125,7 @@ function flattenTemplate(value: unknown): string {
 }
 
 describe("renderActivityDashboard", () => {
-  it("renders the compact dashboard shell, timeline scroll, aggregate bands, and row plots", () => {
+  it("renders the mockup05 dashboard shell, timeline scroll, aggregate bands, and row plots", () => {
     const html = flattenTemplate(
       renderActivityDashboard({
         model: model(),
@@ -169,7 +169,7 @@ describe("renderActivityDashboard", () => {
     expect(html).toContain("width 4.20%");
   });
 
-  it("collapses inventory by default for an all-areas dashboard", () => {
+  it("keeps inventory compact by default for an all-areas dashboard", () => {
     const html = flattenTemplate(
       renderActivityDashboard({
         model: model(),
@@ -178,8 +178,8 @@ describe("renderActivityDashboard", () => {
     );
 
     expect(html).toContain("data-inventory-expanded=false");
-    expect(html).not.toContain("ahc-area-inventory");
-    expect(html).toContain("אביזרים");
+    expect(html).toContain("ahc-area-card__inventory-preview");
+    expect(html).toContain("ahc-inventory-chip");
   });
 
   it("expands inventory by default for a single focused area", () => {
@@ -225,7 +225,7 @@ describe("renderActivityDashboard", () => {
     expect(html).toContain("ahc-dashboard-empty");
   });
 
-  it("keeps the dashboard visible when there are inventory items but no activity rows", () => {
+  it("keeps only inventory visible when there are inventory items but no activity rows", () => {
     const html = flattenTemplate(
       renderActivityDashboard({
         model: model({
@@ -249,6 +249,8 @@ describe("renderActivityDashboard", () => {
     );
 
     expect(html).toContain("ahc-area-card");
-    expect(html).toContain("אין פעילות משמעותית בטווח הנוכחי");
+    expect(html).toContain("ahc-area-card__inventory-preview");
+    expect(html).not.toContain("ahc-dashboard-row");
+    expect(html).not.toContain("ahc-area-card__quiet");
   });
 });
