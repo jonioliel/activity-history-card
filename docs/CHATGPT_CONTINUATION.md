@@ -81,12 +81,13 @@ Implemented:
 - Desktop filters are compact; mobile keeps the advanced filter bottom sheet
 - Smart row curation is enabled by default with `smart_filter: true`
 - `view_mode: activity` now separates `activityRows` from `inventoryItems`
-- Each area card can show a compact accessory inventory including inactive normal entities
+- Each active area renders as a compact lane; inactive areas render as short summaries
+- All-areas inventory opens in a local side drawer instead of expanding chart height
 - Area inventory options are available through `show_area_inventory` and `area_inventory_*`
 - Inventory chip clicks fire Home Assistant `hass-more-info`
 - Empty rows, tiny activity rows, registry `config`/`diagnostic` rows, and noisy technical rows are hidden by default
 - Manual `entities:` are protected from smart filtering unless explicitly excluded
-- A session-level "כל האביזרים" / "פעילות בלבד" toggle expands area inventories without switching to legacy rows
+- "כל האביזרים" opens the local inventory drawer without switching to legacy rows or refetching history
 - `debug: true` includes smart curation counts and hidden-reason diagnostics
 - UI polish pass for the stable activity MVP:
   - body grid is rendered through a dedicated structure
@@ -150,9 +151,9 @@ The latest pass changed the default view from raw swimlane rows to a polished ac
 - `view_mode: activity` is the recommended default.
 - `view_mode: activity_legacy` keeps the previous activity renderer for short-term comparison.
 - `view_mode: legacy_swimlane` keeps the old dense/raw renderer for debugging.
-- The activity dashboard shows a top density strip, compact area cards, aggregate group bands, active rows only, and active segments only.
-- Area cards include a compact inventory section for all normal accessories in that area.
-- The "כל האביזרים" toggle expands area inventories. Raw row inspection remains under `view_mode: legacy_swimlane`.
+- The activity dashboard shows a slim density strip, compact area lanes, aggregate group bands, active rows only, and active segments only.
+- All-areas inventory opens in `ahc-inventory-drawer`; focused single-area inventory may still render inline.
+- The "כל האביזרים" button changes only local UI state. Raw row inspection remains under `view_mode: legacy_swimlane`.
 - Empty/off baselines are not rendered by default.
 - Default `max_visible_rows`/`max_total_rows` is `18`, with `max_rows_per_group: 4` and `min_row_active_seconds: 10`.
 - `show_activity_density: true` is enabled by default.

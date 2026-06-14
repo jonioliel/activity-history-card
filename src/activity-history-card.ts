@@ -49,6 +49,7 @@ import "./activity-history-card-editor";
 import type {
   ActivityHistoryCardConfig,
   ActivityDiagnostics,
+  DesktopDensity,
   ActivitySummary,
   FilterState,
   HistoryStateRecord,
@@ -117,6 +118,7 @@ export class ActivityHistoryCard extends LitElement {
   private _debugLegacyView = false;
   private _expandedInventoryGroups = new Set<string>();
   private _collapsedInventoryGroups = new Set<string>();
+  private _openInventoryAreaId?: string;
   private _curation?: RowCurationDiagnostics;
   private _fetchToken = 0;
   private _lastFetchKey = "";
@@ -151,11 +153,22 @@ export class ActivityHistoryCard extends LitElement {
     }
 
     const timePreset = this._initialTimePreset(config);
+    const viewMode =
+      config.view_mode ?? config.default_view ?? DEFAULT_CONFIG.view_mode;
+    const displayMode = config.display_mode ?? DEFAULT_CONFIG.display_mode;
+    const desktopDensity =
+      config.desktop_density ??
+      (displayMode === "panel" || viewMode === "activity"
+        ? "compact"
+        : DEFAULT_CONFIG.desktop_density);
     this._config = {
       ...DEFAULT_CONFIG,
       ...config,
-      view_mode:
-        config.view_mode ?? config.default_view ?? DEFAULT_CONFIG.view_mode,
+      display_mode: displayMode,
+      desktop_density: desktopDensity,
+      fullscreen_behavior:
+        config.fullscreen_behavior ?? DEFAULT_CONFIG.fullscreen_behavior,
+      view_mode: viewMode,
       group_by: config.group_by ?? DEFAULT_CONFIG.group_by,
       filters: {
         show: true,
@@ -184,6 +197,7 @@ export class ActivityHistoryCard extends LitElement {
     this._debugLegacyView = false;
     this._expandedInventoryGroups.clear();
     this._collapsedInventoryGroups.clear();
+    this._openInventoryAreaId = undefined;
     this._historyCache.clear();
     this._syncRefreshTimer();
     this._requestHistoryRefresh(this._hasFetchedOnce ? "config" : "initial", {
@@ -255,8 +269,10 @@ export class ActivityHistoryCard extends LitElement {
       this._currentRendererMode() === "activity" ? "ahc--mockup05-shell" : "",
       this._isMockup05VisualPreview() ? "ahc--mockup05-preview" : "",
       this._config.display_mode === "panel" ? "ahc--panel" : "",
-      this._fullscreen || this._config.display_mode === "fullscreen"
-        ? "ahc--fullscreen"
+      `ahc--density-${this._desktopDensityClass()}`,
+      this._usesFullscreenShell() ? "ahc--fullscreen" : "",
+      this._fullscreen && this._config.fullscreen_behavior === "fixed_overlay"
+        ? "ahc--fixed-overlay"
         : "",
       this._filterSheetOpen ? "ahc--sheet-open" : "",
       this._usingMockData ? "ahc--mock" : "",
@@ -292,6 +308,21 @@ export class ActivityHistoryCard extends LitElement {
       this._config?.mock_data === true &&
       this._config.mock_profile === "mockup05_visual" &&
       this._currentRendererMode() === "activity"
+    );
+  }
+
+  private _desktopDensity(): DesktopDensity {
+    return this._config.desktop_density ?? DEFAULT_CONFIG.desktop_density;
+  }
+
+  private _desktopDensityClass(): string {
+    return this._desktopDensity().replace("_", "-");
+  }
+
+  private _usesFullscreenShell(): boolean {
+    return (
+      this._config.display_mode === "fullscreen" ||
+      (this._fullscreen && this._config.fullscreen_behavior !== "card")
     );
   }
 
@@ -720,7 +751,9 @@ export class ActivityHistoryCard extends LitElement {
       return renderMockup05Dashboard(mockup05VisualModel, {
         config: this._config,
         onInventoryToggle: this._toggleInventoryGroup,
+        onInventoryClose: this._closeInventoryDrawer,
         onInventoryItemClick: this._openInventoryMoreInfo,
+        openInventoryGroupId: this._openInventoryAreaId,
       });
     }
 
@@ -815,7 +848,9 @@ export class ActivityHistoryCard extends LitElement {
           showAllInventory: this._showAllRows,
           onSegmentClick: this._openSegmentPopover,
           onInventoryToggle: this._toggleInventoryGroup,
+          onInventoryClose: this._closeInventoryDrawer,
           onInventoryItemClick: this._openInventoryMoreInfo,
+          openInventoryGroupId: this._openInventoryAreaId,
         });
     }
   }
@@ -1989,6 +2024,7 @@ export class ActivityHistoryCard extends LitElement {
     this._showAllRows = false;
     this._expandedInventoryGroups.clear();
     this._collapsedInventoryGroups.clear();
+    this._openInventoryAreaId = undefined;
     this._filter = {
       search: "",
       areas: [],
@@ -2008,6 +2044,7 @@ export class ActivityHistoryCard extends LitElement {
     this._showAllRows = !this._showAllRows;
     this._expandedInventoryGroups.clear();
     this._collapsedInventoryGroups.clear();
+    this._openInventoryAreaId = undefined;
     this._rebuildGroups();
   };
 
@@ -2025,6 +2062,13 @@ export class ActivityHistoryCard extends LitElement {
   }
 
   private _toggleInventoryGroup = (groupId: string): void => {
+    if (this._shouldUseInventoryDrawer()) {
+      this._openInventoryAreaId =
+        this._openInventoryAreaId === groupId ? undefined : groupId;
+      this.requestUpdate();
+      return;
+    }
+
     const defaultExpanded = this._isInventoryGroupDefaultExpanded();
     if (this._collapsedInventoryGroups.has(groupId)) {
       this._collapsedInventoryGroups.delete(groupId);
@@ -2038,6 +2082,20 @@ export class ActivityHistoryCard extends LitElement {
     this.requestUpdate();
   };
 
+  private _closeInventoryDrawer = (): void => {
+    this._openInventoryAreaId = undefined;
+    this.requestUpdate();
+  };
+
+  private _shouldUseInventoryDrawer(): boolean {
+    return (
+      this._currentRendererMode() === "activity" &&
+      this._showAllRows === false &&
+      this._config.area_inventory_mode !== "expanded" &&
+      this._dashboardModel?.singleAreaFocused !== true
+    );
+  }
+
   private _openInventoryMoreInfo = (event: Event, entityId: string): void => {
     event.stopPropagation();
     this.dispatchEvent(createHassMoreInfoEvent(entityId));
@@ -2047,6 +2105,7 @@ export class ActivityHistoryCard extends LitElement {
     this._showAllRows = false;
     this._expandedInventoryGroups.clear();
     this._collapsedInventoryGroups.clear();
+    this._openInventoryAreaId = undefined;
   }
 
   private _canToggleAreaInventory(): boolean {

@@ -26,7 +26,9 @@ export interface Mockup05RenderOptions {
     segmentIndex: number,
   ) => void;
   onInventoryToggle?: (groupId: string) => void;
+  onInventoryClose?: () => void;
   onInventoryItemClick?: (event: Event, entityId: string) => void;
+  openInventoryGroupId?: string;
 }
 
 const SEGMENT_TONE_CLASSES: Record<Mockup05SegmentTone, string> = {
@@ -163,6 +165,18 @@ export function renderMockup05Dashboard(
 ): TemplateResult {
   if (!model.groups.length) return renderDashboardEmpty();
   const renderOptions = { ...options, nowPercent: model.nowPercent };
+  const activeGroups = model.groups.filter((group) => group.rows.length > 0);
+  const inactiveGroups = model.groups.filter(
+    (group) => group.rows.length === 0,
+  );
+  const visibleInactiveGroups = inactiveGroups.slice(0, 3);
+  const hiddenInactiveCount = Math.max(
+    0,
+    inactiveGroups.length - visibleInactiveGroups.length,
+  );
+  const openInventoryGroup = options.openInventoryGroupId
+    ? model.groups.find((group) => group.id === options.openInventoryGroupId)
+    : undefined;
 
   return html`
     <section
@@ -189,12 +203,21 @@ export function renderMockup05Dashboard(
       >
         ${renderAxis(model.axisLabels, options.config, model.nowPercent)}
         <div class="ahc-dashboard__scroll">
-          <div class="ahc-dashboard__groups">
-            ${model.groups.map((group) =>
+          <div class="ahc-dashboard__groups ahc-dashboard__lanes">
+            ${activeGroups.map((group) =>
               renderMockup05Group(group, model.axisLabels, renderOptions),
             )}
+            ${visibleInactiveGroups.map((group) =>
+              renderInactiveAreaSummary(group, renderOptions),
+            )}
+            ${hiddenInactiveCount > 0
+              ? renderHiddenInactiveSummary(hiddenInactiveCount)
+              : nothing}
           </div>
         </div>
+        ${openInventoryGroup
+          ? renderInventoryDrawer(openInventoryGroup, renderOptions)
+          : nothing}
       </section>
     </section>
   `;
@@ -244,19 +267,27 @@ export function renderMockup05Group(
   const expanded = group.expandedInventory === true;
   const hasActivity = group.rows.length > 0;
   const hasInventory = group.inventoryItems.length > 0;
+  const rowLimit = options.config?.desktop_density === "ultra_compact" ? 3 : 4;
+  const visibleRows = group.rows.slice(0, rowLimit);
+  const hiddenRowCount = Math.max(0, group.rows.length - visibleRows.length);
+  const inlineInventory = expanded && hasInventory;
 
   return html`
     <section
-      class="ahc-area-card ahc-dashboard-group"
+      class="ahc-area-lane ahc-area-lane--active ahc-area-card ahc-dashboard-group"
       data-has-activity=${hasActivity ? "true" : "false"}
       data-inventory-expanded=${expanded ? "true" : "false"}
     >
-      <header class="ahc-area-card__header ahc-dashboard-group__header">
-        <div class="ahc-area-card__title ahc-dashboard-group__title">
+      <header
+        class="ahc-area-lane__header ahc-area-card__header ahc-dashboard-group__header"
+      >
+        <div
+          class="ahc-area-lane__title ahc-area-card__title ahc-dashboard-group__title"
+        >
           ${renderIcon(group.icon, "ahc-dashboard-icon")}
           <div class="ahc-area-card__title-copy">
             <strong>${group.title}</strong>
-            <span>${group.meta}</span>
+            <span class="ahc-area-lane__meta">${group.meta}</span>
           </div>
         </div>
         <div class="ahc-area-card__actions">
@@ -265,7 +296,7 @@ export function renderMockup05Group(
           </div>
           ${hasInventory
             ? html`<button
-                class="ahc-area-card__inventory-button"
+                class="ahc-area-lane__inventory-trigger ahc-area-card__inventory-button"
                 type="button"
                 aria-expanded=${expanded ? "true" : "false"}
                 @click=${() => options.onInventoryToggle?.(group.id)}
@@ -278,7 +309,7 @@ export function renderMockup05Group(
 
       ${hasActivity || group.aggregateSegments.length
         ? html`<div
-            class="ahc-area-card__aggregate ahc-dashboard-group__aggregate"
+            class="ahc-area-lane__aggregate ahc-area-card__aggregate ahc-dashboard-group__aggregate"
             dir="ltr"
             aria-label=${`פעילות מצטברת עבור ${group.title}`}
           >
@@ -294,20 +325,89 @@ export function renderMockup05Group(
           </div>`
         : nothing}
 
-      <div class="ahc-area-card__content ahc-dashboard-group__body">
+      <div
+        class="ahc-area-lane__content ahc-area-card__content ahc-dashboard-group__body"
+      >
         ${hasActivity
           ? html`<section
               class="ahc-area-card__activity"
               aria-label=${`פעילות באזור ${group.title}`}
             >
-              <div class="ahc-dashboard-group__rows">
-                ${group.rows.map((row) =>
+              <div class="ahc-area-lane__rows ahc-dashboard-group__rows">
+                ${visibleRows.map((row) =>
                   renderMockup05Row(row, axisLabels, options),
                 )}
+                ${hiddenRowCount > 0
+                  ? html`<div
+                      class="ahc-area-lane__empty-summary ahc-dashboard-group__more"
+                    >
+                      עוד ${hiddenRowCount} רכיבים פעילים
+                    </div>`
+                  : nothing}
               </div>
             </section>`
           : nothing}
-        ${hasInventory ? renderInventoryPreview(group, options) : nothing}
+        ${inlineInventory ? renderInventoryPreview(group, options) : nothing}
+      </div>
+    </section>
+  `;
+}
+
+function renderInactiveAreaSummary(
+  group: Mockup05Group,
+  options: Mockup05RenderOptions,
+): TemplateResult {
+  const hasInventory = group.inventoryItems.length > 0;
+
+  return html`
+    <section
+      class="ahc-area-lane ahc-area-lane--inactive ahc-area-card ahc-dashboard-group"
+      data-has-activity="false"
+      data-inventory-expanded="false"
+    >
+      <header
+        class="ahc-area-lane__header ahc-area-card__header ahc-dashboard-group__header"
+      >
+        <div
+          class="ahc-area-lane__title ahc-area-card__title ahc-dashboard-group__title"
+        >
+          ${renderIcon(group.icon, "ahc-dashboard-icon")}
+          <div class="ahc-area-card__title-copy">
+            <strong>${group.title}</strong>
+            <span class="ahc-area-lane__meta">${group.meta}</span>
+          </div>
+        </div>
+        <div class="ahc-area-card__actions">
+          <div
+            class="ahc-area-lane__empty-summary ahc-area-card__meta ahc-dashboard-group__meta"
+          >
+            אין פעילות בטווח
+          </div>
+          ${hasInventory
+            ? html`<button
+                class="ahc-area-lane__inventory-trigger ahc-area-card__inventory-button"
+                type="button"
+                aria-expanded="false"
+                @click=${() => options.onInventoryToggle?.(group.id)}
+              >
+                ${group.inventoryLabel}
+              </button>`
+            : nothing}
+        </div>
+      </header>
+    </section>
+  `;
+}
+
+function renderHiddenInactiveSummary(hiddenCount: number): TemplateResult {
+  return html`
+    <section
+      class="ahc-area-lane ahc-area-lane--inactive ahc-area-lane--more ahc-area-card ahc-dashboard-group"
+      data-has-activity="false"
+      data-inventory-expanded="false"
+    >
+      <div class="ahc-area-lane__empty-summary">
+        עוד ${hiddenCount} אזורים ללא פעילות
       </div>
     </section>
   `;
@@ -319,13 +419,20 @@ export function renderMockup05Row(
   options: Mockup05RenderOptions = {},
 ): TemplateResult {
   return html`
-    <div class="ahc-dashboard-row" dir="rtl">
-      <div class="ahc-dashboard-row__label" dir="rtl">
+    <div class="ahc-lane-row ahc-dashboard-row" dir="rtl">
+      <div class="ahc-lane-row__label ahc-dashboard-row__label" dir="rtl">
         ${renderIcon(row.icon, "ahc-dashboard-row__label-icon")}
         <div class="ahc-dashboard-row__label-copy">
-          <strong title=${row.label}>${row.label}</strong>
+          <strong class="ahc-lane-row__name" title=${row.label}>
+            ${row.label}
+          </strong>
           ${row.secondary
             ? html`<span title=${row.secondary}>${row.secondary}</span>`
+            : nothing}
+          ${row.totalLabel
+            ? html`<small class="ahc-lane-row__duration">
+                ${row.totalLabel}
+              </small>`
             : nothing}
           <span
             class="ahc-dashboard-row__state"
@@ -337,7 +444,7 @@ export function renderMockup05Row(
       </div>
 
       <div
-        class="ahc-dashboard-row__plot"
+        class="ahc-lane-row__plot ahc-dashboard-row__plot"
         dir="ltr"
         role="img"
         aria-label=${`פעילות עבור ${row.label}`}
@@ -442,6 +549,43 @@ function renderInventoryPreview(
           </button>`
         : nothing}
     </section>
+  `;
+}
+
+function renderInventoryDrawer(
+  group: Mockup05Group,
+  options: Mockup05RenderOptions,
+): TemplateResult {
+  const items = group.inventoryItems;
+
+  return html`
+    <aside
+      class="ahc-inventory-drawer"
+      dir="rtl"
+      aria-label=${`כל האביזרים · ${group.title}`}
+    >
+      <header class="ahc-inventory-drawer__header">
+        <div>
+          <strong class="ahc-inventory-drawer__title">
+            כל האביזרים · ${group.title}
+          </strong>
+          <span class="ahc-inventory-drawer__meta">
+            ${group.inventoryTotal} רכיבים באזור
+          </span>
+        </div>
+        <button
+          class="ahc-inventory-drawer__close"
+          type="button"
+          aria-label="סגור"
+          @click=${() => options.onInventoryClose?.()}
+        >
+          ×
+        </button>
+      </header>
+      <div class="ahc-inventory-drawer__items">
+        ${items.map((item) => renderInventoryItem(item, options))}
+      </div>
+    </aside>
   `;
 }
 

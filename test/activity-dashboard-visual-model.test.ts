@@ -208,4 +208,20 @@ describe("activity dashboard visual model mapping", () => {
     expect(majorLabels.at(-1)?.label).toBe("עכשיו");
     expect(innerLabels.every((label) => !label.includes(":47"))).toBe(true);
   });
+
+  it("keeps compact desktop axes to a small number of major labels", () => {
+    const axis = buildDashboardAxis(
+      range,
+      {
+        type: "custom:activity-history-card",
+        desktop_density: "compact",
+      },
+      range.end,
+    );
+    const majorLabels = axis.labels.filter(
+      (label) => label.major && label.label,
+    );
+
+    expect(majorLabels.length).toBeLessThanOrEqual(6);
+  });
 });

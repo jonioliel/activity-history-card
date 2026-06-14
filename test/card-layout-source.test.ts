@@ -10,6 +10,8 @@ describe("activity card body layout source", () => {
     expect(source).toContain('class="ahc__main"');
     expect(source).toContain('class="ahc__insights-panel"');
     expect(source).toContain("this._renderInsights()");
+    expect(source).toContain("ahc--fixed-overlay");
+    expect(source).toContain("ahc--density-${this._desktopDensityClass()}");
   });
 
   it("keeps rendering tied to the loaded history range", () => {

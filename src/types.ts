@@ -16,6 +16,11 @@ export type SummaryScope = "visible" | "all";
 export type ActivityMode = "meaningful" | "all";
 export type AreaInventoryMode = "compact" | "expanded" | "off";
 export type TimelineAxisDensity = "auto" | "compact" | "comfortable";
+export type DesktopDensity = "comfortable" | "compact" | "ultra_compact";
+export type FullscreenBehavior =
+  | "card"
+  | "browser_fullscreen"
+  | "fixed_overlay";
 
 export interface HassEntity {
   entity_id: string;
@@ -83,6 +88,8 @@ export interface ActivityHistoryCardConfig {
   rtl?: DirectionOption;
   direction?: DirectionOption;
   display_mode?: DisplayMode;
+  desktop_density?: DesktopDensity;
+  fullscreen_behavior?: FullscreenBehavior;
   default_view?: ViewMode;
   view_mode?: ViewMode;
   timeline_style?: TimelineStyle;

@@ -47,6 +47,8 @@ export const DEFAULT_CONFIG: Required<
     | "hours_to_show"
     | "live"
     | "display_mode"
+    | "desktop_density"
+    | "fullscreen_behavior"
     | "view_mode"
     | "group_by"
     | "show_summary"
@@ -95,6 +97,8 @@ export const DEFAULT_CONFIG: Required<
   hours_to_show: 24,
   live: false,
   display_mode: "card",
+  desktop_density: "compact",
+  fullscreen_behavior: "fixed_overlay",
   view_mode: "activity",
   group_by: "area",
   show_summary: true,

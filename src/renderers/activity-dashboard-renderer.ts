@@ -45,7 +45,9 @@ export interface ActivityDashboardRendererOptions {
     segmentIndex: number,
   ) => void;
   onInventoryToggle?: (groupId: string) => void;
+  onInventoryClose?: () => void;
   onInventoryItemClick?: (event: Event, entityId: string) => void;
+  openInventoryGroupId?: string;
 }
 
 export function renderActivityDashboard(
@@ -117,7 +119,9 @@ function toMockupOptions(
     config: options.config,
     onSegmentClick: options.onSegmentClick,
     onInventoryToggle: options.onInventoryToggle,
+    onInventoryClose: options.onInventoryClose,
     onInventoryItemClick: options.onInventoryItemClick,
+    openInventoryGroupId: options.openInventoryGroupId,
   };
 }
 
@@ -229,12 +233,12 @@ function toVisualGroup(
     ? group.inventoryItems.map(toVisualInventoryItem)
     : [];
   const previewLimit = inventoryLimit(config);
-  const visibleInventory = expanded
-    ? inventoryItems
-    : inventoryItems.slice(0, Math.min(4, previewLimit));
+  const previewCount = expanded
+    ? inventoryItems.length
+    : Math.min(4, previewLimit, inventoryItems.length);
   const hiddenInventoryCount = Math.max(
     0,
-    group.inventoryItemCount - visibleInventory.length,
+    group.inventoryItemCount - previewCount,
   );
 
   return {
@@ -248,7 +252,7 @@ function toVisualGroup(
     inventoryLabel: "כל האביזרים",
     aggregateSegments: group.aggregateSegments.map(toVisualSegment),
     rows: group.activityRows.map(toVisualRow),
-    inventoryItems: visibleInventory,
+    inventoryItems,
     inventoryTotal: group.inventoryItemCount,
     hiddenInventoryCount,
     expandedInventory: expanded,
@@ -461,6 +465,12 @@ function durationLabel(durationHours: number): string {
 }
 
 function axisMajorTickLimit(config: ActivityHistoryCardConfig): number {
+  if (
+    config.desktop_density === "compact" ||
+    config.desktop_density === "ultra_compact"
+  ) {
+    return 6;
+  }
   if (config.timeline_axis_density === "compact") return 6;
   if (config.timeline_axis_density === "comfortable") return 8;
   return 8;

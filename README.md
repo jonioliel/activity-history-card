@@ -2,7 +2,7 @@
 
 Home Assistant Lovelace custom card for a Hebrew/RTL-friendly activity history dashboard.
 
-The main MVP view is `view_mode: activity`: a compact desktop/mobile dashboard with a density strip, area cards, meaningful activity rows, area inventory chips, and an insights panel. Mock data is never shown unless `mock_data: true` is configured explicitly.
+The main MVP view is `view_mode: activity`: a compact desktop/mobile dashboard with a density strip, area swimlanes, meaningful activity rows, an area inventory drawer, and an insights panel. Mock data is never shown unless `mock_data: true` is configured explicitly.
 
 Repository: <https://github.com/jonioliel/activity-history-card>
 
@@ -34,6 +34,8 @@ type: custom:activity-history-card
 title: Mockup 05 visual preview
 view_mode: activity
 display_mode: panel
+desktop_density: compact
+fullscreen_behavior: fixed_overlay
 mock_data: true
 mock_profile: mockup05_visual
 hours_to_show: 24
@@ -58,6 +60,8 @@ type: custom:activity-history-card
 title: היסטוריית פעילות חכמה
 view_mode: activity
 display_mode: panel
+desktop_density: compact
+fullscreen_behavior: fixed_overlay
 mock_data: false
 auto_discover: true
 live: false
@@ -117,6 +121,24 @@ fan
 ```
 
 Noisy domains like `binary_sensor`, `sensor`, `input_boolean`, `lock`, `vacuum`, and router-style technical entities are not part of the first real-world default.
+
+## Desktop Layout Options
+
+Use `desktop_density` to control how close the desktop panel is to mockup 05:
+
+```yaml
+desktop_density: compact # comfortable | compact | ultra_compact
+```
+
+`compact` is the default for the activity/panel MVP. It keeps active areas short, shows up to four row lanes per area, renders quiet areas as small summaries, and opens all-area inventory in a side drawer instead of growing the timeline.
+
+Fullscreen defaults to a fixed overlay:
+
+```yaml
+fullscreen_behavior: fixed_overlay # card | browser_fullscreen | fixed_overlay
+```
+
+The button still tries native browser fullscreen when available, but the overlay class lets the card visually cover Home Assistant chrome when the browser blocks fullscreen.
 
 ## Manual Entities
 

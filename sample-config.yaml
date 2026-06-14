@@ -9,6 +9,8 @@ live: false
 refresh_interval_seconds: 300
 rtl: auto
 display_mode: panel # card | panel | fullscreen
+desktop_density: compact # comfortable | compact | ultra_compact
+fullscreen_behavior: fixed_overlay # card | browser_fullscreen | fixed_overlay
 view_mode: activity # activity | activity_legacy | legacy_swimlane | heatmap | detail | correlation
 group_by: area # area | domain | floor | entity | none
 

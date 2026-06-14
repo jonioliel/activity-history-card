@@ -141,6 +141,9 @@ describe("renderActivityDashboard", () => {
     expect(html).toContain("ahc-timegrid--density");
     expect(html).toContain("ahc-timegrid--aggregate");
     expect(html).toContain("ahc-timegrid--row");
+    expect(html).toContain("ahc-area-lane");
+    expect(html).toContain("ahc-area-lane--active");
+    expect(html).toContain("ahc-lane-row");
     expect(html).toContain("ahc-area-card");
     expect(html).toContain("ahc-area-card__title");
     expect(html).toContain("ahc-area-card__aggregate");
@@ -169,7 +172,7 @@ describe("renderActivityDashboard", () => {
     expect(html).toContain("width 4.20%");
   });
 
-  it("keeps inventory compact by default for an all-areas dashboard", () => {
+  it("keeps inventory outside the chart by default for an all-areas dashboard", () => {
     const html = flattenTemplate(
       renderActivityDashboard({
         model: model(),
@@ -178,8 +181,24 @@ describe("renderActivityDashboard", () => {
     );
 
     expect(html).toContain("data-inventory-expanded=false");
-    expect(html).toContain("ahc-area-card__inventory-preview");
+    expect(html).toContain("ahc-area-lane__inventory-trigger");
+    expect(html).not.toContain("ahc-area-card__inventory-preview");
+    expect(html).not.toContain("ahc-inventory-drawer");
+  });
+
+  it("opens a side drawer for all-area inventory without changing rows", () => {
+    const html = flattenTemplate(
+      renderActivityDashboard({
+        model: model(),
+        config: { type: "custom:activity-history-card" },
+        openInventoryGroupId: "living",
+      }),
+    );
+
+    expect(html).toContain("ahc-inventory-drawer");
+    expect(html).toContain("ahc-inventory-drawer__items");
     expect(html).toContain("ahc-inventory-chip");
+    expect(html).toContain("מנורת צד");
   });
 
   it("expands inventory by default for a single focused area", () => {
@@ -225,7 +244,7 @@ describe("renderActivityDashboard", () => {
     expect(html).toContain("ahc-dashboard-empty");
   });
 
-  it("keeps only inventory visible when there are inventory items but no activity rows", () => {
+  it("renders inventory-only groups as compact inactive area lanes", () => {
     const html = flattenTemplate(
       renderActivityDashboard({
         model: model({
@@ -248,8 +267,9 @@ describe("renderActivityDashboard", () => {
       }),
     );
 
-    expect(html).toContain("ahc-area-card");
-    expect(html).toContain("ahc-area-card__inventory-preview");
+    expect(html).toContain("ahc-area-lane--inactive");
+    expect(html).toContain("ahc-area-lane__empty-summary");
+    expect(html).toContain("ahc-area-lane__inventory-trigger");
     expect(html).not.toContain("ahc-dashboard-row");
     expect(html).not.toContain("ahc-area-card__quiet");
   });
