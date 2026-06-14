@@ -215,23 +215,31 @@ function toEntityMeta(
   const friendly = stateObj ? hass?.formatEntityName?.(stateObj) : undefined;
   const attrName = stateObj?.attributes?.friendly_name;
 
-  const configuredName = stringAttr(entry.name);
+  const configuredName = stringName(entry.name, entry.entity);
   const registryName =
-    stringAttr(registryEntity?.name) ??
-    stringAttr(registryEntity?.original_name);
+    stringName(registryEntity?.name, entry.entity) ??
+    stringName(registryEntity?.original_name, entry.entity);
   const deviceName =
-    stringAttr(device?.name_by_user) ?? stringAttr(device?.name);
-  const friendlyName = stringAttr(friendly);
-  const attributeName = stringAttr(attrName);
-  const fallbackName = humanizeEntityId(entry.entity);
+    stringName(device?.name_by_user, entry.entity) ??
+    stringName(device?.name, entry.entity);
+  const friendlyName = stringName(friendly, entry.entity);
+  const attributeName = stringName(attrName, entry.entity);
+  const humanizedName = humanizeEntityId(entry.entity);
+  const humanizedNameIsPlaceholder = isPlaceholderName(
+    humanizedName,
+    entry.entity,
+  );
+  const fallbackName = humanizedNameIsPlaceholder
+    ? "רכיב ללא שם"
+    : humanizedName;
+  const baseName =
+    friendlyName ??
+    attributeName ??
+    registryName ??
+    (humanizedNameIsPlaceholder && deviceName ? deviceName : fallbackName);
   const displayName =
     configuredName ??
-    enrichEntityName(
-      friendlyName ?? attributeName ?? registryName ?? fallbackName,
-      deviceName,
-      entry.entity,
-      domain,
-    );
+    enrichEntityName(baseName, deviceName, entry.entity, domain);
 
   return {
     entity_id: entry.entity,
@@ -493,6 +501,29 @@ function normalizeToken(value: string): string {
 
 function stringAttr(value: unknown): string | undefined {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+function stringName(value: unknown, entityId: string): string | undefined {
+  const text = stringAttr(value);
+  if (!text || isPlaceholderName(text, entityId)) return undefined;
+  return text;
+}
+
+function isPlaceholderName(value: string, entityId: string): boolean {
+  const normalized = normalizeToken(value).replace(/[._-]/g, " ");
+  const objectId = normalizeToken(entityId.split(".")[1] ?? entityId).replace(
+    /[._-]/g,
+    " ",
+  );
+  return (
+    normalized === "na" ||
+    normalized === "n/a" ||
+    normalized === "n a" ||
+    normalized === "unknown" ||
+    normalized === "null" ||
+    normalized === "none" ||
+    (normalized === objectId && objectId.length <= 2)
+  );
 }
 
 function enrichEntityName(

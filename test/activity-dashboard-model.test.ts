@@ -209,6 +209,40 @@ describe("buildActivityDashboardModel", () => {
     ]);
   });
 
+  it("keeps every filtered area visible through inventory even without activity", () => {
+    const active = row("switch.active", {
+      name: "תאורה ראשית",
+      area: "סלון",
+    });
+    const quietKitchen = row("switch.kitchen", {
+      name: "שקע מטבח",
+      area: "מטבח",
+      activeMs: 0,
+    });
+    const quietPool = row("switch.pool", {
+      name: "משאבה",
+      area: "בריכה",
+      activeMs: 0,
+    });
+
+    const model = buildActivityDashboardModel(
+      groupRows([active], "area"),
+      range,
+      config(),
+      undefined,
+      { inventoryRows: [active, quietKitchen, quietPool], groupBy: "area" },
+    );
+
+    expect(model.groups.map((item) => item.title)).toEqual([
+      "סלון",
+      "בריכה",
+      "מטבח",
+    ]);
+    expect(
+      model.groups.slice(1).every((group) => !group.activityRows.length),
+    ).toBe(true);
+  });
+
   it("excludes hidden diagnostic inventory items by default", () => {
     const normal = row("switch.normal", { name: "תאורת מטבח" });
     const diagnostic = row("switch.router_lan", {

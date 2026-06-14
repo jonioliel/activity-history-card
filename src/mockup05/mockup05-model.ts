@@ -11,6 +11,7 @@ export type Mockup05StateTone = Mockup05SegmentTone | "idle" | "unavailable";
 export interface Mockup05AxisLabel {
   label: string;
   percent: number;
+  major?: boolean;
 }
 
 export interface Mockup05Hero {
@@ -107,6 +108,7 @@ export interface Mockup05Model {
   summary: Mockup05SummaryCard[];
   rangeLabel: string;
   axisLabels: Mockup05AxisLabel[];
+  nowPercent?: number | null;
   density: Mockup05DensityBucket[];
   groups: Mockup05Group[];
   insights: Mockup05Insight[];

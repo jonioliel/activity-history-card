@@ -17,6 +17,7 @@ import type { ActivityHistoryCardConfig } from "../types";
 
 export interface Mockup05RenderOptions {
   config?: ActivityHistoryCardConfig;
+  nowPercent?: number | null;
   onRefresh?: () => void;
   onFullscreen?: () => void;
   onSegmentClick?: (
@@ -161,6 +162,7 @@ export function renderMockup05Dashboard(
   options: Mockup05RenderOptions = {},
 ): TemplateResult {
   if (!model.groups.length) return renderDashboardEmpty();
+  const renderOptions = { ...options, nowPercent: model.nowPercent };
 
   return html`
     <section
@@ -185,11 +187,11 @@ export function renderMockup05Dashboard(
         class="ahc-dashboard__timeline"
         aria-label="פעילות לפי אזור ורכיב"
       >
-        ${renderAxis(model.axisLabels, options.config)}
+        ${renderAxis(model.axisLabels, options.config, model.nowPercent)}
         <div class="ahc-dashboard__scroll">
           <div class="ahc-dashboard__groups">
             ${model.groups.map((group) =>
-              renderMockup05Group(group, model.axisLabels, options),
+              renderMockup05Group(group, model.axisLabels, renderOptions),
             )}
           </div>
         </div>
@@ -287,6 +289,7 @@ export function renderMockup05Group(
                 renderSegment(segment, "aggregate", options.config),
               ),
               options.config,
+              options.nowPercent,
             )}
           </div>`
         : nothing}
@@ -353,6 +356,7 @@ export function renderMockup05Row(
             }),
           ),
           options.config,
+          options.nowPercent,
         )}
       </div>
     </div>
@@ -521,11 +525,14 @@ function renderTimeGrid(
   variant: "aggregate" | "row" | "density",
   children: TemplateResult | TemplateResult[],
   config?: ActivityHistoryCardConfig,
+  nowPercent?: number | null,
 ): TemplateResult {
   return html`
     <div class=${`ahc-timegrid ahc-timegrid--${variant}`} dir="ltr">
       ${renderGridLines(axisLabels)}
-      ${config?.show_now_line === false ? nothing : renderNowMarker(axisLabels)}
+      ${config?.show_now_line === false
+        ? nothing
+        : renderNowMarker(axisLabels, "line", nowPercent)}
       <div class="ahc-timegrid__segments">${children}</div>
     </div>
   `;
@@ -534,24 +541,27 @@ function renderTimeGrid(
 function renderAxis(
   axisLabels: Mockup05AxisLabel[],
   config?: ActivityHistoryCardConfig,
+  nowPercent?: number | null,
 ): TemplateResult {
   return html`
     <div class="ahc-dashboard__axis" dir="ltr" aria-hidden="true">
       ${renderGridLines(axisLabels)}
       <div class="ahc-dashboard__axis-labels">
-        ${axisLabels.map(
-          (label) => html`
-            <span
-              class="ahc-dashboard__tick ahc-dashboard__axis-label"
-              data-edge=${tickEdge(label.percent)}
-              style=${`left:${label.percent}%`}
-              >${label.label}</span
-            >
-          `,
-        )}
+        ${axisLabels
+          .filter((label) => label.label.trim())
+          .map(
+            (label) => html`
+              <span
+                class="ahc-dashboard__tick ahc-dashboard__axis-label"
+                data-edge=${tickEdge(label.percent)}
+                style=${`left:${label.percent}%`}
+                >${label.label}</span
+              >
+            `,
+          )}
         ${config?.show_now_line === false
           ? nothing
-          : renderNowMarker(axisLabels, "label")}
+          : renderNowMarker(axisLabels, "label", nowPercent)}
       </div>
     </div>
   `;
@@ -565,7 +575,9 @@ function renderGridLines(axisLabels: Mockup05AxisLabel[]): TemplateResult {
       ${labels.map(
         (label) => html`
           <span
-            class="ahc-timegrid__line ahc-timegrid__line--major"
+            class=${label.major === false
+              ? "ahc-timegrid__line ahc-timegrid__line--minor"
+              : "ahc-timegrid__line ahc-timegrid__line--major"}
             style=${`left:${label.percent}%`}
           ></span>
         `,
@@ -577,9 +589,12 @@ function renderGridLines(axisLabels: Mockup05AxisLabel[]): TemplateResult {
 function renderNowMarker(
   axisLabels: Mockup05AxisLabel[],
   labelMode: "line" | "label" = "line",
+  nowPercent?: number | null,
 ): TemplateResult | typeof nothing {
   if (!axisLabels.length) return nothing;
-  const percent = Math.min(98, Math.max(2, axisLabels.at(-1)?.percent ?? 86));
+  if (nowPercent === null) return nothing;
+  const fallbackPercent = axisLabels.at(-1)?.percent ?? 86;
+  const percent = Math.min(98, Math.max(2, nowPercent ?? fallbackPercent));
 
   return html`<span
     class=${labelMode === "label"

@@ -125,6 +125,7 @@ export class ActivityHistoryCard extends LitElement {
   private _backgroundLoading = false;
   private _lastResolvedEntityKey = "";
   private _lastHistoryFetchAt = 0;
+  private _loadedRange?: TimeRange;
   private _refreshTimer?: number;
   private _inFlightHistoryRequest?: Promise<void>;
   private _historyCache = new Map<
@@ -178,6 +179,7 @@ export class ActivityHistoryCard extends LitElement {
 
     this._lastFetchKey = "";
     this._lastResolvedEntityKey = "";
+    this._loadedRange = undefined;
     this._showAllRows = false;
     this._debugLegacyView = false;
     this._expandedInventoryGroups.clear();
@@ -747,7 +749,7 @@ export class ActivityHistoryCard extends LitElement {
       );
     }
 
-    const range = this._resolveRange();
+    const range = this._displayRange();
     switch (this._currentRendererMode()) {
       case "heatmap":
         return renderHeatmapPlaceholder();
@@ -1608,6 +1610,7 @@ export class ActivityHistoryCard extends LitElement {
       historyRecordCount: number,
       discovery = resolved.diagnostics,
     ): void => {
+      this._loadedRange = range;
       this._lastResolvedEntityKey = entityKey;
       this._lastHistoryFetchAt = Date.now();
       this._hasFetchedOnce = true;
@@ -1628,6 +1631,7 @@ export class ActivityHistoryCard extends LitElement {
     };
 
     if (!entities.length) {
+      this._loadedRange = range;
       this._usingMockData = false;
       this._rows = [];
       this._visibleRows = [];
@@ -1741,6 +1745,7 @@ export class ActivityHistoryCard extends LitElement {
 
   private _rebuildGroups(): void {
     const filtered = filterRows(this._rows, this._filter);
+    const range = this._displayRange();
     const rendererMode = this._currentRendererMode();
     const showAllForCuration = rendererMode !== "activity" && this._showAllRows;
     const curated = curateRows(filtered, this._config, {
@@ -1757,7 +1762,7 @@ export class ActivityHistoryCard extends LitElement {
       rendererMode === "activity"
         ? buildActivityDashboardModel(
             this._groups,
-            this._resolveRange(),
+            range,
             this._config,
             curated.diagnostics,
             {
@@ -1874,6 +1879,10 @@ export class ActivityHistoryCard extends LitElement {
     return normalizeRefreshIntervalSeconds(
       this._config?.refresh_interval_seconds,
     );
+  }
+
+  private _displayRange(): TimeRange {
+    return this._loadedRange ?? this._resolveRange();
   }
 
   private _resolveRange(): TimeRange {

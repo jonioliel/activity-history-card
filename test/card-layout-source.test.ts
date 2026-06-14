@@ -11,4 +11,13 @@ describe("activity card body layout source", () => {
     expect(source).toContain('class="ahc__insights-panel"');
     expect(source).toContain("this._renderInsights()");
   });
+
+  it("keeps rendering tied to the loaded history range", () => {
+    expect(source).toContain("private _loadedRange?: TimeRange");
+    expect(source).toContain("private _displayRange(): TimeRange");
+    expect(source).toContain(
+      "return this._loadedRange ?? this._resolveRange()",
+    );
+    expect(source).toContain("const range = this._displayRange()");
+  });
 });

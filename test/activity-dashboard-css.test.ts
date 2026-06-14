@@ -5,7 +5,7 @@ describe("activity dashboard CSS", () => {
   it("styles the area dashboard structure emitted by the renderer", () => {
     [
       "--ahc-insights-width: 340px",
-      "--ahc-dashboard-label-width: 230px",
+      "--ahc-dashboard-label-width: 250px",
       "--ahc-dashboard-row-height: 34px",
       "--ahc-dashboard-segment-height: 11px",
       "--ahc-dashboard-aggregate-height: 13px",

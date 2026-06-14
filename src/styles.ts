@@ -107,7 +107,7 @@ export const activityHistoryCardStyles = css`
     --ahc-activity-segment-min-width: 4px;
     --ahc-activity-group-gap: 12px;
     --ahc-dashboard-row-height: 34px;
-    --ahc-dashboard-label-width: 230px;
+    --ahc-dashboard-label-width: 250px;
     --ahc-dashboard-segment-height: 11px;
     --ahc-dashboard-aggregate-height: 13px;
     --ahc-dashboard-segment-min-width: 6px;
@@ -3256,7 +3256,7 @@ export const activityHistoryCardStyles = css`
     --ahc-orange: #ffa45c;
     --ahc-teal: #7dd3fc;
     --ahc-insights-width: 340px;
-    --ahc-dashboard-label-width: 230px;
+    --ahc-dashboard-label-width: 250px;
     --ahc-dashboard-row-height: 34px;
     --ahc-dashboard-segment-height: 11px;
     --ahc-dashboard-aggregate-height: 13px;
@@ -3886,6 +3886,14 @@ export const activityHistoryCardStyles = css`
     overflow: hidden;
   }
 
+  .ahc-area-card[data-has-activity="false"] {
+    gap: 6px;
+    padding-block: 8px;
+    background:
+      linear-gradient(180deg, rgba(15, 23, 42, 0.48), rgba(2, 6, 23, 0.24)),
+      rgba(15, 23, 42, 0.2);
+  }
+
   .ahc-dashboard-group + .ahc-dashboard-group {
     margin-block-start: 10px;
   }
@@ -4131,6 +4139,11 @@ export const activityHistoryCardStyles = css`
     background:
       linear-gradient(180deg, rgba(15, 23, 42, 0.62), rgba(2, 6, 23, 0.3)),
       rgba(2, 6, 23, 0.22);
+  }
+
+  .ahc-area-card[data-has-activity="false"] .ahc-area-inventory {
+    max-block-size: 82px;
+    margin-block-start: 0;
   }
 
   .ahc-area-card[data-inventory-expanded="true"] .ahc-area-inventory {

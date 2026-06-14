@@ -31,6 +31,7 @@ import {
   renderMockup05Dashboard,
   type Mockup05RenderOptions,
 } from "./mockup05-layout";
+import { buildTimelineAxis } from "./timeline-axis";
 
 export interface ActivityDashboardRendererOptions {
   model: ActivityDashboardModel;
@@ -64,7 +65,7 @@ export function activityDashboardToMockup05Model(
     "expandedInventoryGroups" | "collapsedInventoryGroups" | "showAllInventory"
   > = {},
 ): Mockup05Model {
-  const axisLabels = buildSixAxisLabels(model.range);
+  const axis = buildDashboardAxis(model.range, config);
   const groups = model.groups
     .map((group) => toVisualGroup(group, model, config, options))
     .filter((group): group is Mockup05Group => Boolean(group));
@@ -78,10 +79,34 @@ export function activityDashboardToMockup05Model(
     toolbar: mockup05VisualModel.toolbar,
     summary,
     rangeLabel: rangeLabelFor(model.range),
-    axisLabels,
+    axisLabels: axis.labels,
+    nowPercent: axis.nowPercent,
     density: toVisualDensity(model.densityBuckets),
     groups,
     insights: toVisualInsights(model),
+  };
+}
+
+export function buildDashboardAxis(
+  range: { start: Date; end: Date },
+  config: ActivityHistoryCardConfig = { type: "custom:activity-history-card" },
+  now = new Date(),
+): {
+  labels: Array<{ label: string; percent: number; major?: boolean }>;
+  nowPercent?: number | null;
+} {
+  const axis = buildTimelineAxis(range, {
+    maxMajorTicks: axisMajorTickLimit(config),
+    now,
+  });
+
+  return {
+    labels: axis.ticks.map((tick) => ({
+      label: tick.major ? formatDashboardAxisLabel(tick.time, range, now) : "",
+      percent: tick.percent,
+      major: tick.major,
+    })),
+    nowPercent: axis.nowPercent ?? null,
   };
 }
 
@@ -390,6 +415,15 @@ function fallbackIcon(domain: string): string {
 }
 
 function rangeLabelFor(range: { start: Date; end: Date }): string {
+  const now = new Date();
+  const durationHours = Math.max(
+    1,
+    Math.round((range.end.getTime() - range.start.getTime()) / 3600000),
+  );
+  return `${formatDashboardAxisLabel(range.start, range, now)} - ${formatDashboardAxisLabel(range.end, range, now)} · ${durationLabel(durationHours)}`;
+}
+
+function rangeLabelForLegacy(range: { start: Date; end: Date }): string {
   const durationHours = Math.max(
     1,
     Math.round((range.end.getTime() - range.start.getTime()) / 3600000),
@@ -418,4 +452,63 @@ function buildSixAxisLabels(range: { start: Date; end: Date }): Array<{
       percent,
     };
   });
+}
+
+function durationLabel(durationHours: number): string {
+  return durationHours >= 24
+    ? `${Math.round(durationHours / 24)} ימים`
+    : `${durationHours} שעות`;
+}
+
+function axisMajorTickLimit(config: ActivityHistoryCardConfig): number {
+  if (config.timeline_axis_density === "compact") return 6;
+  if (config.timeline_axis_density === "comfortable") return 8;
+  return 8;
+}
+
+function formatDashboardAxisLabel(
+  date: Date,
+  range: { start: Date; end: Date },
+  now: Date,
+): string {
+  if (sameMinute(date, range.end) && rangeEndsNearNow(range, now)) {
+    return "עכשיו";
+  }
+
+  const durationHours = Math.max(
+    1,
+    (range.end.getTime() - range.start.getTime()) / 3600000,
+  );
+  if (durationHours > 48) {
+    return new Intl.DateTimeFormat("he-IL", {
+      day: "2-digit",
+      month: "2-digit",
+    }).format(date);
+  }
+
+  const duplicatedEndpointTime =
+    sameClockTime(range.start, range.end) &&
+    (sameMinute(date, range.start) || sameMinute(date, range.end));
+  if (duplicatedEndpointTime) {
+    return new Intl.DateTimeFormat("he-IL", {
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date);
+  }
+
+  return formatTime(date);
+}
+
+function rangeEndsNearNow(range: { end: Date }, now: Date): boolean {
+  return Math.abs(now.getTime() - range.end.getTime()) <= 5 * 60 * 1000;
+}
+
+function sameClockTime(a: Date, b: Date): boolean {
+  return a.getHours() === b.getHours() && a.getMinutes() === b.getMinutes();
+}
+
+function sameMinute(a: Date, b: Date): boolean {
+  return Math.abs(a.getTime() - b.getTime()) < 60_000;
 }

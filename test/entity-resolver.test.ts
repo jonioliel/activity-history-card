@@ -323,6 +323,83 @@ describe("resolveEntityMetas", () => {
     ).toBe("מכונת כביסה - blank name");
   });
 
+  it("does not use placeholder NA names when device context is available", async () => {
+    const hass: HomeAssistant = {
+      states: {
+        "switch.na": {
+          entity_id: "switch.na",
+          state: "on",
+          attributes: { friendly_name: "NA" },
+          last_changed: "2026-01-01T00:00:00.000Z",
+          last_updated: "2026-01-01T00:00:00.000Z",
+        },
+      },
+      callWS: async <T = unknown>({
+        type,
+      }: Record<string, unknown>): Promise<T> => {
+        let result: unknown = [];
+        if (type === "config/area_registry/list")
+          result = [{ area_id: "technical", name: "טכני" }];
+        if (type === "config/device_registry/list") {
+          result = [
+            {
+              id: "device-na",
+              area_id: "technical",
+              name_by_user: "שער חניה",
+            },
+          ];
+        }
+        if (type === "config/entity_registry/list") {
+          result = [
+            {
+              entity_id: "switch.na",
+              device_id: "device-na",
+              original_name: "NA",
+            },
+          ];
+        }
+        return result as T;
+      },
+      connection: {
+        subscribeMessage: async () => () => undefined,
+      },
+    };
+
+    const rows = await resolveEntityMetas(
+      { type: "custom:activity-history-card", auto_discover: true },
+      hass,
+    );
+
+    expect(rows[0]?.name).toBe("שער חניה");
+  });
+
+  it("falls back to a readable unnamed label instead of a bare NA name", async () => {
+    const rows = await resolveEntityMetas(
+      {
+        type: "custom:activity-history-card",
+        auto_discover: false,
+        entities: ["switch.na"],
+      },
+      {
+        states: {
+          "switch.na": {
+            entity_id: "switch.na",
+            state: "on",
+            attributes: { friendly_name: "NA" },
+            last_changed: "2026-01-01T00:00:00.000Z",
+            last_updated: "2026-01-01T00:00:00.000Z",
+          },
+        },
+        callWS: async <T = unknown>() => [] as T,
+        connection: {
+          subscribeMessage: async () => () => undefined,
+        },
+      },
+    );
+
+    expect(rows[0]?.name).not.toBe("NA");
+  });
+
   it("reports registry fallback when Home Assistant registries are unavailable", async () => {
     const hass: HomeAssistant = {
       states: {

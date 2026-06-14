@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import type { ActivityDashboardModel } from "../src/activity-dashboard-model";
-import { activityDashboardToMockup05Model } from "../src/renderers/activity-dashboard-renderer";
+import {
+  activityDashboardToMockup05Model,
+  buildDashboardAxis,
+} from "../src/renderers/activity-dashboard-renderer";
 
 const range = {
   start: new Date("2026-01-01T00:00:00.000Z"),
@@ -131,7 +134,11 @@ describe("activity dashboard visual model mapping", () => {
       {},
     );
 
-    expect(visual.axisLabels).toHaveLength(6);
+    const majorAxisLabels = visual.axisLabels.filter(
+      (label) => label.major !== false,
+    );
+    expect(majorAxisLabels.length).toBeGreaterThanOrEqual(4);
+    expect(majorAxisLabels.length).toBeLessThanOrEqual(8);
     expect(visual.summary.map((item) => item.id)).toEqual([
       "active-now",
       "active-components",
@@ -177,5 +184,28 @@ describe("activity dashboard visual model mapping", () => {
 
     expect(visual.groups[0]?.rows).toHaveLength(0);
     expect(visual.groups[0]?.inventoryItems.length).toBeGreaterThan(0);
+  });
+
+  it("builds a rolling 24h axis from real clock ticks and a real now position", () => {
+    const rollingRange = {
+      start: new Date("2026-01-01T10:47:00.000Z"),
+      end: new Date("2026-01-02T10:47:00.000Z"),
+    };
+    const axis = buildDashboardAxis(
+      rollingRange,
+      {
+        type: "custom:activity-history-card",
+        timeline_axis_density: "comfortable",
+      },
+      rollingRange.end,
+    );
+    const majorLabels = axis.labels.filter(
+      (label) => label.major && label.label,
+    );
+    const innerLabels = majorLabels.slice(1, -1).map((label) => label.label);
+
+    expect(axis.nowPercent).toBe(100);
+    expect(majorLabels.at(-1)?.label).toBe("עכשיו");
+    expect(innerLabels.every((label) => !label.includes(":47"))).toBe(true);
   });
 });
