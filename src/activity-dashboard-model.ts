@@ -135,6 +135,7 @@ export interface ActivityDashboardSelection {
 
 export interface BuildActivityDashboardModelOptions {
   inventoryRows?: TimelineRow[];
+  selectedGroups?: TimelineGroup[];
   selectedAreas?: string[];
   groupBy?: FilterState["groupBy"];
 }
@@ -196,6 +197,33 @@ export function selectActivityDashboardGroups(
   };
 }
 
+function selectProvidedActivityDashboardGroups(
+  selectedGroups: TimelineGroup[],
+  sourceGroups: TimelineGroup[],
+): ActivityDashboardSelection {
+  const visibleGroups = selectedGroups
+    .map((group) => ({
+      ...group,
+      rows: group.rows.filter(rowHasVisibleActivity),
+    }))
+    .filter((group) => group.rows.length > 0);
+  const visibleRowCount = visibleGroups.reduce(
+    (sum, group) => sum + group.rows.length,
+    0,
+  );
+  const totalRowCount = sourceGroups.reduce(
+    (sum, group) => sum + group.rows.filter(rowHasVisibleActivity).length,
+    0,
+  );
+
+  return {
+    groups: visibleGroups,
+    totalRowCount,
+    visibleRowCount,
+    hiddenRowCount: Math.max(0, totalRowCount - visibleRowCount),
+  };
+}
+
 export function buildActivityDashboardModel(
   groups: TimelineGroup[],
   range: TimeRange,
@@ -203,8 +231,13 @@ export function buildActivityDashboardModel(
   curation?: RowCurationDiagnostics,
   options: BuildActivityDashboardModelOptions = {},
 ): ActivityDashboardModel {
-  const selection = selectActivityDashboardGroups(groups, config);
+  const selection = options.selectedGroups
+    ? selectProvidedActivityDashboardGroups(options.selectedGroups, groups)
+    : selectActivityDashboardGroups(groups, config);
   const activityRows = selection.groups.flatMap((group) => group.rows);
+  const sourceActivityRows = groups
+    .flatMap((group) => group.rows)
+    .filter(rowHasVisibleActivity);
   const inventoryRows =
     options.inventoryRows ?? groups.flatMap((group) => group.rows);
   const inventoryGroups = buildInventoryGroups(
@@ -226,7 +259,11 @@ export function buildActivityDashboardModel(
     selection.hiddenRowCount,
     totalRowsBeforeCuration - selection.visibleRowCount,
   );
-  const densityBuckets = calculateActivityDensity(activityRows, range, config);
+  const densityBuckets = calculateActivityDensity(
+    sourceActivityRows.length ? sourceActivityRows : activityRows,
+    range,
+    config,
+  );
   const totalVisibleActiveMs = activityRows.reduce(
     (sum, row) => sum + row.totalActiveMs,
     0,
@@ -312,17 +349,26 @@ function toDashboardGroups(
     inventoryGroups.map((group) => [group.id, group]),
   );
   const orderedIds = [
-    ...new Set([...selectedMap.keys(), ...inventoryMap.keys()]),
+    ...new Set([
+      ...selectedMap.keys(),
+      ...sourceMap.keys(),
+      ...inventoryMap.keys(),
+    ]),
   ]
     .map((id) => {
       const selected = selectedMap.get(id);
+      const source = sourceMap.get(id);
       const inventory = inventoryMap.get(id);
+      const sourceActivityRows =
+        source?.rows.filter(rowHasVisibleActivity) ?? [];
       return {
         id,
-        totalActiveMs: selected?.totalActiveMs ?? 0,
-        activityCount: selected?.rows.length ?? 0,
+        totalActiveMs:
+          selected?.totalActiveMs ??
+          sourceActivityRows.reduce((sum, row) => sum + row.totalActiveMs, 0),
+        activityCount: selected?.rows.length ?? sourceActivityRows.length,
         inventoryCount: inventory?.rows.length ?? 0,
-        title: selected?.title ?? inventory?.title ?? id,
+        title: selected?.title ?? source?.title ?? inventory?.title ?? id,
       };
     })
     .filter((item) => item.activityCount > 0 || item.inventoryCount > 0)
@@ -352,15 +398,25 @@ function toDashboardGroup(
   range: TimeRange,
 ): ActivityDashboardGroup {
   const group = selectedGroup ?? sourceGroup;
+  const sourceRows = sourceGroup?.rows ?? selectedGroup?.rows ?? [];
   const activityRows = (selectedGroup?.rows ?? []).map((row) =>
     toDashboardRow(row, range),
   );
   const inventoryItems = (inventoryGroup?.rows ?? [])
     .map(toInventoryItem)
     .sort(sortInventoryItems);
-  const eventCount = activityRows.reduce((sum, row) => sum + row.eventCount, 0);
-  const activeNowCount = activityRows.filter((row) => row.activeNow).length;
-  const sourceActivityCount = sourceGroup?.rows.length ?? activityRows.length;
+  const sourceActivityRows = sourceRows.filter(rowHasVisibleActivity);
+  const metricRows = sourceActivityRows.length
+    ? sourceActivityRows
+    : (selectedGroup?.rows ?? []);
+  const metricActiveMs = metricRows.reduce(
+    (sum, row) => sum + row.totalActiveMs,
+    0,
+  );
+  const metricEventCount = metricRows.reduce(
+    (sum, row) => sum + row.eventCount,
+    0,
+  );
 
   return {
     id: selectedGroup?.id ?? inventoryGroup?.id ?? sourceGroup?.id ?? "all",
@@ -372,17 +428,17 @@ function toDashboardGroup(
     icon: selectedGroup?.icon ?? inventoryGroup?.icon ?? sourceGroup?.icon,
     area: selectedGroup?.title ?? inventoryGroup?.area ?? sourceGroup?.title,
     totalEntityCount: inventoryItems.length,
-    visibleActivityRowCount: activityRows.length,
+    visibleActivityRowCount: sourceActivityRows.length || activityRows.length,
     inventoryItemCount: inventoryItems.length,
-    hiddenRowsCount: Math.max(0, sourceActivityCount - activityRows.length),
-    totalActiveMs: activityRows.reduce(
-      (sum, row) => sum + row.totalActiveMs,
+    hiddenRowsCount: Math.max(
       0,
+      sourceActivityRows.length - activityRows.length,
     ),
-    eventCount,
-    activeNowCount,
+    totalActiveMs: metricActiveMs,
+    eventCount: metricEventCount,
+    activeNowCount: metricRows.filter(isActiveNow).length,
     aggregateSegments: buildAggregateSegments(
-      selectedGroup?.rows ?? [],
+      metricRows,
       range,
       group?.title ?? inventoryGroup?.title ?? "פעילות",
     ),

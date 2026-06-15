@@ -165,9 +165,9 @@ export function renderMockup05Dashboard(
 ): TemplateResult {
   if (!model.groups.length) return renderDashboardEmpty();
   const renderOptions = { ...options, nowPercent: model.nowPercent };
-  const activeGroups = model.groups.filter((group) => group.rows.length > 0);
+  const activeGroups = model.groups.filter((group) => groupHasActivity(group));
   const inactiveGroups = model.groups.filter(
-    (group) => group.rows.length === 0,
+    (group) => !groupHasActivity(group),
   );
   const visibleInactiveGroups = inactiveGroups.slice(0, 3);
   const hiddenInactiveCount = Math.max(
@@ -259,13 +259,18 @@ export function renderMockup05Density(
   `;
 }
 
+function groupHasActivity(group: Mockup05Group): boolean {
+  return group.rows.length > 0 || group.aggregateSegments.length > 0;
+}
+
 export function renderMockup05Group(
   group: Mockup05Group,
   axisLabels: Mockup05AxisLabel[] = [],
   options: Mockup05RenderOptions = {},
 ): TemplateResult {
   const expanded = group.expandedInventory === true;
-  const hasActivity = group.rows.length > 0;
+  const hasRows = group.rows.length > 0;
+  const hasActivity = hasRows || group.aggregateSegments.length > 0;
   const hasInventory = group.inventoryItems.length > 0;
   const rowLimit = options.config?.desktop_density === "ultra_compact" ? 3 : 4;
   const visibleRows = group.rows.slice(0, rowLimit);
@@ -328,7 +333,7 @@ export function renderMockup05Group(
       <div
         class="ahc-area-lane__content ahc-area-card__content ahc-dashboard-group__body"
       >
-        ${hasActivity
+        ${hasRows
           ? html`<section
               class="ahc-area-card__activity"
               aria-label=${`פעילות באזור ${group.title}`}

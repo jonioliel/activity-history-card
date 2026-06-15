@@ -1789,6 +1789,19 @@ export class ActivityHistoryCard extends LitElement {
     });
     this._visibleRows = curated.rows;
     this._curation = curated.diagnostics;
+    const dashboardSourceRows = [
+      ...curated.rows,
+      ...curated.hiddenRows.filter(
+        (row) => curated.hiddenReasons.get(row.entity.entity_id) === "max_rows",
+      ),
+    ];
+    const dashboardSourceGroups = groupRows(
+      dashboardSourceRows,
+      this._filter.groupBy,
+    ).filter(
+      (group) =>
+        this._config.hide_empty_groups === false || group.rows.length > 0,
+    );
     this._groups = groupRows(curated.rows, this._filter.groupBy).filter(
       (group) =>
         this._config.hide_empty_groups === false || group.rows.length > 0,
@@ -1796,11 +1809,12 @@ export class ActivityHistoryCard extends LitElement {
     this._dashboardModel =
       rendererMode === "activity"
         ? buildActivityDashboardModel(
-            this._groups,
+            dashboardSourceGroups,
             range,
             this._config,
             curated.diagnostics,
             {
+              selectedGroups: this._groups,
               inventoryRows: filtered,
               selectedAreas: this._filter.areas,
               groupBy: this._filter.groupBy,

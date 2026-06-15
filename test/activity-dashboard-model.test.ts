@@ -139,6 +139,93 @@ describe("buildActivityDashboardModel", () => {
     expect(model.hiddenRowsCount).toBe(6);
   });
 
+  it("keeps capped active areas marked as active through aggregate activity", () => {
+    const visible = row("switch.visible", {
+      area: "visible-area",
+      activeMs: 2 * 60 * 60 * 1000,
+    });
+    const capped = row("switch.capped", {
+      area: "capped-area",
+      activeMs: 90 * 60 * 1000,
+    });
+    const model = buildActivityDashboardModel(
+      groupRows([visible, capped], "area"),
+      range,
+      config(),
+      undefined,
+      {
+        selectedGroups: groupRows([visible], "area"),
+        inventoryRows: [visible, capped],
+        groupBy: "area",
+      },
+    );
+    const cappedGroup = model.groups.find(
+      (group) => group.title === "capped-area",
+    );
+
+    expect(cappedGroup?.activityRows).toHaveLength(0);
+    expect(cappedGroup?.visibleActivityRowCount).toBe(1);
+    expect(cappedGroup?.totalActiveMs).toBe(90 * 60 * 1000);
+    expect(cappedGroup?.aggregateSegments.length).toBeGreaterThan(0);
+  });
+
+  it("uses source activity for density and active groups when no rows are selected", () => {
+    const hiddenActive = row("switch.hidden_active", {
+      area: "hidden-area",
+      activeMs: 45 * 60 * 1000,
+    });
+    const model = buildActivityDashboardModel(
+      groupRows([hiddenActive], "area"),
+      range,
+      config(),
+      undefined,
+      {
+        selectedGroups: [],
+        inventoryRows: [hiddenActive],
+        groupBy: "area",
+      },
+    );
+    const hiddenGroup = model.groups.find(
+      (group) => group.title === "hidden-area",
+    );
+
+    expect(hiddenGroup?.activityRows).toHaveLength(0);
+    expect(hiddenGroup?.totalActiveMs).toBe(45 * 60 * 1000);
+    expect(hiddenGroup?.aggregateSegments.length).toBeGreaterThan(0);
+    expect(model.densityBuckets.some((bucket) => bucket.intensity > 0)).toBe(
+      true,
+    );
+  });
+
+  it("keeps aggregate group metrics based on hidden capped rows in the same area", () => {
+    const visible = row("switch.visible", {
+      area: "shared-area",
+      activeMs: 30 * 60 * 1000,
+    });
+    const hidden = row("switch.hidden", {
+      area: "shared-area",
+      activeMs: 75 * 60 * 1000,
+    });
+    const model = buildActivityDashboardModel(
+      groupRows([visible, hidden], "area"),
+      range,
+      config(),
+      undefined,
+      {
+        selectedGroups: groupRows([visible], "area"),
+        inventoryRows: [visible, hidden],
+        groupBy: "area",
+      },
+    );
+    const group = model.groups.find((group) => group.title === "shared-area");
+
+    expect(group?.activityRows).toHaveLength(1);
+    expect(group?.hiddenRowsCount).toBe(1);
+    expect(group?.visibleActivityRowCount).toBe(2);
+    expect(group?.totalActiveMs).toBe(105 * 60 * 1000);
+    expect(group?.eventCount).toBe(2);
+  });
+
   it("builds summary and insights from the visible model rows", () => {
     const model = buildActivityDashboardModel(
       [

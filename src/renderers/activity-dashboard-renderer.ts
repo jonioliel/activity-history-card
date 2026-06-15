@@ -215,7 +215,10 @@ function toVisualGroup(
   const inventoryEnabled =
     config.show_area_inventory !== false &&
     config.area_inventory_mode !== "off";
-  const hasActivity = group.activityRows.length > 0;
+  const hasActivity =
+    group.activityRows.length > 0 ||
+    group.aggregateSegments.length > 0 ||
+    group.totalActiveMs > 0;
   const hasInventory = inventoryEnabled && group.inventoryItems.length > 0;
 
   if (!hasActivity && !hasInventory) return undefined;
