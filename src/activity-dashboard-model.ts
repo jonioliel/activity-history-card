@@ -136,6 +136,7 @@ export interface ActivityDashboardSelection {
 export interface BuildActivityDashboardModelOptions {
   inventoryRows?: TimelineRow[];
   selectedGroups?: TimelineGroup[];
+  includeInactiveRows?: boolean;
   selectedAreas?: string[];
   groupBy?: FilterState["groupBy"];
 }
@@ -200,11 +201,15 @@ export function selectActivityDashboardGroups(
 function selectProvidedActivityDashboardGroups(
   selectedGroups: TimelineGroup[],
   sourceGroups: TimelineGroup[],
+  includeInactiveRows = false,
 ): ActivityDashboardSelection {
+  const rowFilter = includeInactiveRows
+    ? () => true
+    : (row: TimelineRow) => rowHasVisibleActivity(row);
   const visibleGroups = selectedGroups
     .map((group) => ({
       ...group,
-      rows: group.rows.filter(rowHasVisibleActivity),
+      rows: group.rows.filter(rowFilter),
     }))
     .filter((group) => group.rows.length > 0);
   const visibleRowCount = visibleGroups.reduce(
@@ -212,7 +217,7 @@ function selectProvidedActivityDashboardGroups(
     0,
   );
   const totalRowCount = sourceGroups.reduce(
-    (sum, group) => sum + group.rows.filter(rowHasVisibleActivity).length,
+    (sum, group) => sum + group.rows.filter(rowFilter).length,
     0,
   );
 
@@ -232,7 +237,11 @@ export function buildActivityDashboardModel(
   options: BuildActivityDashboardModelOptions = {},
 ): ActivityDashboardModel {
   const selection = options.selectedGroups
-    ? selectProvidedActivityDashboardGroups(options.selectedGroups, groups)
+    ? selectProvidedActivityDashboardGroups(
+        options.selectedGroups,
+        groups,
+        options.includeInactiveRows,
+      )
     : selectActivityDashboardGroups(groups, config);
   const activityRows = selection.groups.flatMap((group) => group.rows);
   const sourceActivityRows = groups

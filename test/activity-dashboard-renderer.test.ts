@@ -172,6 +172,36 @@ describe("renderActivityDashboard", () => {
     expect(html).toContain("width 4.20%");
   });
 
+  it("renders every row in an area instead of collapsing after the first few", () => {
+    const baseGroup = model().groups[0]!;
+    const baseRow = baseGroup.activityRows[0]!;
+    const activityRows = Array.from({ length: 6 }, (_, index) => ({
+      ...baseRow,
+      entityId: `switch.entity_${index}`,
+      name: `Entity ${index}`,
+      segments: index === 0 ? baseRow.segments : [],
+    }));
+    const html = flattenTemplate(
+      renderActivityDashboard({
+        model: model({
+          visibleRowsCount: activityRows.length,
+          groups: [
+            {
+              ...baseGroup,
+              visibleActivityRowCount: 1,
+              activityRows,
+            },
+          ],
+        }),
+        config: { type: "custom:activity-history-card" },
+      }),
+    );
+
+    expect(html).toContain("Entity 0");
+    expect(html).toContain("Entity 5");
+    expect(html).not.toContain("ahc-dashboard-group__more");
+  });
+
   it("keeps inventory outside the chart by default for an all-areas dashboard", () => {
     const html = flattenTemplate(
       renderActivityDashboard({

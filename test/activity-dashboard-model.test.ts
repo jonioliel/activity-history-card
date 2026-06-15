@@ -296,6 +296,32 @@ describe("buildActivityDashboardModel", () => {
     ]);
   });
 
+  it("can render inactive accessories as timeline rows in area dashboard mode", () => {
+    const active = row("switch.active", { name: "תאורה ראשית" });
+    const inactive = row("switch.inactive", {
+      name: "שקע שירות",
+      activeMs: 0,
+    });
+    const model = buildActivityDashboardModel(
+      groupRows([active, inactive], "area"),
+      range,
+      config(),
+      undefined,
+      {
+        selectedGroups: groupRows([active, inactive], "area"),
+        includeInactiveRows: true,
+        inventoryRows: [active, inactive],
+        groupBy: "area",
+      },
+    );
+    const names = model.groups[0]?.activityRows.map((item) => item.name);
+
+    expect(model.visibleRowsCount).toBe(2);
+    expect(model.hiddenRowsCount).toBe(0);
+    expect(names).toEqual(["תאורה ראשית", "שקע שירות"]);
+    expect(model.groups[0]?.activityRows[1]?.segments).toEqual([]);
+  });
+
   it("keeps every filtered area visible through inventory even without activity", () => {
     const active = row("switch.active", {
       name: "תאורה ראשית",

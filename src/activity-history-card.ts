@@ -64,6 +64,7 @@ import type {
 } from "./types";
 
 const CARD_VERSION = "0.1.0";
+const ACTIVITY_DASHBOARD_ROW_CAP = 10_000;
 type EmptyStateReason =
   | "no_entities_selected"
   | "no_resolved_entities"
@@ -1787,14 +1788,40 @@ export class ActivityHistoryCard extends LitElement {
       showAll: showAllForCuration,
       groupBy: this._filter.groupBy,
     });
-    this._visibleRows = curated.rows;
-    this._curation = curated.diagnostics;
-    const dashboardSourceRows = [
-      ...curated.rows,
-      ...curated.hiddenRows.filter(
-        (row) => curated.hiddenReasons.get(row.entity.entity_id) === "max_rows",
-      ),
-    ];
+    const dashboardCurated =
+      rendererMode === "activity"
+        ? curateRows(
+            filtered,
+            {
+              ...this._config,
+              hide_empty_rows: false,
+              show_inactive_baselines: true,
+              max_rows_per_group: ACTIVITY_DASHBOARD_ROW_CAP,
+              max_total_rows: ACTIVITY_DASHBOARD_ROW_CAP,
+              max_visible_rows: ACTIVITY_DASHBOARD_ROW_CAP,
+            },
+            {
+              groupBy: this._filter.groupBy,
+            },
+          )
+        : curated;
+    const displayRows =
+      rendererMode === "activity" ? dashboardCurated.rows : curated.rows;
+    this._visibleRows = displayRows;
+    this._curation =
+      rendererMode === "activity"
+        ? dashboardCurated.diagnostics
+        : curated.diagnostics;
+    const dashboardSourceRows =
+      rendererMode === "activity"
+        ? dashboardCurated.rows
+        : [
+            ...curated.rows,
+            ...curated.hiddenRows.filter(
+              (row) =>
+                curated.hiddenReasons.get(row.entity.entity_id) === "max_rows",
+            ),
+          ];
     const dashboardSourceGroups = groupRows(
       dashboardSourceRows,
       this._filter.groupBy,
@@ -1802,7 +1829,7 @@ export class ActivityHistoryCard extends LitElement {
       (group) =>
         this._config.hide_empty_groups === false || group.rows.length > 0,
     );
-    this._groups = groupRows(curated.rows, this._filter.groupBy).filter(
+    this._groups = groupRows(displayRows, this._filter.groupBy).filter(
       (group) =>
         this._config.hide_empty_groups === false || group.rows.length > 0,
     );
@@ -1812,9 +1839,10 @@ export class ActivityHistoryCard extends LitElement {
             dashboardSourceGroups,
             range,
             this._config,
-            curated.diagnostics,
+            dashboardCurated.diagnostics,
             {
               selectedGroups: this._groups,
+              includeInactiveRows: true,
               inventoryRows: filtered,
               selectedAreas: this._filter.areas,
               groupBy: this._filter.groupBy,
@@ -1833,7 +1861,7 @@ export class ActivityHistoryCard extends LitElement {
           );
     if (this._rows.length && !filtered.length) {
       this._emptyReason = "all_entities_filtered";
-    } else if (filtered.length && !curated.rows.length) {
+    } else if (filtered.length && !displayRows.length) {
       this._emptyReason = "no_meaningful_activity";
     } else if (
       this._emptyReason === "all_entities_filtered" ||

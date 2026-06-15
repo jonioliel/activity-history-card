@@ -165,15 +165,6 @@ export function renderMockup05Dashboard(
 ): TemplateResult {
   if (!model.groups.length) return renderDashboardEmpty();
   const renderOptions = { ...options, nowPercent: model.nowPercent };
-  const activeGroups = model.groups.filter((group) => groupHasActivity(group));
-  const inactiveGroups = model.groups.filter(
-    (group) => !groupHasActivity(group),
-  );
-  const visibleInactiveGroups = inactiveGroups.slice(0, 3);
-  const hiddenInactiveCount = Math.max(
-    0,
-    inactiveGroups.length - visibleInactiveGroups.length,
-  );
   const openInventoryGroup = options.openInventoryGroupId
     ? model.groups.find((group) => group.id === options.openInventoryGroupId)
     : undefined;
@@ -204,15 +195,11 @@ export function renderMockup05Dashboard(
         ${renderAxis(model.axisLabels, options.config, model.nowPercent)}
         <div class="ahc-dashboard__scroll">
           <div class="ahc-dashboard__groups ahc-dashboard__lanes">
-            ${activeGroups.map((group) =>
-              renderMockup05Group(group, model.axisLabels, renderOptions),
+            ${model.groups.map((group) =>
+              group.rows.length
+                ? renderMockup05Group(group, model.axisLabels, renderOptions)
+                : renderInactiveAreaSummary(group, renderOptions),
             )}
-            ${visibleInactiveGroups.map((group) =>
-              renderInactiveAreaSummary(group, renderOptions),
-            )}
-            ${hiddenInactiveCount > 0
-              ? renderHiddenInactiveSummary(hiddenInactiveCount)
-              : nothing}
           </div>
         </div>
         ${openInventoryGroup
@@ -260,7 +247,10 @@ export function renderMockup05Density(
 }
 
 function groupHasActivity(group: Mockup05Group): boolean {
-  return group.rows.length > 0 || group.aggregateSegments.length > 0;
+  return (
+    group.aggregateSegments.length > 0 ||
+    group.rows.some((row) => row.segments.length > 0)
+  );
 }
 
 export function renderMockup05Group(
@@ -270,11 +260,10 @@ export function renderMockup05Group(
 ): TemplateResult {
   const expanded = group.expandedInventory === true;
   const hasRows = group.rows.length > 0;
-  const hasActivity = hasRows || group.aggregateSegments.length > 0;
+  const hasActivity = groupHasActivity(group);
   const hasInventory = group.inventoryItems.length > 0;
-  const rowLimit = options.config?.desktop_density === "ultra_compact" ? 3 : 4;
-  const visibleRows = group.rows.slice(0, rowLimit);
-  const hiddenRowCount = Math.max(0, group.rows.length - visibleRows.length);
+  const visibleRows = group.rows;
+  const hiddenRowCount = 0;
   const inlineInventory = expanded && hasInventory;
 
   return html`
