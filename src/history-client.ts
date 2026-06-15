@@ -108,10 +108,10 @@ function normalizeHistoryArray(
       const entityId = stringValue(record.entity_id) ?? lastEntityId;
       if (entityId) lastEntityId = entityId;
       const lastChanged =
-        stringValue(record.last_changed) ??
-        stringValue(record.lc) ??
-        stringValue(record.last_updated) ??
-        stringValue(record.lu);
+        timestampValue(record.last_changed) ??
+        timestampValue(record.lc) ??
+        timestampValue(record.last_updated) ??
+        timestampValue(record.lu);
       const state = stringValue(record.state) ?? stringValue(record.s);
       if (!entityId || !state || !lastChanged) return undefined;
       const attrs = objectValue(record.attributes) ?? objectValue(record.a);
@@ -122,7 +122,7 @@ function normalizeHistoryArray(
       };
       if (attrs) normalized.attributes = attrs;
       const lastUpdated =
-        stringValue(record.last_updated) ?? stringValue(record.lu);
+        timestampValue(record.last_updated) ?? timestampValue(record.lu);
       if (lastUpdated) normalized.last_updated = lastUpdated;
       return normalized;
     })
@@ -131,6 +131,14 @@ function normalizeHistoryArray(
 
 function stringValue(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
+}
+
+function timestampValue(value: unknown): string | undefined {
+  if (typeof value === "string") return value;
+  if (typeof value !== "number" || !Number.isFinite(value)) return undefined;
+  const ms = value < 1_000_000_000_000 ? value * 1000 : value;
+  const date = new Date(ms);
+  return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
 }
 
 function objectValue(value: unknown): Record<string, unknown> | undefined {

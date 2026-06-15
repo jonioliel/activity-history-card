@@ -51,6 +51,33 @@ describe("normalizeHistoryResponse", () => {
       },
     ]);
   });
+
+  it("normalizes numeric Home Assistant compact timestamps", () => {
+    const result = normalizeHistoryResponse(
+      {
+        "switch.test": [
+          { s: "on", lu: 1781460000 },
+          { s: "off", lc: 1781460300, lu: 1781460301 },
+        ],
+      },
+      ["switch.test"],
+    );
+
+    expect(result["switch.test"]).toEqual([
+      {
+        entity_id: "switch.test",
+        state: "on",
+        last_changed: "2026-06-14T18:00:00.000Z",
+        last_updated: "2026-06-14T18:00:00.000Z",
+      },
+      {
+        entity_id: "switch.test",
+        state: "off",
+        last_changed: "2026-06-14T18:05:00.000Z",
+        last_updated: "2026-06-14T18:05:01.000Z",
+      },
+    ]);
+  });
 });
 
 describe("getHistoryRequestPlan", () => {
